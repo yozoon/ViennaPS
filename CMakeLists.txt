@@ -112,6 +112,6 @@ install(FILES ${HEADER_FILES} DESTINATION "include/${PROJECT_NAME}/Models")
 file(GLOB HEADER_FILES "${PROJECT_SOURCE_DIR}/${PROJECT_NAME}/Geometries/*.hpp")
 install(FILES ${HEADER_FILES} DESTINATION "include/${PROJECT_NAME}/Geometries")
 
-# Install all headers files from DenseCellSet subdirectory 
+# Install all headers files from DenseCellSet subdirectory
 file(GLOB HEADER_FILES "${PROJECT_SOURCE_DIR}/${PROJECT_NAME}/DenseCellSet/*.hpp")
 install(FILES ${HEADER_FILES} DESTINATION "include/${PROJECT_NAME}/DenseCellSet")

@@ -5,8 +5,8 @@
 #include <lsDomain.hpp>
 #include <lsMakeGeometry.hpp>
 
-#include <ViennaPS/psDomain.hpp>
 #include <ViennaPS/Geometries/psMakeTrench.hpp>
+#include <ViennaPS/psDomain.hpp>
 
 /**
   Creates a hole geometry in z direction. For 2D geometries a regular trench is
