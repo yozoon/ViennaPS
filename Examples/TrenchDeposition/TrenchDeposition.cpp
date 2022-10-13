@@ -1,8 +1,8 @@
-#include <Geometries/psMakeTrench.hpp>
-#include <SimpleDeposition.hpp>
-#include <psProcess.hpp>
-#include <psToSurfaceMesh.hpp>
-#include <psVTKWriter.hpp>
+#include <ViennaPS/Geometries/psMakeTrench.hpp>
+#include <ViennaPS/Models/SimpleDeposition.hpp>
+#include <ViennaPS/psProcess.hpp>
+#include <ViennaPS/psToSurfaceMesh.hpp>
+#include <ViennaPS/psVTKWriter.hpp>
 
 int main(int argc, char *argv[]) {
   using NumericType = double;

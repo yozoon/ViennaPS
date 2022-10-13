@@ -1,8 +1,8 @@
-#include <Geometries/psMakeHole.hpp>
-#include <SF6O2Etching.hpp>
-#include <psProcess.hpp>
-#include <psToSurfaceMesh.hpp>
-#include <psVTKWriter.hpp>
+#include <ViennaPS/Geometries/psMakeHole.hpp>
+#include <ViennaPS/Models/SF6O2Etching.hpp>
+#include <ViennaPS/psProcess.hpp>
+#include <ViennaPS/psToSurfaceMesh.hpp>
+#include <ViennaPS/psVTKWriter.hpp>
 
 #include "ConfigParser.hpp"
 

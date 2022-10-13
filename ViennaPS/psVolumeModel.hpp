@@ -1,9 +1,9 @@
 #ifndef PS_VOLUME_MODEL
 #define PS_VOLUME_MODEL
 
-#include <csTracing.hpp>
-#include <psDomain.hpp>
-#include <psSmartPointer.hpp>
+#include <ViennaPS/psDomain.hpp>
+#include <ViennaPS/psSmartPointer.hpp>
+#include <ViennaPS/DenseCellSet/csTracing.hpp>
 
 template <typename NumericType, int D> class psVolumeModel {
 protected:

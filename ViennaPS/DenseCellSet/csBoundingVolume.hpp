@@ -1,10 +1,11 @@
-#pragma once
+#ifndef CS_BOUNDING_VOLUME_HPP
+#define CS_BOUNDING_VOLUME_HPP
 
 #include <set>
 
-#include <csUtil.hpp>
-
 #include <lsSmartPointer.hpp>
+
+#include "csUtil.hpp"
 
 template <class T, int D> class csBoundingVolume {
 private:
@@ -204,3 +205,5 @@ private:
         BVH1, BVH2, BVH3, BVH4, BVH5, BVH6, BVH7, BVH8};
   }
 };
+
+#endif

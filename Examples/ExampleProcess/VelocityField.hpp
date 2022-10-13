@@ -2,9 +2,10 @@
 #define VELOCITY_FIELD_HPP
 
 #include <iostream>
-#include <psSmartPointer.hpp>
-#include <psVelocityField.hpp>
 #include <vector>
+
+#include <ViennaPS/psSmartPointer.hpp>
+#include <ViennaPS/psVelocityField.hpp>
 
 template <class T> class VelocityField : public psVelocityField<T> {
 public:

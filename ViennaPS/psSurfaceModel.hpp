@@ -1,10 +1,11 @@
 #ifndef PS_SURFACE_MODEL
 #define PS_SURFACE_MODEL
 
-#include <psPointData.hpp>
-#include <psProcessParams.hpp>
-#include <psSmartPointer.hpp>
 #include <vector>
+
+#include <ViennaPS/psPointData.hpp>
+#include <ViennaPS/psProcessParams.hpp>
+#include <ViennaPS/psSmartPointer.hpp>
 
 template <typename NumericType> class psSurfaceModel {
 protected:

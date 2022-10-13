@@ -1,10 +1,11 @@
-#pragma once
+#ifndef PS_MAKE_TRENCH_HPP
+#define PS_MAKE_TRENCH_HPP
 
 #include <lsBooleanOperation.hpp>
 #include <lsDomain.hpp>
 #include <lsMakeGeometry.hpp>
 
-#include <psDomain.hpp>
+#include <ViennaPS/psDomain.hpp>
 
 /**
   Creates a trench geometry in z(3D)/y(2D) direction.
@@ -118,3 +119,5 @@ public:
     domain->insertNextLevelSet(substrate, false);
   }
 };
+
+#endif

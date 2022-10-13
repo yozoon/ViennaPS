@@ -1,9 +1,8 @@
-#include <csTracing.hpp>
-#include <csTracingParticle.hpp>
-
-#include <psProcessModel.hpp>
-
 #include <rayUtil.hpp>
+
+#include <ViennaPS/psProcessModel.hpp>
+#include <ViennaPS/DenseCellSet/csTracing.hpp>
+#include <ViennaPS/DenseCellSet/csTracingParticle.hpp>
 
 template <class T> class DamageIon : public csParticle<DamageIon<T>, T> {
 public:

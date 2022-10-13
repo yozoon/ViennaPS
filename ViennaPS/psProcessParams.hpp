@@ -2,9 +2,11 @@
 #ifndef PS_PROCESS_PARAMS
 #define PS_PROCESS_PARAMS
 
-#include <psSmartPointer.hpp>
-#include <rayMessage.hpp>
 #include <vector>
+
+#include <rayMessage.hpp>
+
+#include <ViennaPS/psSmartPointer.hpp>
 
 // TODO: Implement ViennaPS messaging system
 

@@ -1,12 +1,12 @@
 #include <lsMakeGeometry.hpp>
 
-#include <Geometries/psMakeHole.hpp>
-#include <psPointData.hpp>
-#include <psProcess.hpp>
-#include <psProcessModel.hpp>
-#include <psSmartPointer.hpp>
-#include <psToSurfaceMesh.hpp>
-#include <psVTKWriter.hpp>
+#include <ViennaPS/Geometries/psMakeHole.hpp>
+#include <ViennaPS/psPointData.hpp>
+#include <ViennaPS/psProcess.hpp>
+#include <ViennaPS/psProcessModel.hpp>
+#include <ViennaPS/psSmartPointer.hpp>
+#include <ViennaPS/psToSurfaceMesh.hpp>
+#include <ViennaPS/psVTKWriter.hpp>
 
 #include "Particles.hpp"
 #include "SurfaceModel.hpp"

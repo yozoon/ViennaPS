@@ -1,15 +1,16 @@
-#pragma once
-
-#include <csTracingParticle.hpp>
+#ifndef SF6_O2_ETCHING_HPP
+#define SF6_O2_ETCHING_HPP
 
 #include <rayParticle.hpp>
 #include <rayReflection.hpp>
 #include <rayUtil.hpp>
 
-#include <psProcessModel.hpp>
-#include <psSmartPointer.hpp>
-#include <psSurfaceModel.hpp>
-#include <psVelocityField.hpp>
+#include <ViennaPS/DenseCellSet/csTracingParticle.hpp>
+
+#include <ViennaPS/psProcessModel.hpp>
+#include <ViennaPS/psSmartPointer.hpp>
+#include <ViennaPS/psSurfaceModel.hpp>
+#include <ViennaPS/psVelocityField.hpp>
 
 template <typename NumericType, int D>
 class SF6O2SurfaceModel : public psSurfaceModel<NumericType> {
@@ -439,3 +440,5 @@ public:
     return processModel;
   }
 };
+
+#endif

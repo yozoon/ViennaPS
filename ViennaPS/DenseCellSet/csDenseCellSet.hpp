@@ -1,10 +1,6 @@
 #ifndef DENSE_CELL_SET
 #define DENSE_CELL_SET
 
-#include <csBVH.hpp>
-#include <csTracePath.hpp>
-#include <csUtil.hpp>
-
 #include <lsDomain.hpp>
 #include <lsMakeGeometry.hpp>
 #include <lsMesh.hpp>
@@ -14,6 +10,10 @@
 #include <lsVTKWriter.hpp>
 
 #include <rayUtil.hpp>
+
+#include "csBVH.hpp"
+#include "csTracePath.hpp"
+#include "csUtil.hpp"
 
 /**
   This class represents a cell-based voxel implementation of a volume. The

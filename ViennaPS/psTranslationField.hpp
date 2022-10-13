@@ -2,8 +2,10 @@
 #define PS_TRANSLATIONFIELD_HPP
 
 #include <iostream>
+
 #include <lsVelocityField.hpp>
-#include <psVelocityField.hpp>
+
+#include <ViennaPS/psVelocityField.hpp>
 
 template <typename NumericType>
 class psTranslationField : public lsVelocityField<NumericType> {

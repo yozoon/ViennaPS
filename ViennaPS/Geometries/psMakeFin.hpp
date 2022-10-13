@@ -1,9 +1,11 @@
-#pragma once
+#ifndef PS_MAKE_FIN_HPP
+#define PS_MAKE_FIN_HPP
 
 #include <lsBooleanOperation.hpp>
 #include <lsDomain.hpp>
 #include <lsMakeGeometry.hpp>
-#include <psDomain.hpp>
+
+#include <ViennaPS/psDomain.hpp>
 
 template <class NumericType, int D> class psMakeFin {
   using LSPtrType = psSmartPointer<lsDomain<NumericType, D>>;
@@ -99,3 +101,5 @@ public:
     }
   }
 };
+
+#endif

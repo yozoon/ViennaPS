@@ -7,17 +7,17 @@
 #include <lsMessage.hpp>
 #include <lsToDiskMesh.hpp>
 
-#include <psDomain.hpp>
-#include <psProcessModel.hpp>
-#include <psSmartPointer.hpp>
-#include <psSurfaceModel.hpp>
-#include <psTranslationField.hpp>
-#include <psVelocityField.hpp>
-#include <psVolumeModel.hpp>
-
 #include <rayBoundCondition.hpp>
 #include <rayParticle.hpp>
 #include <rayTrace.hpp>
+
+#include <ViennaPS/psDomain.hpp>
+#include <ViennaPS/psProcessModel.hpp>
+#include <ViennaPS/psSmartPointer.hpp>
+#include <ViennaPS/psSurfaceModel.hpp>
+#include <ViennaPS/psTranslationField.hpp>
+#include <ViennaPS/psVelocityField.hpp>
+#include <ViennaPS/psVolumeModel.hpp>
 
 template <typename NumericType, int D> class psProcess {
   using translatorType = std::unordered_map<unsigned long, unsigned long>;

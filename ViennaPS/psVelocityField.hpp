@@ -1,8 +1,9 @@
 #ifndef PS_VELOCITY_FIELD
 #define PS_VELOCITY_FIELD
 
-#include <psSmartPointer.hpp>
 #include <vector>
+
+#include <ViennaPS/psSmartPointer.hpp>
 
 template <typename NumericType> class psVelocityField {
 private:

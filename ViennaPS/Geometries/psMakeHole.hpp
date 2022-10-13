@@ -1,11 +1,12 @@
-#pragma once
+#ifndef PS_MAKE_HOLE
+#define PS_MAKE_HOLE
 
 #include <lsBooleanOperation.hpp>
 #include <lsDomain.hpp>
 #include <lsMakeGeometry.hpp>
 
-#include <psDomain.hpp>
-#include <psMakeTrench.hpp>
+#include <ViennaPS/psDomain.hpp>
+#include <ViennaPS/Geometries/psMakeTrench.hpp>
 
 /**
   Creates a hole geometry in z direction. For 2D geometries a regular trench is
@@ -120,3 +121,5 @@ public:
     domain->insertNextLevelSet(substrate, false);
   }
 };
+
+#endif

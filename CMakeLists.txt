@@ -26,6 +26,10 @@ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
       CACHE BOOL "Export all symbols")
 endif()
 
+set(ViennaPS_SOURCE_DIR
+    ${PROJECT_SOURCE_DIR}
+    CACHE PATH "Path to ViennaPS sources" FORCE)
+
 set(ViennaPS_BINARY_DIR
     ${PROJECT_BINARY_DIR}
     CACHE PATH "Path to local ViennaPS installation" FORCE)
@@ -96,7 +100,18 @@ install(FILES "${PROJECT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
               "${PROJECT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake"
         DESTINATION ${LOCAL_CONFIG_DIR})
 
-# install include files
-file(GLOB_RECURSE HEADER_FILES "${PROJECT_SOURCE_DIR}/include/*.hpp")
+# Install all core header files
+file(GLOB HEADER_FILES "${PROJECT_SOURCE_DIR}/${PROJECT_NAME}/*.hpp")
+install(FILES ${HEADER_FILES} DESTINATION "include/${PROJECT_NAME}")
 
-install(FILES ${HEADER_FILES} DESTINATION "include")
+# Install all header files from Models subdirectory
+file(GLOB HEADER_FILES "${PROJECT_SOURCE_DIR}/${PROJECT_NAME}/Models/*.hpp")
+install(FILES ${HEADER_FILES} DESTINATION "include/${PROJECT_NAME}/Models")
+
+# Install all header files from Geometries subdirectory
+file(GLOB HEADER_FILES "${PROJECT_SOURCE_DIR}/${PROJECT_NAME}/Geometries/*.hpp")
+install(FILES ${HEADER_FILES} DESTINATION "include/${PROJECT_NAME}/Geometries")
+
+# Install all headers files from DenseCellSet subdirectory 
+file(GLOB HEADER_FILES "${PROJECT_SOURCE_DIR}/${PROJECT_NAME}/DenseCellSet/*.hpp")
+install(FILES ${HEADER_FILES} DESTINATION "include/${PROJECT_NAME}/DenseCellSet")

@@ -1,4 +1,5 @@
-#pragma once
+#ifndef CS_TRACE_PATH_HPP
+#define CS_TRACE_PATH_HPP
 
 #include <unordered_map>
 
@@ -38,3 +39,5 @@ public:
     gridData.clear();
   }
 };
+
+#endif

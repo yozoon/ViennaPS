@@ -1,10 +1,7 @@
-#pragma once
+#ifndef CS_TRACING_HPP
+#define CS_TRACING_HPP
 
 #include <embree3/rtcore.h>
-
-#include <csDenseCellSet.hpp>
-#include <csTracingKernel.hpp>
-#include <csTracingParticle.hpp>
 
 #include <lsToDiskMesh.hpp>
 
@@ -12,6 +9,10 @@
 #include <rayParticle.hpp>
 #include <raySourceRandom.hpp>
 #include <rayUtil.hpp>
+
+#include "csDenseCellSet.hpp"
+#include "csTracingKernel.hpp"
+#include "csTracingParticle.hpp"
 
 template <class T, int D> class csTracing {
 private:
@@ -218,3 +219,4 @@ private:
 #endif
   }
 };
+#endif

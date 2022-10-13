@@ -18,7 +18,7 @@ if(NOT ViennaPS_FOUND)
   4. Now the configure step should pick up the built dependencies and proceed as intended.")
 endif()
 
-list(PREPEND VIENNAPS_INCLUDE_DIRS ${VIENNAPS_BUILD_INCLUDE_DIRS})
+list(PREPEND VIENNAPS_INCLUDE_DIRS "${ViennaPS_SOURCE_DIR}")
 
 # Add subfolders to the include directories, since during installation the directory structure is
 # flattened, but in the source tree - which we are using here - it is not.

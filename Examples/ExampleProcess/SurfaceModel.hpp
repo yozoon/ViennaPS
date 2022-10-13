@@ -1,6 +1,7 @@
-#pragma once
+#ifndef SURFACE_MODEL_HPP
+#define SURFACE_MODEL_HPP
 
-#include <psSurfaceModel.hpp>
+#include <ViennaPS/psSurfaceModel.hpp>
 
 template <typename NumericType>
 class SurfaceModel : public psSurfaceModel<NumericType> {
@@ -33,3 +34,4 @@ public:
     // update coverages
   }
 };
+#endif

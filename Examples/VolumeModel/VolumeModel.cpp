@@ -1,8 +1,8 @@
-#include <Geometries/psMakeFin.hpp>
-#include <PlasmaDamage.hpp>
-#include <psProcess.hpp>
-#include <psToSurfaceMesh.hpp>
-#include <psVTKWriter.hpp>
+#include <ViennaPS/Geometries/psMakeFin.hpp>
+#include <ViennaPS/Models/PlasmaDamage.hpp>
+#include <ViennaPS/psProcess.hpp>
+#include <ViennaPS/psToSurfaceMesh.hpp>
+#include <ViennaPS/psVTKWriter.hpp>
 
 int main(int argc, char *argv[]) {
   using NumericType = float;

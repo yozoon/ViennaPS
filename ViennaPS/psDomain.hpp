@@ -8,9 +8,9 @@
 #include <lsToSurfaceMesh.hpp>
 #include <lsVTKWriter.hpp>
 
-#include <csDenseCellSet.hpp>
+#include <ViennaPS/DenseCellSet/csDenseCellSet.hpp>
 
-#include <psSmartPointer.hpp>
+#include <ViennaPS/psSmartPointer.hpp>
 
 /**
   This class represents all materials in the simulation domain.

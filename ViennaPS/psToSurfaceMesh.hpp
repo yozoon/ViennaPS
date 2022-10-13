@@ -1,7 +1,9 @@
-#pragma once
+#ifndef PS_TO_SURFACE_MESH_HPP
+#define PS_TO_SURFACE_MESH_HPP
 
 #include <lsToSurfaceMesh.hpp>
-#include <psDomain.hpp>
+
+#include <ViennaPS/psDomain.hpp>
 
 template <class T, int D> class psToSurfaceMesh {
 private:
@@ -22,3 +24,4 @@ public:
     meshConverter.setMesh(passedMesh);
   }
 };
+#endif

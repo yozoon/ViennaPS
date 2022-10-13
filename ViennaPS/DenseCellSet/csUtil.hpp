@@ -1,4 +1,5 @@
-#pragma once
+#ifndef CS_UTIL_HPP
+#define CS_UTIL_HPP
 
 #include <algorithm>
 #include <array>
@@ -6,8 +7,9 @@
 #include <chrono>
 #include <cmath>
 #include <iostream>
-#include <omp.h>
 #include <vector>
+
+#include <omp.h>
 
 template <typename T> using csPair = std::array<T, 2>;
 
@@ -161,3 +163,5 @@ template <typename T> [[nodiscard]] rayTriple<T> ConvertSse(__m128 const &vec) {
 }
 #endif
 } // namespace csUtil
+
+#endif

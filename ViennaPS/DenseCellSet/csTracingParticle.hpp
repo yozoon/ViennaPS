@@ -1,10 +1,11 @@
-#pragma once
-
-#include <csUtil.hpp>
+#ifndef CS_TRACING_PARTICLE_HPP
+#define CS_TRACING_PARTICLE_HPP
 
 #include <rayRNG.hpp>
 #include <rayReflection.hpp>
 #include <rayUtil.hpp>
+
+#include "csUtil.hpp"
 
 template <typename T> class csAbstractParticle {
 public:
@@ -49,3 +50,5 @@ protected:
   csParticle(const csParticle &) = default;
   csParticle(csParticle &&) = default;
 };
+
+#endif

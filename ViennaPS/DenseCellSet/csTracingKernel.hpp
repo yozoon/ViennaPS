@@ -1,4 +1,5 @@
-#pragma once
+#ifndef CS_TRACING_KERNEL_HPP
+#define CS_TRACING_KERNEL_HPP
 
 #include <lsSmartPointer.hpp>
 
@@ -8,9 +9,9 @@
 #include <raySource.hpp>
 #include <rayUtil.hpp>
 
-#include <csDenseCellSet.hpp>
-#include <csTracePath.hpp>
-#include <csTracingParticle.hpp>
+#include "csDenseCellSet.hpp"
+#include "csTracePath.hpp"
+#include "csTracingParticle.hpp"
 
 template <typename T, int D> class csTracingKernel {
 public:
@@ -321,3 +322,5 @@ private:
     std::cout.flush();
   }
 };
+
+#endif

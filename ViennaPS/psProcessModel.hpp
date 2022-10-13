@@ -1,11 +1,12 @@
 #ifndef PS_PROCESS_MODEL
 #define PS_PROCESS_MODEL
 
-#include <psSmartPointer.hpp>
-#include <psSurfaceModel.hpp>
-#include <psVelocityField.hpp>
-#include <psVolumeModel.hpp>
 #include <rayParticle.hpp>
+
+#include <ViennaPS/psSmartPointer.hpp>
+#include <ViennaPS/psSurfaceModel.hpp>
+#include <ViennaPS/psVelocityField.hpp>
+#include <ViennaPS/psVolumeModel.hpp>
 
 template <typename NumericType, int D> class psProcessModel {
 private:

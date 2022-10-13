@@ -1,13 +1,14 @@
-#pragma once
+#ifndef SIMPLE_DEPOSITION_HPP
+#define SIMPLE_DEPOSITION_HPP
 
 #include <rayParticle.hpp>
 #include <rayReflection.hpp>
 #include <rayUtil.hpp>
 
-#include <psProcessModel.hpp>
-#include <psSmartPointer.hpp>
-#include <psSurfaceModel.hpp>
-#include <psVelocityField.hpp>
+#include <ViennaPS/psProcessModel.hpp>
+#include <ViennaPS/psSmartPointer.hpp>
+#include <ViennaPS/psSurfaceModel.hpp>
+#include <ViennaPS/psVelocityField.hpp>
 
 template <typename NumericType, int D>
 class SimpleDepositionSurfaceModel : public psSurfaceModel<NumericType> {
@@ -111,3 +112,4 @@ public:
     return processModel;
   }
 };
+#endif

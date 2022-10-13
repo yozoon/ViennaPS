@@ -1,8 +1,9 @@
-#pragma once
-
-#include <csBoundingVolume.hpp>
+#ifndef CS_BVH_HPP
+#define CS_BVH_HPP
 
 #include <lsSmartPointer.hpp>
+
+#include "csBoundingVolume.hpp"
 
 template <class T, int D> class csBVH {
 private:
@@ -33,3 +34,5 @@ public:
 
   size_t getTotalCellCount() { return BV->getTotalCellCounts(); }
 };
+
+#endif
