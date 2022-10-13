@@ -9,9 +9,9 @@
 #include <raySource.hpp>
 #include <rayUtil.hpp>
 
-#include "csDenseCellSet.hpp"
-#include "csTracePath.hpp"
-#include "csTracingParticle.hpp"
+#include <ViennaPS/DenseCellSet/csDenseCellSet.hpp>
+#include <ViennaPS/DenseCellSet/csTracePath.hpp>
+#include <ViennaPS/DenseCellSet/csTracingParticle.hpp>
 
 template <typename T, int D> class csTracingKernel {
 public:

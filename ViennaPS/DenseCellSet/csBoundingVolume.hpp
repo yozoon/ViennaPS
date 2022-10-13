@@ -5,7 +5,7 @@
 
 #include <lsSmartPointer.hpp>
 
-#include "csUtil.hpp"
+#include <ViennaPS/DenseCellSet/csUtil.hpp>
 
 template <class T, int D> class csBoundingVolume {
 private:

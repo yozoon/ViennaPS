@@ -5,7 +5,7 @@
 #include <rayReflection.hpp>
 #include <rayUtil.hpp>
 
-#include "csUtil.hpp"
+#include <ViennaPS/DenseCellSet/csUtil.hpp>
 
 template <typename T> class csAbstractParticle {
 public:

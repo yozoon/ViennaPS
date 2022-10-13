@@ -11,9 +11,9 @@
 
 #include <rayUtil.hpp>
 
-#include "csBVH.hpp"
-#include "csTracePath.hpp"
-#include "csUtil.hpp"
+#include <ViennaPS/DenseCellSet/csBVH.hpp>
+#include <ViennaPS/DenseCellSet/csTracePath.hpp>
+#include <ViennaPS/DenseCellSet/csUtil.hpp>
 
 /**
   This class represents a cell-based voxel implementation of a volume. The

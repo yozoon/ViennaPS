@@ -10,9 +10,9 @@
 #include <raySourceRandom.hpp>
 #include <rayUtil.hpp>
 
-#include "csDenseCellSet.hpp"
-#include "csTracingKernel.hpp"
-#include "csTracingParticle.hpp"
+#include <ViennaPS/DenseCellSet/csDenseCellSet.hpp>
+#include <ViennaPS/DenseCellSet/csTracingKernel.hpp>
+#include <ViennaPS/DenseCellSet/csTracingParticle.hpp>
 
 template <class T, int D> class csTracing {
 private:

@@ -3,7 +3,7 @@
 
 #include <lsSmartPointer.hpp>
 
-#include "csBoundingVolume.hpp"
+#include <ViennaPS/DenseCellSet/csBoundingVolume.hpp>
 
 template <class T, int D> class csBVH {
 private:
