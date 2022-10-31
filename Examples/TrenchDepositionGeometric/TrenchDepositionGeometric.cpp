@@ -1,5 +1,5 @@
+#include <GeometricUniformDeposition.hpp>
 #include <Geometries/psMakeTrench.hpp>
-#include <SimpleDeposition.hpp>
 #include <psProcess.hpp>
 #include <psToSurfaceMesh.hpp>
 #include <psVTKWriter.hpp>
@@ -14,16 +14,11 @@ int main(int argc, char *argv[]) {
                                10 /*trench height*/, false /*create mask*/)
       .apply();
 
-  NumericType layerThickness = 2.0;
-  NumericType stickingProbability = 0.0001;
-  SimpleDeposition<NumericType, D> model(stickingProbability /*particle sticking probability*/,
-                                         1. /*particel source power*/);
+  GeometricUniformDeposition<NumericType, D> model(2.0 /*layer thickness*/);
 
   psProcess<NumericType, D> process;
   process.setDomain(geometry);
   process.setProcessModel(model.getProcessModel());
-  process.setNumberOfRaysPerPoint(3000);
-  process.setProcessDuration(layerThickness / stickingProbability);
 
   auto mesh = psSmartPointer<lsMesh<NumericType>>::New();
   psToSurfaceMesh<NumericType, D>(geometry, mesh).apply();
