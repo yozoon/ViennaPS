@@ -16,8 +16,9 @@ int main(int argc, char *argv[]) {
 
   NumericType layerThickness = 2.0;
   NumericType stickingProbability = 0.0001;
-  SimpleDeposition<NumericType, D> model(stickingProbability /*particle sticking probability*/,
-                                         1. /*particel source power*/);
+  SimpleDeposition<NumericType, D> model(
+      stickingProbability /*particle sticking probability*/,
+      1. /*particel source power*/);
 
   psProcess<NumericType, D> process;
   process.setDomain(geometry);
