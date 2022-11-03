@@ -63,7 +63,8 @@ public:
   }
 
   template <typename GeometricModelType>
-  void setGeometricModel(psSmartPointer<GeometricModelType> passedGeometricModel) {
+  void
+  setGeometricModel(psSmartPointer<GeometricModelType> passedGeometricModel) {
     geometricModel =
         std::dynamic_pointer_cast<psGeometricModel<NumericType, D>>(
             passedGeometricModel);
