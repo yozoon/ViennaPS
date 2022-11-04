@@ -10,9 +10,10 @@ int main(int argc, char *argv[]) {
   using NumericType = double;
   constexpr int D = 3;
 
-// Parse the parameters
+  // Parse the parameters
   int P, y;
-  NumericType topRadius, maskHeight, taperAngle, processTime, totalEtchantFlux, totalOxygenFlux, totalIonFlux, A_O;
+  NumericType topRadius, maskHeight, taperAngle, processTime, totalEtchantFlux,
+      totalOxygenFlux, totalIonFlux, A_O;
   NumericType bottomRadius = -1;
 
   if (argc > 1) {
@@ -55,8 +56,9 @@ int main(int argc, char *argv[]) {
       .apply();
 
   SF6O2Etching<NumericType, D> model(
-      totalIonFlux /*ion flux*/, totalEtchantFlux /*etchant flux*/, totalOxygenFlux /*oxygen flux*/,
-      100 /*min ion energy (eV)*/, 3 /*oxy sputter yield*/, 0 /*mask material ID*/);
+      totalIonFlux /*ion flux*/, totalEtchantFlux /*etchant flux*/,
+      totalOxygenFlux /*oxygen flux*/, 100 /*min ion energy (eV)*/,
+      3 /*oxy sputter yield*/, 0 /*mask material ID*/);
 
   psProcess<NumericType, D> process;
   process.setDomain(geometry);
