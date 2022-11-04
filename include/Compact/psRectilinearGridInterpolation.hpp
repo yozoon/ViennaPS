@@ -177,8 +177,13 @@ public:
         // bound.
         int lower = (i >> j) & 1;
 
+        // If the grid index is at the maximum in this axis, always mark this
+        // point as the lower point (thus if the input lies at or outside of the
+        // upper edge boundary of the grid in the given axis, we use the same
+        // corner multiple times)
         if (gridIndices[j] == uniqueValues[j].size() - 1)
           lower = 1;
+
         // If it is a lower bound, use the grid index itself, otherwise add
         // 1 to the index (= index of upper bound along that axis)
         index += (gridIndices[j] + (1 - lower)) * stepsize;
