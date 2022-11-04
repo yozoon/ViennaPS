@@ -50,17 +50,17 @@ class psRectilinearGridInterpolation
       std::vector<size_t> rangeBreaks;
       rangeBreaks.push_back(0);
       if (capture)
-        uniqueValues[axis].insert((*start)[axis]);
+        uniqueValues[axis].insert(start->at(axis));
 
       for (unsigned i = 1; i < size; ++i)
-        if ((*(start + i - 1))[axis] != (*(start + i))[axis]) {
+        if ((start + i - 1)->at(axis) != (start + i)->at(axis)) {
           if (rangeSize == 0)
             rangeSize = i;
 
           size_t tmp = rangeBreaks.back();
 
           rangeBreaks.push_back(i);
-          uniqueValues[axis].insert((*(start + i))[axis]);
+          uniqueValues[axis].insert((start + i)->at(axis));
 
           if (rangeSize != i - tmp) {
             std::cout << "Data is not arranged in a rectilinear grid!\n";
@@ -84,6 +84,9 @@ class psRectilinearGridInterpolation
   }
 
 public:
+  psRectilinearGridInterpolation(bool passedAllowExtrapolation = false)
+      : allowExtrapolation(passedAllowExtrapolation) {}
+
   void initialize() override {
     data = dataSource->getAll();
     if (!data)
@@ -112,11 +115,12 @@ public:
         // Check if the input lies within the bounds of our data grid
         if (input[i] < *(uniqueValues[i].begin()) ||
             input[i] > *(uniqueValues[i].rbegin())) {
-          std::cout
-              << "The provided value lies outside of the grid in dimension "
-              << i << std::endl;
-          if (!allowExtrapolation)
+          if (!allowExtrapolation) {
+            std::cout
+                << "The provided value lies outside of the grid in dimension "
+                << i << std::endl;
             return {{}};
+          }
         }
       } else {
         std::cout << "The grid has no values along dimension " << i
@@ -157,12 +161,6 @@ public:
       else
         normalizedCoordinates[i] =
             (input[i] - lowerBound) / (upperBound - lowerBound);
-
-      // std::cout << input[i] << " lies between " << lowerBounds[i] << " and "
-      //           << upperBounds[i] << " with a lower index of " <<
-      //           gridIndices[i]
-      //           << " and normalized coords of " << normalizedCoordinates[i]
-      //           << std::endl;
     }
 
     // Now retrieve the values at the corners of the selected hyperrectangle
@@ -170,6 +168,7 @@ public:
     for (int i = 0; i < corners.size(); ++i) {
       size_t index = 0;
       size_t stepsize = 1;
+
       for (int j = InputDim - 1; j >= 0; --j) {
         // To get all combinations of corners of the hyperrectangle, we say
         // that each bit in the i variable corresponds to an axis. A zero
@@ -177,8 +176,11 @@ public:
         // hyperrectangle along the axis and a one represents the upper
         // bound.
         int lower = (i >> j) & 1;
-        //  If it is a lower bound, use the grid index itself, otherwise add
-        //  1 to the index (= index of upper bound along that axis)
+
+        if (gridIndices[j] == uniqueValues[j].size() - 1)
+          lower = 1;
+        // If it is a lower bound, use the grid index itself, otherwise add
+        // 1 to the index (= index of upper bound along that axis)
         index += (gridIndices[j] + (1 - lower)) * stepsize;
         stepsize *= uniqueValues[j].size();
       }
@@ -192,8 +194,9 @@ public:
       for (int i = InputDim - 1; i >= 0; --i) {
         int stride = 1 << i;
         for (int j = 0; j < stride; ++j) {
-          corners[j][dim] = (1 - normalizedCoordinates[i]) * corners[j][dim] +
-                            normalizedCoordinates[i] * corners[j + stride][dim];
+          corners[j][dim] =
+              normalizedCoordinates[i] * corners[j][dim] +
+              (1 - normalizedCoordinates[i]) * corners[j + stride][dim];
         }
       }
       result[dim] = corners[0][dim];
