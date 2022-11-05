@@ -8,13 +8,18 @@
 #include <psSmartPointer.hpp>
 
 template <class NumericType, int D, int Dim = D> struct psPointLocator {
+  static_assert(D <= Dim);
+
   using VectorType = std::array<NumericType, Dim>;
   using PointType = std::array<NumericType, D>;
   using SizeType = std::size_t;
 
-  psPointLocator() {}
-
   virtual void build() = 0;
+
+  virtual void setPoints(std::vector<VectorType> &passedPoints) = 0;
+
+  virtual void
+  setScalingFactors(const std::array<NumericType, D> &passedScalingFactors) = 0;
 
   virtual std::pair<SizeType, NumericType>
   findNearest(const std::array<NumericType, D> &x) const = 0;
