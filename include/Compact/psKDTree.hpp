@@ -45,8 +45,6 @@
 
 template <class NumericType, int D, int Dim = D>
 class psKDTree : psPointLocator<NumericType, D, Dim> {
-  static_assert(D <= Dim);
-
   using typename psPointLocator<NumericType, D, Dim>::VectorType;
   using typename psPointLocator<NumericType, D, Dim>::PointType;
   using typename psPointLocator<NumericType, D, Dim>::SizeType;
@@ -320,7 +318,7 @@ public:
     }
   }
 
-  void setPoints(std::vector<VectorType> &passedPoints) {
+  void setPoints(std::vector<VectorType> &passedPoints) override {
     nodes.reserve(passedPoints.size());
     {
       for (SizeType i = 0; i < passedPoints.size(); ++i) {
@@ -329,8 +327,8 @@ public:
     }
   }
 
-  void
-  setScalingFactors(const std::array<NumericType, D> &passedScalingFactors) {
+  void setScalingFactors(
+      const std::array<NumericType, D> &passedScalingFactors) override {
     scalingFactors = passedScalingFactors;
   }
 

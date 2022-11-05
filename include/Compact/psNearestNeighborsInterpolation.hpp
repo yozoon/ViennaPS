@@ -5,87 +5,39 @@
 #include <cmath>
 #include <numeric>
 #include <tuple>
+#include <type_traits>
 #include <vector>
 
-#ifdef _OPENMP
-#include <omp.h>
-#endif
-
+#include <psDataScaler.hpp>
 #include <psKDTree.hpp>
 #include <psSmartPointer.hpp>
 #include <psValueEstimator.hpp>
 
-template <typename NumericType, int D, int Dim> class psStandardScaler {
-  static_assert(D <= Dim);
-
-  using VectorType = std::array<NumericType, Dim>;
-
-  psSmartPointer<std::vector<VectorType>> data = nullptr;
-  std::array<NumericType, D> scalingFactors;
-
-public:
-  psStandardScaler() {}
-
-  void setData(psSmartPointer<std::vector<VectorType>> passedData) {
-    data = passedData;
-  }
-
-  void apply() {
-    if (!data)
-      return;
-
-    std::vector<NumericType> mean(D, 0.);
-
-#pragma omp parallel for schedule(dynamic) default(none) shared(data, mean)
-    for (int i = 0; i < D; ++i)
-      mean[i] = std::accumulate(data->begin(), data->end(), 0.,
-                                [&](const auto &sum, const auto &element) {
-                                  return sum + element[i];
-                                });
-    for (int i = 0; i < D; ++i)
-      mean[i] /= data->size();
-
-    std::vector<NumericType> stddev(D, 0.);
-
-#pragma omp parallel for schedule(dynamic) default(none)                       \
-    shared(data, mean, stddev)
-    for (int i = 0; i < D; ++i)
-      stddev[i] = std::accumulate(data->begin(), data->end(), 0.,
-                                  [&](const auto &sum, const auto &element) {
-                                    return sum + (element[i] - mean[i]) *
-                                                     (element[i] - mean[i]);
-                                  });
-
-    for (int i = 0; i < D; ++i) {
-      stddev[i] = std::sqrt(stddev[i] / data->size());
-      if (stddev[i] > 0)
-        scalingFactors[i] = 1.0 / stddev[i];
-      else
-        scalingFactors[i] = 1.0;
-
-      // std::cout << mean[i] << ' ' << stddev[i] << '\n';
-    }
-  }
-
-  std::array<NumericType, D> getScalingFactors() const {
-    return scalingFactors;
-  }
-};
-
-// Class providing simple linear interpolation on rectilinear data grids
-template <typename NumericType, int InputDim, int OutputDim>
+// Class providing nearest neighbors interpolation
+template <typename NumericType, int InputDim, int OutputDim,
+          typename PointLocator =
+              psKDTree<NumericType, InputDim, InputDim + OutputDim>,
+          typename DataScaler =
+              psStandardScaler<NumericType, InputDim, InputDim + OutputDim>>
 class psNearestNeighborsInterpolation
     : public psValueEstimator<NumericType, InputDim, OutputDim, NumericType> {
 
-  using typename psValueEstimator<NumericType, InputDim, OutputDim,
-                                  NumericType>::InputType;
-  using typename psValueEstimator<NumericType, InputDim, OutputDim,
-                                  NumericType>::OutputType;
+  static_assert(std::is_base_of_v<
+                psPointLocator<NumericType, InputDim, InputDim + OutputDim>,
+                PointLocator>);
 
-  using psValueEstimator<NumericType, InputDim, OutputDim,
-                         NumericType>::DataDim;
-  using psValueEstimator<NumericType, InputDim, OutputDim,
-                         NumericType>::dataSource;
+  static_assert(std::is_base_of_v<
+                psDataScaler<NumericType, InputDim, InputDim + OutputDim>,
+                DataScaler>);
+
+  using Parent =
+      psValueEstimator<NumericType, InputDim, OutputDim, NumericType>;
+
+  using typename Parent::InputType;
+  using typename Parent::OutputType;
+
+  using Parent::DataDim;
+  using Parent::dataSource;
 
   using DataPtr = typename decltype(dataSource)::element_type::DataPtr;
   using DataVector = std::vector<std::array<NumericType, DataDim>>;
@@ -93,28 +45,40 @@ class psNearestNeighborsInterpolation
   DataPtr data = nullptr;
   bool initialized = false;
   int numberOfNeighbors;
+  NumericType distanceExponent;
 
-  psKDTree<NumericType, InputDim, DataDim> tree;
+  PointLocator locator;
 
 public:
-  psNearestNeighborsInterpolation() : numberOfNeighbors(3) {}
+  psNearestNeighborsInterpolation()
+      : numberOfNeighbors(3), distanceExponent(2.) {}
 
-  psNearestNeighborsInterpolation(int passedNumberOfNeighbors)
-      : numberOfNeighbors(passedNumberOfNeighbors) {}
+  psNearestNeighborsInterpolation(int passedNumberOfNeighbors,
+                                  NumericType passedDistanceExponent = 2.)
+      : numberOfNeighbors(passedNumberOfNeighbors),
+        distanceExponent(passedDistanceExponent) {}
+
+  void setNumberOfNeighbors(int passedNumberOfNeighbors) {
+    numberOfNeighbors = passedNumberOfNeighbors;
+  }
+
+  void setDistanceExponent(NumericType passedDistanceExponent) {
+    distanceExponent = passedDistanceExponent;
+  }
 
   void initialize() override {
     data = dataSource->getAll();
     if (!data)
       return;
 
-    psStandardScaler<NumericType, InputDim, DataDim> scaler;
+    DataScaler scaler;
     scaler.setData(data);
     scaler.apply();
     auto scalingFactors = scaler.getScalingFactors();
 
-    tree.setPoints(*data);
-    tree.setScalingFactors(scalingFactors);
-    tree.build();
+    locator.setPoints(*data);
+    locator.setScalingFactors(scalingFactors);
+    locator.build();
 
     initialized = true;
   }
@@ -124,7 +88,7 @@ public:
     if (!initialized)
       initialize();
 
-    auto neighbors = tree.findKNearest(input, numberOfNeighbors);
+    auto neighbors = locator.findKNearest(input, numberOfNeighbors);
     OutputType result{0};
 
     NumericType weightSum{0};
@@ -142,7 +106,7 @@ public:
         weightSum = 1.;
         break;
       } else {
-        weight = 1. / distance;
+        weight = std::pow(1. / distance, distanceExponent);
       }
       for (int i = 0; i < OutputDim; ++i)
         result[i] += weight * data->at(nearestIndex)[InputDim + i];
