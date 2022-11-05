@@ -11,13 +11,15 @@
 // Class providing simple linear interpolation on rectilinear data grids
 template <typename NumericType, int InputDim, int OutputDim>
 class psRectilinearGridInterpolation
-    : public psValueEstimator<NumericType, InputDim, OutputDim> {
+    : public psValueEstimator<NumericType, InputDim, OutputDim, bool> {
 
-  using typename psValueEstimator<NumericType, InputDim, OutputDim>::InputType;
-  using typename psValueEstimator<NumericType, InputDim, OutputDim>::OutputType;
+  using Parent = psValueEstimator<NumericType, InputDim, OutputDim, bool>;
 
-  using psValueEstimator<NumericType, InputDim, OutputDim>::DataDim;
-  using psValueEstimator<NumericType, InputDim, OutputDim>::dataSource;
+  using typename Parent::InputType;
+  using typename Parent::OutputType;
+
+  using Parent::DataDim;
+  using Parent::dataSource;
 
   using DataPtr = typename decltype(dataSource)::element_type::DataPtr;
   using DataVector = std::vector<std::array<NumericType, DataDim>>;
@@ -106,26 +108,28 @@ public:
     initialized = true;
   }
 
-  std::tuple<OutputType> estimate(const InputType &input) override {
+  std::tuple<OutputType, bool> estimate(const InputType &input) override {
     if (!initialized)
       initialize();
 
+    bool isInside = true;
     for (int i = 0; i < InputDim; ++i)
       if (!uniqueValues[i].empty()) {
         // Check if the input lies within the bounds of our data grid
         if (input[i] < *(uniqueValues[i].begin()) ||
             input[i] > *(uniqueValues[i].rbegin())) {
+          isInside = false;
           if (!allowExtrapolation) {
             std::cout
                 << "The provided value lies outside of the grid in dimension "
                 << i << std::endl;
-            return {{}};
+            return {{}, {}};
           }
         }
       } else {
         std::cout << "The grid has no values along dimension " << i
                   << std::endl;
-        return {{}};
+        return {{}, {}};
       }
 
     std::array<size_t, InputDim> gridIndices;
@@ -207,7 +211,7 @@ public:
       result[dim] = corners[0][dim];
     }
 
-    return {result};
+    return {result, isInside};
   }
 };
 

@@ -55,7 +55,7 @@ int main() {
 
           // We use structural bindings to directly unpack the tuple of one
           // element
-          auto [value] = interpolation.estimate(x);
+          auto [value, isInside] = interpolation.estimate(x);
 
           writer.writeRow({x[0], x[1], x[2], value[0]});
         }
