@@ -76,4 +76,51 @@ public:
   }
 };
 
+// Class that calculates scaling factors based on median distances
+template <typename NumericType, int D, int Dim>
+class psMedianDistanceScaler : public psDataScaler<NumericType, D, Dim> {
+  using Parent = psDataScaler<NumericType, D, Dim>;
+
+  using Parent::data;
+  using Parent::scalingFactors;
+
+public:
+  psMedianDistanceScaler() {}
+
+  void apply() override {
+    if (!data)
+      return;
+
+    size_t size = data->size();
+    size_t triSize = size * (size - 1) / 2;
+
+    auto dat = data;
+
+#pragma omp parallel
+#pragma omp single
+    for (int i = 0; i < D; ++i) {
+#pragma omp task final(1)
+      {
+        std::vector<NumericType> distances(triSize);
+#pragma omp parallel for default(none) firstprivate(i, size)                   \
+    shared(dat, distances) schedule(dynamic)
+        for (int j = 1; j < size; ++j) {
+          for (int k = 0; k < j; ++k)
+            distances[j * (j - 1) / 2 + k] =
+                std::abs(dat->at(j)[i] - dat->at(k)[i]);
+        }
+
+        size_t medianIndex = triSize / 2;
+        std::nth_element(distances.begin(), distances.begin() + medianIndex,
+                         distances.end());
+        if (distances[medianIndex] > 0)
+          scalingFactors[i] = 1.0 / distances[medianIndex];
+        else
+          scalingFactors[i] = 1.0;
+      }
+    }
+#pragma omp taskwait
+  }
+};
+
 #endif

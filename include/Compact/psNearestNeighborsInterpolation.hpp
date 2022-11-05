@@ -15,10 +15,10 @@
 
 // Class providing nearest neighbors interpolation
 template <typename NumericType, int InputDim, int OutputDim,
-          typename PointLocator =
-              psKDTree<NumericType, InputDim, InputDim + OutputDim>,
           typename DataScaler =
-              psStandardScaler<NumericType, InputDim, InputDim + OutputDim>>
+              psStandardScaler<NumericType, InputDim, InputDim + OutputDim>,
+          typename PointLocator =
+              psKDTree<NumericType, InputDim, InputDim + OutputDim>>
 class psNearestNeighborsInterpolation
     : public psValueEstimator<NumericType, InputDim, OutputDim, NumericType> {
 

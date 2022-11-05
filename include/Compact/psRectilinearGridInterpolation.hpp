@@ -8,7 +8,7 @@
 
 #include <psValueEstimator.hpp>
 
-// Class providing simple linear interpolation on rectilinear data grids
+// Class providing linear interpolation on rectilinear data grids
 template <typename NumericType, int InputDim, int OutputDim>
 class psRectilinearGridInterpolation
     : public psValueEstimator<NumericType, InputDim, OutputDim, bool> {
