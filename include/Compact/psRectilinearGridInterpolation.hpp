@@ -136,6 +136,7 @@ public:
     std::array<NumericType, InputDim> normalizedCoordinates;
 
     // Check in which hyperrectangle the provided input coordinates are located
+    // Future Improvement: use binary search instead of linear search
     for (int i = 0; i < InputDim; ++i) {
       // Step down the unique values until we reache the first value that's less
       // than the provided input coordinate along the current axis (= lower

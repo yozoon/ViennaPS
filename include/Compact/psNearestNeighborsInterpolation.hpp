@@ -42,12 +42,12 @@ class psNearestNeighborsInterpolation
   using DataPtr = typename decltype(dataSource)::element_type::DataPtr;
   using DataVector = std::vector<std::array<NumericType, DataDim>>;
 
-  DataPtr data = nullptr;
-  bool initialized = false;
   int numberOfNeighbors;
+  PointLocator locator;
   NumericType distanceExponent;
 
-  PointLocator locator;
+  DataPtr data = nullptr;
+  bool initialized = false;
 
 public:
   psNearestNeighborsInterpolation()
@@ -95,7 +95,7 @@ public:
     NumericType minDistance{0};
 
     for (int j = 0; j < numberOfNeighbors; ++j) {
-      auto &[nearestIndex, distance] = neighbors->at(j);
+      auto [nearestIndex, distance] = neighbors->at(j);
 
       minDistance = std::min({distance, minDistance});
 
