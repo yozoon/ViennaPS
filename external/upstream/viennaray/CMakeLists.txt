@@ -5,7 +5,7 @@ get_property(
   PROPERTY TYPE)
 # If it is not from cache and defined at this point, the variable was passed as a -D command line
 # argument
-if("${is_cached}" STREQUAL "" DEFINED ViennaRay_DIR)
+if("${is_cached}" STREQUAL "" AND DEFINED ViennaRay_DIR)
   # Required for windows to convert backslashes to forward slashes
   file(TO_CMAKE_PATH "${ViennaRay_DIR}" ViennaRay_DIR)
   set(ViennaRay_DIR
