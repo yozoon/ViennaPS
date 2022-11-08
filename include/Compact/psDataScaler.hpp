@@ -99,11 +99,11 @@ public:
 #pragma omp parallel
 #pragma omp single
     for (int i = 0; i < D; ++i) {
-#pragma omp task final(1)
+#pragma omp task untied
       {
         std::vector<NumericType> distances(triSize);
-#pragma omp parallel for default(none) firstprivate(i, size)                   \
-    shared(dat, distances) schedule(dynamic)
+#pragma omp parallel for collapse(2) default(none) firstprivate(i, size)       \
+    shared(dat, distances)
         for (int j = 1; j < size; ++j) {
           for (int k = 0; k < j; ++k)
             distances[j * (j - 1) / 2 + k] =
