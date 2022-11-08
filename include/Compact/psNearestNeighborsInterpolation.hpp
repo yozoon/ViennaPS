@@ -66,10 +66,13 @@ public:
     distanceExponent = passedDistanceExponent;
   }
 
-  void initialize() override {
+  bool initialize() override {
+    if (!dataSource)
+      return false;
+
     data = dataSource->getAll();
     if (!data)
-      return;
+      return false;
 
     DataScaler scaler;
     scaler.setData(data);
@@ -81,6 +84,7 @@ public:
     locator.build();
 
     initialized = true;
+    return true;
   }
 
   std::tuple<OutputType, NumericType>

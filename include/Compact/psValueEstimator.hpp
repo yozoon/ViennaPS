@@ -25,7 +25,7 @@ public:
     dataSource = passedDataSource;
   }
 
-  virtual void initialize() {}
+  virtual bool initialize() {}
 
   virtual std::tuple<OutputType, FeedbackType...>
   estimate(const InputType &input) = 0;
