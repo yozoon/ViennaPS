@@ -89,10 +89,13 @@ public:
   psRectilinearGridInterpolation(bool passedAllowExtrapolation = false)
       : allowExtrapolation(passedAllowExtrapolation) {}
 
-  void initialize() override {
+  bool initialize() override {
+    if (!dataSource)
+      return false;
+
     data = dataSource->getAll();
     if (!data)
-      return;
+      return false;
 
     auto equalSize = rearrange(data->begin(), data->end(), 0, true);
 
@@ -106,6 +109,7 @@ public:
     // #endif
 
     initialized = true;
+    return true;
   }
 
   std::tuple<OutputType, bool> estimate(const InputType &input) override {
