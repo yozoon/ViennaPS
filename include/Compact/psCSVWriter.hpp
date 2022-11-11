@@ -62,18 +62,26 @@ public:
   }
 
   void writeRow(const std::vector<NumericType> &data) {
-    if (data.size() != NumCols)
+    if (data.size() != NumCols) {
+      std::cout << "Unexpected number of items in the provided row!\n";
       return;
-    if (!file.is_open())
+    }
+    if (!file.is_open()) {
+      std::cout << "Couldn't open file `" << filename << "`\n";
       return;
+    }
     file << join(data.cbegin(), data.cend()) << '\n';
   }
 
   void writeRow(std::initializer_list<NumericType> data) {
-    if (data.size() != NumCols)
+    if (data.size() != NumCols) {
+      std::cout << "Unexpected number of items in the provided row!\n";
       return;
-    if (!file.is_open())
+    }
+    if (!file.is_open()) {
+      std::cout << "Couldn't open file `" << filename << "`\n";
       return;
+    }
     file << join(data.begin(), data.end()) << '\n';
   }
 
