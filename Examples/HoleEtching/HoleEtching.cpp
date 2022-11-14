@@ -3,18 +3,26 @@
 #include <psConfigParser.hpp>
 #include <psProcess.hpp>
 #include <psToSurfaceMesh.hpp>
+#include <psUtils.hpp>
 #include <psVTKWriter.hpp>
+
+#include "Parameters.hpp"
 
 int main(int argc, char *argv[]) {
   using NumericType = double;
   constexpr int D = 3;
 
   // Parse the parameters
-  psProcessParameters<NumericType> params;
+  int P, y;
+
+  Parameters<NumericType> params;
   if (argc > 1) {
-    psConfigParser<NumericType> parser(argv[1]);
-    parser.apply();
-    params = parser.getParameters();
+    auto config = psUtils::readConfigFile(argv[1]);
+    if (config.empty()) {
+      std::cerr << "Empty config provided" << std::endl;
+      return -1;
+    }
+    params.fromMap(config);
   }
 
   auto geometry = psSmartPointer<psDomain<NumericType, D>>::New();
@@ -25,19 +33,18 @@ int main(int argc, char *argv[]) {
       params.taperAngle /* tapering angle in degrees */, true /*create mask*/)
       .apply();
 
-  SF6O2Etching<NumericType, D> model(params.totalIonFlux /*ion flux*/,
-                                     params.totalEtchantFlux /*etchant flux*/,
-                                     params.totalOxygenFlux /*oxygen flux*/,
-                                     params.ionEnergy /*min ion energy (eV)*/,
-                                     params.A_O /*oxy sputter yield*/,
-                                     0 /*mask material ID*/);
+  SF6O2Etching<NumericType, D> model(
+      params.totalIonFlux /*ion flux*/,
+      params.totalEtchantFlux /*etchant flux*/,
+      params.totalOxygenFlux /*oxygen flux*/, 100 /*min ion energy (eV)*/,
+      3 /*oxy sputter yield*/, 0 /*mask material ID*/);
 
   psProcess<NumericType, D> process;
   process.setDomain(geometry);
   process.setProcessModel(model.getProcessModel());
   process.setMaxCoverageInitIterations(10);
-  process.setNumberOfRaysPerPoint(1000);
-  process.setProcessDuration(params.processTime);
+  process.setNumberOfRaysPerPoint(50);
+  process.setProcessDuration(processTime);
 
   auto mesh = psSmartPointer<lsMesh<NumericType>>::New();
   psToSurfaceMesh<NumericType, D>(geometry, mesh).apply();

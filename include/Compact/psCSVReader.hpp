@@ -9,8 +9,8 @@
 #include <tuple>
 #include <vector>
 
-#include <psParser.hpp>
 #include <psSmartPointer.hpp>
+#include <psUtils.hpp>
 
 // Simple class for reading CSV files
 template <class NumericType, int NumCols> class psCSVReader {
@@ -62,7 +62,7 @@ public:
         std::array<NumericType, NumCols> a{0};
         int i = 0;
         while (std::getline(iss, tmp, delimiter) && i < NumCols) {
-          a[i] = psInternal::parse<NumericType>(tmp);
+          a[i] = psUtils::convertToNumeric<NumericType>(tmp);
           ++i;
         }
         data->push_back(a);

@@ -243,11 +243,12 @@ public:
     // Set the flag to stop tracing if the energy is below the threshold
     if (NewEnergy > minEnergy) {
       E = NewEnergy;
+
       auto direction = rayReflectionConedCosine<NumericType, D>(
           rayInternal::PI / 2. - std::min(incAngle, minAngle), rayDir,
           geomNormal, Rng);
-      return std::pair<NumericType, rayTriple<NumericType>>{NumericType(0),
-                                                            direction};
+
+      return std::pair<NumericType, rayTriple<NumericType>>{0., direction};
     } else {
       return std::pair<NumericType, rayTriple<NumericType>>{
           1., rayTriple<NumericType>{0., 0., 0.}};
@@ -263,9 +264,11 @@ public:
   }
 
   int getRequiredLocalDataSize() const override final { return 4; }
+
   NumericType getSourceDistributionPower() const override final {
     return 1000.;
   }
+
   std::vector<std::string> getLocalDataLabels() const override final {
     return std::vector<std::string>{"ionSputteringRate", "ionEnhancedRate",
                                     "oxygenSputteringRate", "oxideEtchRate"};
