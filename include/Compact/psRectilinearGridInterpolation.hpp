@@ -153,6 +153,7 @@ public:
         // past-the-end iterator is returned.
         auto upperIt = uniqueValues[i].upper_bound(input[i]);
 
+        // Get the index of the lower bound (upper bound index - 1)
         gridIndices[i] = std::distance(uniqueValues[i].begin(), upperIt) - 1;
 
         NumericType upperBound = *upperIt;
