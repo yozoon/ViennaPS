@@ -10,8 +10,8 @@
 
 #include <psCSVReader.hpp>
 #include <psDataSource.hpp>
-#include <psParser.hpp>
 #include <psSmartPointer.hpp>
+#include <psUtils.hpp>
 
 template <typename NumericType, int D>
 class psCSVDataSource : public psDataSource<NumericType, D> {
@@ -25,7 +25,7 @@ class psCSVDataSource : public psDataSource<NumericType, D> {
                          std::vector<NumericType> &positionalParameters) {
     // Positional parameter
     try {
-      NumericType num = psInternal::parse<NumericType>(input);
+      NumericType num = psUtils::convertToNumeric<NumericType>(input);
       positionalParameters.push_back(num);
     } catch (const std::invalid_argument &) {
       std::cout << "Error while converting parameter '" << input
@@ -36,14 +36,15 @@ class psCSVDataSource : public psDataSource<NumericType, D> {
   static void processNamedParam(
       const std::string &input,
       std::unordered_map<std::string, NumericType> &namedParameters) {
-    const std::string regexPattern = "^[\\ \\t]*([0-9a-zA-Z\\_\\-]+)[\\ \\t]*=[\\ "
-                                     "\\t]*([0-9eE\\.\\-\\+]+)[\\ \\t]*$";
+    const std::string regexPattern =
+        "^[\\ \\t]*([0-9a-zA-Z\\_\\-]+)[\\ \\t]*=[\\ "
+        "\\t]*([0-9eE\\.\\-\\+]+)[\\ \\t]*$";
     const std::regex rgx(regexPattern);
 
     std::smatch smatch;
     if (std::regex_search(input, smatch, rgx) && smatch.size() == 3) {
       try {
-        NumericType value = psInternal::parse<NumericType>(smatch[2]);
+        NumericType value = psUtils::convertToNumeric<NumericType>(smatch[2]);
         namedParameters.insert({smatch[1], value});
       } catch (const std::invalid_argument &) {
         std::cout << "Error while parsing parameter '" << input << "'\n";
