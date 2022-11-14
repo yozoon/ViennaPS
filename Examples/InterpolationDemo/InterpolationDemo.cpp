@@ -17,14 +17,13 @@
 
 int main() {
   using NumericType = double;
-  static constexpr int D = 2;
 
   static constexpr int InputDim = 3;
   static constexpr int TargetDim = 1;
 
   static constexpr int DataDim = InputDim + TargetDim;
 
-  const int numSamples = 40;
+  static constexpr int numSamples = 40;
 
   {
     auto dataSource =
@@ -32,16 +31,18 @@ int main() {
     dataSource->setFilename("griddata.csv");
 
     psRectilinearGridInterpolation<NumericType, InputDim, TargetDim>
-        interpolation(true);
+        interpolation;
     interpolation.setDataSource(dataSource);
     interpolation.initialize();
 
     // Quick demo of the positional and named parameters feature
+    std::cout << "Positional parameters: ";
     for (auto value : dataSource->getPositionalParameters()) {
       std::cout << value << ',';
     }
     std::cout << std::endl;
 
+    std::cout << "Named parameters: ";
     for (auto [key, value] : dataSource->getNamedParameters()) {
       std::cout << key << '=' << value << ',';
     }
@@ -67,8 +68,7 @@ int main() {
           x[1] = -6. + j * (8. + 6.) / (numSamples - 1);
           x[2] = -6. + k * (1. + 6.) / (numSamples - 1);
 
-          // We use structural bindings to directly unpack the tuple of one
-          // element
+          // We use structural bindings to directly unpack the tuple
           auto [value, isInside] = interpolation.estimate(x);
 
           writer.writeRow({x[0], x[1], x[2], value[0]});
@@ -104,7 +104,7 @@ int main() {
           x[2] = -6. + k * (1. + 6.) / (numSamples - 1);
 
           // We use structural bindings to directly unpack the tuple
-          auto [value, _] = interpolation.estimate(x);
+          auto [value, minDistance] = interpolation.estimate(x);
 
           writer.writeRow({x[0], x[1], x[2], value[0]});
         }
@@ -141,7 +141,7 @@ int main() {
           x[2] = -6. + k * (1. + 6.) / (numSamples - 1);
 
           // We use structural bindings to directly unpack the tuple
-          auto [value, _] = interpolation.estimate(x);
+          auto [value, minDistance] = interpolation.estimate(x);
 
           writer.writeRow({x[0], x[1], x[2], value[0]});
         }

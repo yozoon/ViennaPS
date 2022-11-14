@@ -28,10 +28,10 @@ class psRectilinearGridInterpolation
 
   std::array<std::set<NumericType>, InputDim> uniqueValues;
   bool initialized = false;
-  bool allowExtrapolation = false;
 
   // For rectilinear grid interpolation to work, we first have to ensure that
   // our input coordinates are arranged in a certain way
+  // Future improvement: parallelize the recursive sorting using OpenMP taks
   bool rearrange(typename DataVector::iterator start,
                  typename DataVector::iterator end, int axis, bool capture) {
     bool equalSize = true;
@@ -86,8 +86,7 @@ class psRectilinearGridInterpolation
   }
 
 public:
-  psRectilinearGridInterpolation(bool passedAllowExtrapolation = false)
-      : allowExtrapolation(passedAllowExtrapolation) {}
+  psRectilinearGridInterpolation() {}
 
   bool initialize() override {
     if (!dataSource)
@@ -123,12 +122,6 @@ public:
         if (input[i] < *(uniqueValues[i].begin()) ||
             input[i] > *(uniqueValues[i].rbegin())) {
           isInside = false;
-          if (!allowExtrapolation) {
-            std::cout
-                << "The provided value lies outside of the grid in dimension "
-                << i << std::endl;
-            return {{}, {}};
-          }
         }
       } else {
         std::cout << "The grid has no values along dimension " << i
@@ -140,36 +133,33 @@ public:
     std::array<NumericType, InputDim> normalizedCoordinates;
 
     // Check in which hyperrectangle the provided input coordinates are located
-    // Future Improvement: use binary search instead of linear search
     for (int i = 0; i < InputDim; ++i) {
-      // Step down the unique values until we reache the first value that's less
-      // than the provided input coordinate along the current axis (= lower
-      // coordinate along this axis of the quad)
-      gridIndices[i] = uniqueValues[i].size();
-      NumericType lowerBound = *uniqueValues[i].begin();
-      NumericType upperBound = *uniqueValues[i].rbegin();
-      for (auto r = uniqueValues[i].rbegin(); r != uniqueValues[i].rend();
-           ++r) {
-        --gridIndices[i];
-        if (*r < input[i]) {
-          lowerBound = *r;
-          break;
-        } else {
-          upperBound = *r;
-        }
-      }
-
-      // Calculate normalized coordinates in the selected range
-      if (input[i] <= lowerBound)
+      if (input[i] <= *uniqueValues[i].begin()) {
+        // The coordinate is lower than or equal to the lowest grid point along
+        // the axis i.
+        gridIndices[i] = 0;
         normalizedCoordinates[i] = 0;
-      else if (input[i] >= upperBound)
-        normalizedCoordinates[i] = 1;
-      else if (lowerBound == upperBound)
-        normalizedCoordinates[i] = 0; // Only happens if we are exactly at the
-                                      // lowest end of the data grid
-      else
+      } else if (input[i] >= *uniqueValues[i].rbegin()) {
+        // The coordinate is greater than or equal to the greatest grid point
+        // along the axis i.
+        gridIndices[i] = uniqueValues[i].size() - 1;
+        normalizedCoordinates[i] = 1.;
+      } else {
+        // The corrdinate is somewhere in between (excluding) the lowest and
+        // greatest grid point.
+
+        // The following function returns an iterator pointing to the first
+        // element that is greater than input[i]. If no such element is found, a
+        // past-the-end iterator is returned.
+        auto upperIt = uniqueValues[i].upper_bound(input[i]);
+
+        gridIndices[i] = std::distance(uniqueValues[i].begin(), upperIt) - 1;
+
+        NumericType upperBound = *upperIt;
+        NumericType lowerBound = *(--upperIt);
         normalizedCoordinates[i] =
             (input[i] - lowerBound) / (upperBound - lowerBound);
+      }
     }
 
     // Now retrieve the values at the corners of the selected hyperrectangle
