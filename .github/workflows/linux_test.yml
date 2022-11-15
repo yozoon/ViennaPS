@@ -164,5 +164,5 @@ jobs:
         run: cmake --build ./build --target buildDependencies buildExamples
 
       - name: Run
-        working-directory: ${{github.workspace}}/viennaps/build/Examples/InterpolationDemo
+        working-directory: ${{github.workspace}}/build/Examples/InterpolationDemo
         run: ./InterpolationDemo
