@@ -24,13 +24,13 @@ jobs:
 
       - name: Setup Cache for Build Dependencies
         uses: actions/cache@v3
-        id: cache-dependencies
+        id: cache-viennals-dependencies
         with:
           key: viennals-dependencies-cache-${{ runner.os }}-${{env.BUILD_TYPE}}-${{ hashFiles(format('{0}/viennals/external/upstream/**CMakeLists.txt', github.workspace )) }}-${{env.CACHE_TAG}}
           path: ${{github.workspace}}/viennals/dependencies/Build
 
       - name: Configure ViennaLS
-        if: ${{ steps.cache-dependencies.outputs.cache-hit != 'true' }}
+        if: ${{ steps.cache-viennals-dependencies.outputs.cache-hit != 'true' }}
         working-directory: ./viennals
         run: |
           cmake -B ./build \
@@ -38,7 +38,7 @@ jobs:
             -DCMAKE_INSTALL_PREFIX=./install
 
       - name: Configure ViennaLS (cached dependencies)
-        if: ${{ steps.cache-dependencies.outputs.cache-hit == 'true' }}
+        if: ${{ steps.cache-viennals-dependencies.outputs.cache-hit == 'true' }}
         working-directory: ./viennals
         run: |
           cmake -B ./build \
@@ -66,13 +66,13 @@ jobs:
 
       - name: Setup Cache for Build Dependencies
         uses: actions/cache@v3
-        id: cache-dependencies
+        id: cache-viennaray-dependencies
         with:
           key: viennaray-dependencies-cache-${{ runner.os }}-${{env.BUILD_TYPE}}-${{ hashFiles( format('{0}/viennaray/external/upstream/**CMakeLists.txt', github.workspace )) }}-${{env.CACHE_TAG}}
           path: ${{github.workspace}}/viennaray/embree
 
       - name: Download and Unpack embree
-        if: ${{ steps.cache-dependencies.outputs.cache-hit != 'true' }}
+        if: ${{ steps.cache-viennaray-dependencies.outputs.cache-hit != 'true' }}
         working-directory: ./viennaray
         run: |
           curl -L -O https://github.com/embree/embree/releases/download/v3.13.0/embree-3.13.0.x86_64.linux.tar.gz \
