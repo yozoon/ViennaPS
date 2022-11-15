@@ -105,10 +105,10 @@ jobs:
           path: ./viennaps
 
       - name: print folders
-        working-directory: ./viennaps
         run: |
           tree -d ./viennals
           tree -d ./viennaray
+          tree -d ./viennaps
 
       - name: Configure CMake
         working-directory: ./viennaps
