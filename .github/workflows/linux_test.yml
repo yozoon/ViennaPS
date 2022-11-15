@@ -5,11 +5,10 @@ on:
     branches: [actions]
   pull_request:
     branches: [actions]
+  repository_dispatch:
+    types: [on-demand-test]
   workflow_dispatch:
 
-  repository_dispatch:
-    types:
-      - webhook
 
 env:
   BUILD_TYPE: Debug
