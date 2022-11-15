@@ -15,6 +15,7 @@ runs:
       with:
         repository: ViennaTools/ViennaLS
         path: ${{inputs.path}}
+        ref: master
 
     # - name: Setup Cache for Build Dependencies
     #   uses: actions/cache@v3
