@@ -13,7 +13,7 @@ runs:
         repository: ViennaTools/ViennaLS
         path: viennals
 
-    - name: Cache Build Dependencies
+    - name: Setup Cache for Build Dependencies
       uses: actions/cache@v3
       id: cache-dependencies
       with:
@@ -22,7 +22,7 @@ runs:
           ${{github.workspace}}/viennals/dependencies/Install
 
     - if: ${{ steps.cache-dependencies.outputs.cache-hit != 'true' }}
-      name: Configure CMake
+      name: Configure ViennaLS
       shell: bash
       run: |
         cmake -B ${{github.workspace}}/viennals/build \
@@ -30,7 +30,7 @@ runs:
           -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/viennals/install
 
     - if: ${{ steps.cache-dependencies.outputs.cache-hit == 'true' }}
-      name: Configure CMake
+      name: Configure ViennaLS (cached dependencies)
       shell: bash
       run: |
         cmake -B ${{github.workspace}}/viennals/build \
@@ -41,7 +41,7 @@ runs:
 
     - name: Build ViennaLS
       shell: bash
-      run: cmake --build ${{github.workspace}}/viennals/build
+      run: cmake --build ${{github.workspace}}/viennals/build --target buildDependencies all
 
     - name: Install ViennaLS
       shell: bash
