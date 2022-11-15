@@ -21,16 +21,16 @@ runs:
         path: ${{inputs.path}}
         ref: master
 
-    # - name: Setup Cache for Build Dependencies
-    #   uses: actions/cache@v3
-    #   id: cache-dependencies
-    #   with:
-    #     key: viennals-dependencies-cache-${{ runner.os }}-${{ hashFiles('./viennals/external/upstream/**CMakeLists.txt') }}
-    #     path: |
-    #       ${{github.workspace}}/viennals/dependencies/Install
+    - name: Setup Cache for Build Dependencies
+      uses: actions/cache@v3
+      id: cache-dependencies
+      with:
+        key: viennals-dependencies-cache-${{ runner.os }}-${{ hashFiles(inputs.path + '/viennals/external/upstream/**CMakeLists.txt') }}
+        path: |
+          ${{inputs.path}}/dependencies/Install
 
-    # - if: ${{ steps.cache-dependencies.outputs.cache-hit != 'true' }}
-    - name: Configure ViennaLS
+    - if: ${{ steps.cache-dependencies.outputs.cache-hit != 'true' }}
+      name: Configure ViennaLS
       shell: bash
       working-directory: ${{inputs.path}}
       run: |
@@ -38,15 +38,15 @@ runs:
           -DCMAKE_BUILD_TYPE=${{inputs.build_type}} \
           -DCMAKE_INSTALL_PREFIX=${{inputs.path}}/install
 
-    # - if: ${{ steps.cache-dependencies.outputs.cache-hit == 'true' }}
-    #   name: Configure ViennaLS (cached dependencies)
-    #   shell: bash
-    #   run: |
-    #     cmake -B ${{github.workspace}}/viennals/build \
-    #       -DCMAKE_BUILD_TYPE=${{inputs.build_type}} \
-    #       -DVTK_DIR=${{github.workspace}}/viennals/dependencies/Install/vtk_external/lib/cmake/vtk-9.1/ \
-    #       -DViennaHRLE_DIR=${{github.workspace}}/viennals/dependencies/Install/viennahrle_external/lib/cmake/ViennaHRLE/ \
-    #       -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/viennals/install
+    - if: ${{ steps.cache-dependencies.outputs.cache-hit == 'true' }}
+      name: Configure ViennaLS (cached dependencies)
+      shell: bash
+      run: |
+        cmake -B ${{github.workspace}}/viennals/build \
+          -DCMAKE_BUILD_TYPE=${{inputs.build_type}} \
+          -DVTK_DIR=${{github.workspace}}/viennals/dependencies/Install/vtk_external/lib/cmake/vtk-9.1/ \
+          -DViennaHRLE_DIR=${{github.workspace}}/viennals/dependencies/Install/viennahrle_external/lib/cmake/ViennaHRLE/ \
+          -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/viennals/install
 
     - name: Build ViennaLS
       shell: bash
