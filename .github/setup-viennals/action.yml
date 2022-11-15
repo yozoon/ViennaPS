@@ -1,6 +1,9 @@
 name: setup-viennals
 description: Setup ViennaLS
 inputs:
+  path:
+    description: directory where the action should be executed
+    required: true
   build_type:
     description: CMake build type (Release, Debug, RelWithDebInfo, etc.)
     required: false
@@ -11,7 +14,7 @@ runs:
     - uses: actions/checkout@v3
       with:
         repository: ViennaTools/ViennaLS
-        path: viennals
+        path: ${{inputs.path}}
 
     # - name: Setup Cache for Build Dependencies
     #   uses: actions/cache@v3
@@ -25,9 +28,9 @@ runs:
     - name: Configure ViennaLS
       shell: bash
       run: |
-        cmake -B ${{github.workspace}}/viennals/build \
+        cmake -B ${{inputs.path}}/build \
           -DCMAKE_BUILD_TYPE=${{inputs.build_type}} \
-          -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/viennals/install
+          -DCMAKE_INSTALL_PREFIX=${{inputs.path}}/install
 
     # - if: ${{ steps.cache-dependencies.outputs.cache-hit == 'true' }}
     #   name: Configure ViennaLS (cached dependencies)
@@ -41,8 +44,8 @@ runs:
 
     - name: Build ViennaLS
       shell: bash
-      run: cmake --build ${{github.workspace}}/viennals/build --target buildDependencies all
+      run: cmake --build ${{inputs.path}}/build --target buildDependencies all
 
     - name: Install ViennaLS
       shell: bash
-      run: cmake --install ${{github.workspace}}/viennals/build
+      run: cmake --install ${{inputs.path}}/build

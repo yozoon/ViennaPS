@@ -19,6 +19,7 @@ jobs:
 
       - uses: ./viennaps/.github/setup-viennals/
         with:
+          path: ${{github.workspace}}/viennals/
           build_type: Debug
 
       - name: Configure CMake
