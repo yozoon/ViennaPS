@@ -26,7 +26,7 @@ jobs:
         uses: actions/cache@v3
         id: cache-dependencies
         with:
-          key: viennals-dependencies-cache-${{ runner.os }}-${{env.BUILD_TYPE}}-${{ hashFiles(format('{0}/external/upstream/**CMakeLists.txt', ${{github.workspace}}/viennals )) }}-${{env.CACHE_TAG}}
+          key: viennals-dependencies-cache-${{ runner.os }}-${{env.BUILD_TYPE}}-${{ hashFiles(format('{0}/viennals/external/upstream/**CMakeLists.txt', github.workspace )) }}-${{env.CACHE_TAG}}
           path: ${{github.workspace}}/viennals/dependencies/Build
 
       - name: Configure ViennaLS
@@ -68,7 +68,7 @@ jobs:
         uses: actions/cache@v3
         id: cache-dependencies
         with:
-          key: viennaray-dependencies-cache-${{ runner.os }}-${{env.BUILD_TYPE}}-${{ hashFiles( format('{0}/external/upstream/**CMakeLists.txt', ${{github.workspace}}/viennaray )) }}-${{env.CACHE_TAG}}
+          key: viennaray-dependencies-cache-${{ runner.os }}-${{env.BUILD_TYPE}}-${{ hashFiles( format('{0}/viennaray/external/upstream/**CMakeLists.txt', github.workspace )) }}-${{env.CACHE_TAG}}
           path: ${{github.workspace}}/viennaray/embree
 
       - name: Download and Unpack embree
