@@ -11,6 +11,10 @@ inputs:
 runs:
   using: composite
   steps:
+    - name: print path
+      shell: bash
+      run: echo ${{inputs.path}}
+
     - uses: actions/checkout@v3
       with:
         repository: ViennaTools/ViennaLS
@@ -28,6 +32,7 @@ runs:
     # - if: ${{ steps.cache-dependencies.outputs.cache-hit != 'true' }}
     - name: Configure ViennaLS
       shell: bash
+      working-directory: ${{inputs.path}}
       run: |
         cmake -B ${{inputs.path}}/build \
           -DCMAKE_BUILD_TYPE=${{inputs.build_type}} \
@@ -45,8 +50,10 @@ runs:
 
     - name: Build ViennaLS
       shell: bash
+      working-directory: ${{inputs.path}}
       run: cmake --build ${{inputs.path}}/build --target buildDependencies all
 
     - name: Install ViennaLS
       shell: bash
+      working-directory: ${{inputs.path}}
       run: cmake --install ${{inputs.path}}/build
