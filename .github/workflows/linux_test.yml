@@ -1,0 +1,153 @@
+name: Test Examples
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+  repository_dispatch:
+    types: [ webhook ]
+  workflow_dispatch:
+
+env:
+  BUILD_TYPE: Debug
+  CACHE_TAG: 0
+
+jobs:
+  setup-viennals:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./viennals
+    steps:
+      - name: Checkout ViennaLS
+        uses: actions/checkout@v3
+        with:
+          repository: yozoon/ViennaLS
+          path: ./viennals
+
+      - name: Setup Cache for Build Dependencies
+        uses: actions/cache@v3
+        id: cache-dependencies
+        with:
+          key: viennals-dependencies-cache-${{ runner.os }}-${{env.BUILD_TYPE}}-${{ hashFiles( './viennals/external/upstream/**CMakeLists.txt' ) }}-${{env.CACHE_TAG}}
+          path: ${{github.workspace}}/viennals/dependencies/Install
+
+      - name: Configure ViennaLS
+        if: ${{ steps.cache-dependencies.outputs.cache-hit != 'true' }}
+        run: |
+          cmake -B ./build \
+            -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} \
+            -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/viennals/install
+
+      - name: Configure ViennaLS (cached dependencies)
+        if: ${{ steps.cache-dependencies.outputs.cache-hit == 'true' }}
+        shell: bash
+        run: |
+          cmake -B ./build \
+            -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} \
+            -DVTK_DIR=${{github.workspace}}/viennals/dependencies/Install/vtk_external/lib/cmake/vtk-9.1/ \
+            -DViennaHRLE_DIR=${{github.workspace}}/viennals/dependencies/Install/viennahrle_external/lib/cmake/ViennaHRLE/ \
+            -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/viennals/install
+
+      - name: Build ViennaLS
+        run: cmake --build ./build --target buildDependencies all
+
+      - name: Install ViennaLS
+        run: cmake --install ./build
+
+      - name: Compress Installation
+        run: tar -cpzf ${{github.workspace}}/viennals.tar.gz ./install ./dependencies/Install/
+
+      - name: Save Build Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: viennals-${{runner.os}}-${{env.BUILD_TYPE}}
+          path: ${{github.workspace}}/viennals.tar.gz
+
+  setup-viennaray:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./viennaray
+    steps:
+      - name: Checkout ViennaRay
+        uses: actions/checkout@v3
+        with:
+          repository: ViennaTools/ViennaRay
+          path: ./viennaray
+
+      - name: Setup Cache for Build Dependencies
+        uses: actions/cache@v3
+        id: cache-dependencies
+        with:
+          key: viennaray-dependencies-cache-${{ runner.os }}-${{env.BUILD_TYPE}}-${{ hashFiles( './viennaray/external/upstream/**CMakeLists.txt' ) }}-${{env.CACHE_TAG}}
+          path: ${{github.workspace}}/viennaray/embree
+
+      - name: Download and Unpack embree
+        if: ${{ steps.cache-dependencies.outputs.cache-hit != 'true' }}
+        run: |
+          curl -L -O https://github.com/embree/embree/releases/download/v3.13.0/embree-3.13.0.x86_64.linux.tar.gz \
+            && tar -xf embree-3.13.0.x86_64.linux.tar.gz \
+            && mv embree-3.13.0.x86_64.linux embree
+
+      - name: Configure ViennaRay
+        run: |
+          cmake -B ./build \
+            -D CMAKE_BUILD_TYPE=${{env.build_type}} \
+            -D embree_DIR=${{github.workspace}}/viennaray/embree/lib/cmake/embree-3.13.0 \
+            -D CMAKE_INSTALL_PREFIX=${{github.workspace}}/viennaray/install
+
+      - name: Build ViennaRay
+        run: cmake --build ./build --target buildDependencies all
+
+      - name: Install ViennaRay
+        run: cmake --install ./build
+
+      - name: Compress Installation
+        run: tar -cpzf ${{github.workspace}}/viennaray.tar.gz ./install ./embree
+
+      - name: Save Build Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: viennaray-${{runner.os}}-${{env.BUILD_TYPE}}
+          path: ${{github.workspace}}/viennaray.tar.gz
+
+  build-examples:
+    runs-on: ubuntu-latest
+    needs: [setup-viennals, setup-viennaray]
+
+    steps:
+      - name: Checkout ViennaPS
+        uses: actions/checkout@v3
+
+      - name: Download ViennaLS Build Artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: viennals-${{runner.os}}-${{env.BUILD_TYPE}}
+
+      - name: Download ViennaRay Build Artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: viennaray-${{runner.os}}-${{env.BUILD_TYPE}}
+
+      - name: Decompress Build Artifacts
+        run: |
+          mkdir -p viennals \
+          && mkdir -p viennaray \
+          && tar -xzf viennals.tar.gz -C ${{github.workspace}}/viennals \
+          && tar -xzf viennaray.tar.gz -C ${{github.workspace}}/viennaray
+
+      - name: Configure CMake
+        run: |
+          cmake -B ./build \
+            -D ViennaLS_DIR=${{github.workspace}}/viennals/install/lib/cmake/ViennaLS/ \
+            -D ViennaRay_DIR=${{github.workspace}}/viennaray/install/lib/cmake/ViennaRay/ \
+            -D VIENNAPS_BUILD_EXAMPLES=ON
+
+      - name: Build Examples
+        run: cmake --build ./build --target buildExamples
+
+      - name: Run
+        working-directory: ${{github.workspace}}/build/Examples/InterpolationDemo
+        run: ./InterpolationDemo
