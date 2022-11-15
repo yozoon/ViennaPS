@@ -2,7 +2,7 @@ name: Linux
 
 on:
   push:
-      branches: [ actions ]
+    branches: [actions]
   workflow_dispatch:
 
 jobs:
@@ -10,7 +10,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: ./github/setup-action
+      - uses: actions/checkout@v2
+      - uses: ./.github/setup-action
         with:
           build_type: Debug
 
