@@ -1,9 +1,15 @@
-name: Linux
+name: Test Examples
 
 on:
   push:
     branches: [actions]
+  pull_request:
+    branches: [actions]
   workflow_dispatch:
+
+  repository_dispatch:
+    types:
+      - webhook
 
 env:
   BUILD_TYPE: Debug
@@ -21,9 +27,6 @@ jobs:
         with:
           repository: yozoon/ViennaLS
           path: ./viennals
-
-      # - name: Store ViennaLS commit hash in environment
-      #   run: echo "VIENNALS_COMMIT=$(git rev-parse HEAD)" >> $GITHUB_ENV
 
       - name: Setup Cache for Build Dependencies
         uses: actions/cache@v3
@@ -52,13 +55,6 @@ jobs:
       - name: Build ViennaLS
         run: cmake --build ./build --target buildDependencies all
 
-      # - name: Setup Cache for ViennaLS install
-      #   uses: actions/cache@v3
-      #   id: cache-installation
-      #   with:
-      #     key: viennals-cache-${{ runner.os }}-${{env.BUILD_TYPE}}-${{env.VIENNALS_COMMIT}}
-      #     path: ./install
-
       - name: Install ViennaLS
         run: cmake --install ./build
 
@@ -77,14 +73,11 @@ jobs:
       run:
         working-directory: ./viennaray
     steps:
-      - name: Clone ViennaRay
+      - name: Checkout ViennaRay
         uses: actions/checkout@v3
         with:
           repository: ViennaTools/ViennaRay
           path: ./viennaray
-
-      # - name: Store ViennaRay commit hash in environment
-      #   run: echo "VIENNARAY_COMMIT=$(git rev-parse HEAD)" >> $GITHUB_ENV
 
       - name: Setup Cache for Build Dependencies
         uses: actions/cache@v3
@@ -127,7 +120,7 @@ jobs:
     needs: [setup-viennals, setup-viennaray]
 
     steps:
-      - name: Clone ViennaPS
+      - name: Checkout ViennaPS
         uses: actions/checkout@v3
 
       - name: Download ViennaLS Build Artifacts
@@ -147,12 +140,6 @@ jobs:
           && tar -xzf viennals.tar.gz -C ${{github.workspace}}/viennals \
           && tar -xzf viennaray.tar.gz -C ${{github.workspace}}/viennaray
 
-      - name: print folders
-        run: |
-          tree -d ${{github.workspace}}/viennals
-          tree -d ${{github.workspace}}/viennaray
-          tree -d ${{github.workspace}}/viennaps
-
       - name: Configure CMake
         run: |
           cmake -B ./build \
@@ -160,8 +147,8 @@ jobs:
             -D ViennaRay_DIR=${{github.workspace}}/viennaray/install/lib/cmake/ViennaRay/ \
             -D VIENNAPS_BUILD_EXAMPLES=ON
 
-      - name: Build Dependencies
-        run: cmake --build ./build --target buildDependencies buildExamples
+      - name: Build Examples
+        run: cmake --build ./build --target buildExamples
 
       - name: Run
         working-directory: ${{github.workspace}}/build/Examples/InterpolationDemo
