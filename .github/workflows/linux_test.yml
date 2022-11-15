@@ -46,8 +46,8 @@ jobs:
         run: cmake -B ${{github.workspace}}/build -DVIENNAPS_BUILD_EXAMPLES=ON
 
       - name: Build Examples
-        run: cmake --build ${{github.workspace}}/build
+        run: cmake --build ${{github.workspace}}/build --target buildExamples
 
       - name: Run
-        working-directory: ${{github.workspace}}/build
-        run: ./Examples/InterpolationDemo/InterpolationDemo
+        working-directory: ${{github.workspace}}/build/Examples/InterpolationDemo
+        run: ./InterpolationDemo
