@@ -7,6 +7,7 @@ on:
 
 env:
   BUILD_TYPE: Debug
+  CACHE_TAG: 0
 
 jobs:
   setup-viennals:
@@ -18,7 +19,7 @@ jobs:
       - name: Checkout ViennaLS
         uses: actions/checkout@v3
         with:
-          repository: ViennaTools/ViennaLS
+          repository: yozoon/ViennaLS
           path: ./viennals
 
       # - name: Store ViennaLS commit hash in environment
@@ -28,10 +29,8 @@ jobs:
         uses: actions/cache@v3
         id: cache-dependencies
         with:
-          key: viennals-dependencies-cache-${{ runner.os }}-${{env.BUILD_TYPE}}-${{ hashFiles( './external/upstream/**CMakeLists.txt' ) }}
-          path: |
-            ./dependencies/Build
-            ./dependencies/Install
+          key: viennals-dependencies-cache-${{ runner.os }}-${{env.BUILD_TYPE}}-${{ hashFiles( './external/upstream/**CMakeLists.txt' ) }}-${{env.CACHE_TAG}}
+          path: ./dependencies/Install
 
       - name: Configure ViennaLS
         if: ${{ steps.cache-dependencies.outputs.cache-hit != 'true' }}
@@ -63,11 +62,14 @@ jobs:
       - name: Install ViennaLS
         run: cmake --install ./build
 
+      - name: Compress Installation
+        run: tar -cpzf ${{github.workspace}}/viennals.tar.gz ${{github.workspace}}/viennals/install ${{github.workspace}}/viennals/dependencies/Install/
+
       - name: Save Build Artifacts
         uses: actions/upload-artifact@v3
         with:
           name: viennals-${{runner.os}}-${{env.BUILD_TYPE}}
-          path: ${{github.workspace}}/viennals/
+          path: ${{github.workspace}}/viennals.tar.gz
 
   setup-viennaray:
     runs-on: ubuntu-latest
@@ -88,7 +90,7 @@ jobs:
         uses: actions/cache@v3
         id: cache-dependencies
         with:
-          key: viennaray-dependencies-cache-${{ runner.os }}-${{env.BUILD_TYPE}}-${{ hashFiles( './external/upstream/**CMakeLists.txt' ) }}
+          key: viennaray-dependencies-cache-${{ runner.os }}-${{env.BUILD_TYPE}}-${{ hashFiles( './external/upstream/**CMakeLists.txt' ) }}-${{env.CACHE_TAG}}
           path: ./embree
 
       - name: Download and Unpack embree
@@ -111,11 +113,14 @@ jobs:
       - name: Install ViennaRay
         run: cmake --install ./build
 
+      - name: Compress Installation
+        run: tar -cpzf ${{github.workspace}}/viennaray.tar.gz ${{github.workspace}}/viennaray/install ${{github.workspace}}/embree
+
       - name: Save Build Artifacts
         uses: actions/upload-artifact@v3
         with:
           name: viennaray-${{runner.os}}-${{env.BUILD_TYPE}}
-          path: ${{github.workspace}}/viennaray/
+          path: ${{github.workspace}}/viennaray.tar.gz
 
   build-examples:
     runs-on: ubuntu-latest
@@ -129,13 +134,18 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: viennals-${{runner.os}}-${{env.BUILD_TYPE}}
-          path: ./viennals/
+          path: ./viennals.tar.gz
 
       - name: Download ViennaRay Build Artifacts
         uses: actions/download-artifact@v3
         with:
           name: viennaray-${{runner.os}}-${{env.BUILD_TYPE}}
-          path: ./viennaray/
+          path: ./viennaray.tar.gz
+
+      - name: Decompress Build Artifacts
+        run: |
+          tar -zxvf viennals.tar.gz \
+          && tar -zxvf viennaray.tar.gz
 
       - name: print folders
         run: |
