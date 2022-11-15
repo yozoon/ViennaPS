@@ -21,7 +21,7 @@ runs:
       uses: actions/cache@v3
       id: cache-dependencies
       with:
-        key: viennals-dependencies-cache-${{ runner.os }}-${{ hashFiles(inputs.path + '/viennals/external/upstream/**CMakeLists.txt') }}
+        key: viennals-dependencies-cache-${{ runner.os }}-${{ hashFiles( format('{0}/viennals/external/upstream/**CMakeLists.txt', inputs.path) ) }}
         path: |
           ${{inputs.path}}/dependencies/Build
           ${{inputs.path}}/dependencies/Install
