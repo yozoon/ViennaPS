@@ -9,45 +9,149 @@ env:
   BUILD_TYPE: Debug
 
 jobs:
-  build-test:
+  setup-viennals:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./viennals
+    steps:
+      - name: Checkout ViennaLS
+        uses: actions/checkout@v3
+        with:
+          repository: ViennaTools/ViennaLS
+          path: ./viennals
+
+      # - name: Store ViennaLS commit hash in environment
+      #   run: echo "VIENNALS_COMMIT=$(git rev-parse HEAD)" >> $GITHUB_ENV
+
+      - name: Setup Cache for Build Dependencies
+        uses: actions/cache@v3
+        id: cache-dependencies
+        with:
+          key: viennals-dependencies-cache-${{ runner.os }}-${{env.BUILD_TYPE}}-${{ hashFiles( './external/upstream/**CMakeLists.txt' ) }}
+          path: |
+            ./dependencies/Build
+            ./dependencies/Install
+
+      - name: Configure ViennaLS
+        if: ${{ steps.cache-dependencies.outputs.cache-hit != 'true' }}
+        run: |
+          cmake -B ./build \
+            -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} \
+            -DCMAKE_INSTALL_PREFIX=./install
+
+      - name: Configure ViennaLS (cached dependencies)
+        if: ${{ steps.cache-dependencies.outputs.cache-hit == 'true' }}
+        shell: bash
+        run: |
+          cmake -B ./build \
+            -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} \
+            -DVTK_DIR=./dependencies/Build/vtk_external/ \
+            -DViennaHRLE_DIR=./dependencies/Install/viennahrle_external/lib/cmake/ViennaHRLE/ \
+            -DCMAKE_INSTALL_PREFIX=./install
+
+      - name: Build ViennaLS
+        run: cmake --build ./build --target buildDependencies all
+
+      # - name: Setup Cache for ViennaLS install
+      #   uses: actions/cache@v3
+      #   id: cache-installation
+      #   with:
+      #     key: viennals-cache-${{ runner.os }}-${{env.BUILD_TYPE}}-${{env.VIENNALS_COMMIT}}
+      #     path: ./install
+
+      - name: Install ViennaLS
+        run: cmake --install ./build
+
+      - name: Save Build Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: viennals-${{runner.os}}-${{env.BUILD_TYPE}}
+          path: ${{github.workspace}}/viennals/
+
+  setup-viennaray:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./viennaray
+    steps:
+      - name: Clone ViennaRay
+        uses: actions/checkout@v3
+        with:
+          repository: ViennaTools/ViennaRay
+          path: ./viennaray
+
+      # - name: Store ViennaRay commit hash in environment
+      #   run: echo "VIENNARAY_COMMIT=$(git rev-parse HEAD)" >> $GITHUB_ENV
+
+      - name: Setup Cache for Build Dependencies
+        uses: actions/cache@v3
+        id: cache-dependencies
+        with:
+          key: viennaray-dependencies-cache-${{ runner.os }}-${{env.BUILD_TYPE}}-${{ hashFiles( './external/upstream/**CMakeLists.txt' ) }}
+          path: ./embree
+
+      - name: Download and Unpack embree
+        if: ${{ steps.cache-dependencies.outputs.cache-hit != 'true' }}
+        run: |
+          curl -L -O https://github.com/embree/embree/releases/download/v3.13.0/embree-3.13.0.x86_64.linux.tar.gz \
+            && tar -xf embree-3.13.0.x86_64.linux.tar.gz \
+            && mv embree-3.13.0.x86_64.linux embree
+
+      - name: Configure ViennaRay
+        run: |
+          cmake -B ./build \
+            -D CMAKE_BUILD_TYPE=${{env.build_type}} \
+            -D embree_DIR=./embree/lib/cmake/embree-3.13.0/ \
+            -D CMAKE_INSTALL_PREFIX=./install
+
+      - name: Build ViennaRay
+        run: cmake --build ./build --target buildDependencies all
+
+      - name: Install ViennaRay
+        run: cmake --install ./build
+
+      - name: Save Build Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: viennaray-${{runner.os}}-${{env.BUILD_TYPE}}
+          path: ${{github.workspace}}/viennaray/
+
+  build-examples:
+    runs-on: ubuntu-latest
+    needs: [setup-viennals, setup-viennaray]
 
     steps:
       - name: Clone ViennaPS
         uses: actions/checkout@v3
 
-      - name: Setup ViennaLS
-        uses: ./.github/setup-viennals/
+      - name: Download ViennaLS Build Artifacts
+        uses: actions/download-artifact@v3
         with:
-          path: ${{github.workspace}}/viennals/
-          build_type: Debug
+          name: viennals-${{runner.os}}-${{env.BUILD_TYPE}}
+          path: ./viennals/
 
-      - name: Setup ViennaRay
-        uses: ./.github/setup-viennaray/
+      - name: Download ViennaRay Build Artifacts
+        uses: actions/download-artifact@v3
         with:
-          path: ${{github.workspace}}/viennaray/
-          build_type: Debug
-
-      - name: Configure CMake
-        run: |
-          cmake -B ${{github.workspace}}/build \
-            -DViennaLS_DIR=${{github.workspace}}/viennals/install/lib/cmake/ViennaLS/ \
-            -DViennaRay_DIR=${{github.workspace}}/viennaray/install/lib/cmake/ViennaRay/
+          name: viennaray-${{runner.os}}-${{env.BUILD_TYPE}}
+          path: ./viennaray/
 
       - name: print folders
         run: |
-          tree -d ${{github.workspace}}/viennals
-          tree -d ${{github.workspace}}/viennaray
+          tree -d ./viennals
+          tree -d ./viennaray
+
+      - name: Configure CMake
+        run: |
+          cmake -B ./build \
+            -D ViennaLS_DIR=./viennals/install/lib/cmake/ViennaLS/ \
+            -D ViennaRay_DIR=./viennaray/install/lib/cmake/ViennaRay/ \
+            -D VIENNAPS_BUILD_EXAMPLES=ON
 
       - name: Build Dependencies
-        run: cmake --build ${{github.workspace}}/build --target buildDependencies
-
-      - name: Enable Examples Target
-        run: cmake -B ${{github.workspace}}/build -DVIENNAPS_BUILD_EXAMPLES=ON
-
-      - name: Build Examples
-        run: cmake --build ${{github.workspace}}/build --target buildExamples
+        run: cmake --build ./build --target buildDependencies buildExamples
 
       - name: Run
-        working-directory: ${{github.workspace}}/build/Examples/InterpolationDemo
+        working-directory: ./build/Examples/InterpolationDemo
         run: ./InterpolationDemo
