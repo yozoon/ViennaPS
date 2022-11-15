@@ -37,7 +37,7 @@ jobs:
         run: |
           cmake -B ./build \
             -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} \
-            -DCMAKE_INSTALL_PREFIX=./install
+            -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/viennals/install
 
       - name: Configure ViennaLS (cached dependencies)
         if: ${{ steps.cache-dependencies.outputs.cache-hit == 'true' }}
@@ -45,9 +45,9 @@ jobs:
         run: |
           cmake -B ./build \
             -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} \
-            -DVTK_DIR=./dependencies/Build/vtk_external/ \
-            -DViennaHRLE_DIR=./dependencies/Install/viennahrle_external/lib/cmake/ViennaHRLE/ \
-            -DCMAKE_INSTALL_PREFIX=./install
+            -DVTK_DIR=${{github.workspace}}/viennals/dependencies/Install/vtk_external/ \
+            -DViennaHRLE_DIR=${{github.workspace}}/viennals/dependencies/Install/viennahrle_external/lib/cmake/ViennaHRLE/ \
+            -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/viennals/install
 
       - name: Build ViennaLS
         run: cmake --build ./build --target buildDependencies all
@@ -91,7 +91,7 @@ jobs:
         id: cache-dependencies
         with:
           key: viennaray-dependencies-cache-${{ runner.os }}-${{env.BUILD_TYPE}}-${{ hashFiles( './viennaray/external/upstream/**CMakeLists.txt' ) }}-${{env.CACHE_TAG}}
-          path: ./embree
+          path: ./viennaray/embree
 
       - name: Download and Unpack embree
         if: ${{ steps.cache-dependencies.outputs.cache-hit != 'true' }}
@@ -104,8 +104,8 @@ jobs:
         run: |
           cmake -B ./build \
             -D CMAKE_BUILD_TYPE=${{env.build_type}} \
-            -D embree_DIR=./embree/lib/cmake/embree-3.13.0/ \
-            -D CMAKE_INSTALL_PREFIX=./install
+            -D embree_DIR=${{github.workspace}}/viennaray/embree/lib/cmake/embree-3.13.0 \
+            -D CMAKE_INSTALL_PREFIX=${{github.workspace}}/viennaray/install
 
       - name: Build ViennaRay
         run: cmake --build ./build --target buildDependencies all
