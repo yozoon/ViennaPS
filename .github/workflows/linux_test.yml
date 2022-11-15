@@ -14,8 +14,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-        with:
-          path: viennaps
 
       - uses: ./viennaps/.github/setup-viennals/
         with:
@@ -30,15 +28,15 @@ jobs:
       - name: print folders
         run: tree -d ${{github.workspace}}/viennals
 
-      # - name: Build Dependencies
-      #   run: cmake --build ${{github.workspace}}/build --target buildDependencies
+      - name: Build Dependencies
+        run: cmake --build ${{github.workspace}}/build --target buildDependencies
 
-      # - name: Enable Examples Target
-      #   run: cmake -B ${{github.workspace}}/build -DVIENNAPS_BUILD_EXAMPLES=ON
+      - name: Enable Examples Target
+        run: cmake -B ${{github.workspace}}/build -DVIENNAPS_BUILD_EXAMPLES=ON
 
-      # - name: Build Examples
-      #   run: cmake --build ${{github.workspace}}/build
+      - name: Build Examples
+        run: cmake --build ${{github.workspace}}/build
 
-      # - name: Run
-      #   working-directory: ${{github.workspace}}/build
-      #   run: ./Examples/InterpolationDemo/InterpolationDemo
+      - name: Run
+        working-directory: ${{github.workspace}}/build
+        run: ./Examples/InterpolationDemo/InterpolationDemo
