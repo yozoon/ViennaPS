@@ -134,36 +134,37 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: viennals-${{runner.os}}-${{env.BUILD_TYPE}}
-          path: ./viennals.tar.gz
+          path: ${{github.workspace}}/viennals.tar.gz
 
       - name: Download ViennaRay Build Artifacts
         uses: actions/download-artifact@v3
         with:
           name: viennaray-${{runner.os}}-${{env.BUILD_TYPE}}
-          path: ./viennaray.tar.gz
+          path: ${{github.workspace}}/viennaray.tar.gz
 
       - name: Decompress Build Artifacts
         run: |
           mkdir -p viennals \
           && mkdir -p viennaray \
-          && tar -xzf viennals.tar.gz -C viennals \
-          && tar -xzf viennaray.tar.gz -C viennaray
+          && tar -xzf viennals.tar.gz -C ${{github.workspace}}/viennals \
+          && tar -xzf viennaray.tar.gz -C ${{github.workspace}}/viennaray
 
       - name: print folders
         run: |
-          tree -d ./viennals
-          tree -d ./viennaray
+          tree -d ${{github.workspace}}/viennals
+          tree -d ${{github.workspace}}/viennaray
+          tree -d ${{github.workspace}}/viennaps
 
       - name: Configure CMake
         run: |
           cmake -B ./build \
-            -D ViennaLS_DIR=./viennals/install/lib/cmake/ViennaLS/ \
-            -D ViennaRay_DIR=./viennaray/install/lib/cmake/ViennaRay/ \
+            -D ViennaLS_DIR=${{github.workspace}}/viennals/install/lib/cmake/ViennaLS/ \
+            -D ViennaRay_DIR=${{github.workspace}}/viennaray/install/lib/cmake/ViennaRay/ \
             -D VIENNAPS_BUILD_EXAMPLES=ON
 
       - name: Build Dependencies
         run: cmake --build ./build --target buildDependencies buildExamples
 
       - name: Run
-        working-directory: ./build/Examples/InterpolationDemo
+        working-directory: ${{github.workspace}}/viennaps/build/Examples/InterpolationDemo
         run: ./InterpolationDemo
