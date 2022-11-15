@@ -15,7 +15,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - uses: ./viennaps/.github/setup-viennals/
+      - uses: ./.github/setup-viennals/
         with:
           path: ${{github.workspace}}/viennals/
           build_type: Debug
