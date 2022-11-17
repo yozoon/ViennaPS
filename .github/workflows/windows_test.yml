@@ -54,13 +54,13 @@ jobs:
       - name: Configure ViennaLS (cached dependencies)
         if: ${{ steps.cache-dependencies.outputs.cache-hit == 'true' }}
         shell: bash
-        run: cmake -B "${{github.workspace}}\viennals\build" -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DVTK_DIR=${{github.workspace}}/viennals/dependencies/Install/vtk_external/lib/cmake/vtk-9.1/ -DViennaHRLE_DIR=${{github.workspace}}/viennals/dependencies/Install/viennahrle_external/lib/cmake/ViennaHRLE/ -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/viennals/install
+        run: cmake -B ${{github.workspace}}/viennals/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DVTK_DIR=${{github.workspace}}/viennals/dependencies/Install/vtk_external/lib/cmake/vtk-9.1/ -DViennaHRLE_DIR=${{github.workspace}}/viennals/dependencies/Install/viennahrle_external/lib/cmake/ViennaHRLE/ -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/viennals/install
 
       - name: Build ViennaLS
-        run: cmake --build "${{github.workspace}}\viennals\build" --target buildDependencies all
+        run: cmake --build ${{github.workspace}}/viennals/build --target buildDependencies all
 
       - name: Install ViennaLS
-        run: cmake --install "${{github.workspace}}\viennals\build"
+        run: cmake --install ${{github.workspace}}/viennals/build
 
       - name: Compress Installation
         run: tar -cpzf "${{github.workspace}}\viennals.tar.gz" install "dependencies\Install\"
@@ -104,13 +104,13 @@ jobs:
 
       - name: Configure ViennaRay
         run: |
-          cmake -B "${{github.workspace}}\viennaray\build" -D CMAKE_BUILD_TYPE=${{env.build_type}} -D embree_DIR=${{github.workspace}}/viennaray/embree/lib/cmake/embree-3.13.0 -D CMAKE_INSTALL_PREFIX=${{github.workspace}}/viennaray/install
+          cmake -B ${{github.workspace}}/viennaray/build -D CMAKE_BUILD_TYPE=${{env.build_type}} -D embree_DIR=${{github.workspace}}/viennaray/embree/lib/cmake/embree-3.13.0 -D CMAKE_INSTALL_PREFIX=${{github.workspace}}/viennaray/install
 
       - name: Build ViennaRay
-        run: cmake --build "${{github.workspace}}\viennaray\build" --target buildDependencies all
+        run: cmake --build ${{github.workspace}}/viennaray/build --target buildDependencies all
 
       - name: Install ViennaRay
-        run: cmake --install "${{github.workspace}}\viennaray\build"
+        run: cmake --install ${{github.workspace}}/viennaray/build
 
       - name: Compress Installation
         run: tar -cpzf "${{github.workspace}}\viennaray.tar.gz" install embree
