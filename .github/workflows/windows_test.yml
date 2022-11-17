@@ -1,4 +1,4 @@
-name: Test Examples on Linux
+name: Test Examples on Windows
 
 on:
   push:
@@ -7,8 +7,8 @@ on:
     branches: [master]
   repository_dispatch:
     types:
-      - viennals-update-linux
-      - viennaray-update-linux
+      - viennals-update-windows
+      - viennaray-update-windows
   # Run this workflow every Sunday at 18:30 to refresh caches
   schedule:
     - cron: "30 18 * * 0"
@@ -24,7 +24,7 @@ concurrency:
 
 jobs:
   setup-viennals:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     defaults:
       run:
         working-directory: ./viennals
@@ -85,7 +85,7 @@ jobs:
           path: ${{github.workspace}}/viennals.tar.gz
 
   setup-viennaray:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     defaults:
       run:
         working-directory: ./viennaray
@@ -143,7 +143,7 @@ jobs:
           path: ${{github.workspace}}/viennaray.tar.gz
 
   build-examples:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     needs: [setup-viennals, setup-viennaray]
     if: ${{ github.event_name != 'schedule' }}
 
