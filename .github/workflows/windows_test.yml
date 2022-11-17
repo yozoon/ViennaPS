@@ -52,7 +52,7 @@ jobs:
         run: pip3 install -U vtk==9.1.0
 
       - name: Get python sitelib
-        run: python3 -c "from distutils.sysconfig import get_python_lib; print(get_python_lib(plat_specific=True,standard_lib=False))" | Out-File -FilePath $env:PYTHON_SITELIB -Encoding utf8 -Append
+        run: echo ("PYTHON_SITELIB=" + $(python3 -c "from distutils.sysconfig import get_python_lib; print(get_python_lib(plat_specific=True,standard_lib=False))")) >> $env:GITHUB_ENV
 
       - name: Print directory content
         run: dir "${{env.PYTHON_SITELIB}}"
