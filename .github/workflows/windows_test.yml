@@ -52,7 +52,7 @@ jobs:
         run: pip3 install -U vtk==9.1.0
 
       - name: Configure ViennaLS
-        if: ${{ steps.cache-dependencies.outputs.cache-hit != 'true' }}
+        # if: ${{ steps.cache-dependencies.outputs.cache-hit != 'true' }}
         run: cmake -B ./build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/viennals/install
 
       # - name: Configure ViennaLS (cached dependencies)
