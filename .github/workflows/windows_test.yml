@@ -51,9 +51,15 @@ jobs:
       - name: Install VTK using pip
         run: pip3 install -U vtk==9.1.0
 
+      - name: Get python sitelib
+        run: python3 -c "distutils.sysconfig.get_python_lib(plat_specific=True,standard_lib=False)" | Out-File -FilePath $env:PYTHON_SITELIB -Encoding utf8 -Append
+
+      - name: Print directory content
+        run: dir "${{env.PYTHON_SITELIB}}"
+
       - name: Configure ViennaLS
         # if: ${{ steps.cache-dependencies.outputs.cache-hit != 'true' }}
-        run: cmake -B ./build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/viennals/install
+        run: cmake -B ./build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/viennals/install -DVTK_DIR=${{env.PYTHON_SITELIB}}
 
       # - name: Configure ViennaLS (cached dependencies)
       #   if: ${{ steps.cache-dependencies.outputs.cache-hit == 'true' }}
