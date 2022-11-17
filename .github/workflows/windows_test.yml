@@ -38,12 +38,7 @@ jobs:
       - name: Clear Cache
         if: ${{ github.event_name == 'schedule' }}
         run: |
-          curl \
-            -X DELETE \
-            -H "Accept: application/vnd.github+json" \
-            -H "Authorization: Bearer ${{ secrets.PAT_CACHE }}" \
-            https://api.github.com/repos/yozoon/viennaps/actions/caches?key=viennals-dependencies-cache-${{ runner.os }}-${{env.BUILD_TYPE}}-${{ hashFiles( './viennals/external/upstream/**CMakeLists.txt' ) }}-${{env.CACHE_TAG}} \
-          && sleep 10
+          curl -X DELETE -H "Accept: application/vnd.github+json" -H "Authorization: Bearer ${{ secrets.PAT_CACHE }}" https://api.github.com/repos/yozoon/viennaps/actions/caches?key=viennals-dependencies-cache-${{ runner.os }}-${{env.BUILD_TYPE}}-${{ hashFiles( './viennals/external/upstream/**CMakeLists.txt' ) }}-${{env.CACHE_TAG}}
 
       - name: Setup Cache for Build Dependencies
         uses: actions/cache@v3
@@ -54,20 +49,12 @@ jobs:
 
       - name: Configure ViennaLS
         if: ${{ steps.cache-dependencies.outputs.cache-hit != 'true' }}
-        run: |
-          cmake -B ./build \
-            -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} \
-            -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/viennals/install
+        run: cmake -B ./build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/viennals/install
 
       - name: Configure ViennaLS (cached dependencies)
         if: ${{ steps.cache-dependencies.outputs.cache-hit == 'true' }}
         shell: bash
-        run: |
-          cmake -B ./build \
-            -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} \
-            -DVTK_DIR=${{github.workspace}}/viennals/dependencies/Install/vtk_external/lib/cmake/vtk-9.1/ \
-            -DViennaHRLE_DIR=${{github.workspace}}/viennals/dependencies/Install/viennahrle_external/lib/cmake/ViennaHRLE/ \
-            -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/viennals/install
+        run: cmake -B ./build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DVTK_DIR=${{github.workspace}}/viennals/dependencies/Install/vtk_external/lib/cmake/vtk-9.1/ -DViennaHRLE_DIR=${{github.workspace}}/viennals/dependencies/Install/viennahrle_external/lib/cmake/ViennaHRLE/ -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/viennals/install
 
       - name: Build ViennaLS
         run: cmake --build ./build --target buildDependencies all
@@ -99,12 +86,7 @@ jobs:
       - name: Clear Cache
         if: ${{ github.event_name == 'schedule' }}
         run: |
-          curl \
-            -X DELETE \
-            -H "Accept: application/vnd.github+json" \
-            -H "Authorization: Bearer ${{ secrets.PAT_CACHE }}" \
-            https://api.github.com/repos/yozoon/viennaps/actions/caches?key=viennaray-dependencies-cache-${{ runner.os }}-${{env.BUILD_TYPE}}-${{ hashFiles( './viennaray/external/upstream/**CMakeLists.txt' ) }}-${{env.CACHE_TAG}} \
-          && sleep 10
+          curl -X DELETE -H "Accept: application/vnd.github+json" -H "Authorization: Bearer ${{ secrets.PAT_CACHE }}" https://api.github.com/repos/yozoon/viennaps/actions/caches?key=viennaray-dependencies-cache-${{ runner.os }}-${{env.BUILD_TYPE}}-${{ hashFiles( './viennaray/external/upstream/**CMakeLists.txt' ) }}-${{env.CACHE_TAG}}
 
       - name: Setup Cache for Build Dependencies
         uses: actions/cache@v3
@@ -115,17 +97,14 @@ jobs:
 
       - name: Download and Unpack embree
         if: ${{ steps.cache-dependencies.outputs.cache-hit != 'true' }}
-        run: |
-          curl -L -O https://github.com/embree/embree/releases/download/v3.13.0/embree-3.13.0.x86_64.linux.tar.gz \
-            && tar -xf embree-3.13.0.x86_64.linux.tar.gz \
-            && mv embree-3.13.0.x86_64.linux embree
+        run: curl -L -O https://github.com/embree/embree/releases/download/v3.13.0/embree-3.13.0.x64.vc14.windows.zip; tar -xf ${{github.workspace}}/embree-3.13.0.x64.vc14.windows.zip; mv ${{github.workspace}}/embree-3.13.0.x64.vc14.windows/ ${{github.workspace}}/embree/
+
+      - name: Add embree to path
+        run: echo "${{github.workspace}}\embree\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
 
       - name: Configure ViennaRay
         run: |
-          cmake -B ./build \
-            -D CMAKE_BUILD_TYPE=${{env.build_type}} \
-            -D embree_DIR=${{github.workspace}}/viennaray/embree/lib/cmake/embree-3.13.0 \
-            -D CMAKE_INSTALL_PREFIX=${{github.workspace}}/viennaray/install
+          cmake -B ./build -D CMAKE_BUILD_TYPE=${{env.build_type}} -D embree_DIR=${{github.workspace}}/viennaray/embree/lib/cmake/embree-3.13.0 -D CMAKE_INSTALL_PREFIX=${{github.workspace}}/viennaray/install
 
       - name: Build ViennaRay
         run: cmake --build ./build --target buildDependencies all
@@ -163,17 +142,11 @@ jobs:
 
       - name: Decompress Build Artifacts
         run: |
-          mkdir -p viennals \
-          && mkdir -p viennaray \
-          && tar -xzf viennals.tar.gz -C ${{github.workspace}}/viennals \
-          && tar -xzf viennaray.tar.gz -C ${{github.workspace}}/viennaray
+          mkdir -p viennals; mkdir -p viennaray; tar -xzf viennals.tar.gz -C ${{github.workspace}}/viennals; tar -xzf viennaray.tar.gz -C ${{github.workspace}}/viennaray
 
       - name: Configure CMake
         run: |
-          cmake -B ./build \
-            -D ViennaLS_DIR=${{github.workspace}}/viennals/install/lib/cmake/ViennaLS/ \
-            -D ViennaRay_DIR=${{github.workspace}}/viennaray/install/lib/cmake/ViennaRay/ \
-            -D VIENNAPS_BUILD_EXAMPLES=ON
+          cmake -B ./build -D ViennaLS_DIR=${{github.workspace}}/viennals/install/lib/cmake/ViennaLS/ -D ViennaRay_DIR=${{github.workspace}}/viennaray/install/lib/cmake/ViennaRay/ -D VIENNAPS_BUILD_EXAMPLES=ON
 
       - name: Build Examples
         run: cmake --build ./build --target buildExamples
