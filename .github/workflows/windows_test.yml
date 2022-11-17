@@ -97,29 +97,29 @@ jobs:
 
       - name: Download and Unpack embree
         if: ${{ steps.cache-dependencies.outputs.cache-hit != 'true' }}
-        run: curl -L -O https://github.com/embree/embree/releases/download/v3.13.0/embree-3.13.0.x64.vc14.windows.zip; tar -xf ${{github.workspace}}/embree-3.13.0.x64.vc14.windows.zip; mv ${{github.workspace}}/embree-3.13.0.x64.vc14.windows/ ${{github.workspace}}/embree/
+        run: curl -L -O "https://github.com/embree/embree/releases/download/v3.13.0/embree-3.13.0.x64.vc14.windows.zip"; tar -xf "${{github.workspace}}\embree-3.13.0.x64.vc14.windows.zip"; mv "${{github.workspace}}\embree-3.13.0.x64.vc14.windows" "${{github.workspace}}\embree\"
 
       - name: Add embree to path
         run: echo "${{github.workspace}}\embree\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
 
       - name: Configure ViennaRay
         run: |
-          cmake -B ./build -D CMAKE_BUILD_TYPE=${{env.build_type}} -D embree_DIR=${{github.workspace}}/viennaray/embree/lib/cmake/embree-3.13.0 -D CMAKE_INSTALL_PREFIX=${{github.workspace}}/viennaray/install
+          cmake -B build -D CMAKE_BUILD_TYPE=${{env.build_type}} -D embree_DIR=${{github.workspace}}/viennaray/embree/lib/cmake/embree-3.13.0 -D CMAKE_INSTALL_PREFIX=${{github.workspace}}/viennaray/install
 
       - name: Build ViennaRay
-        run: cmake --build ./build --target buildDependencies all
+        run: cmake --build build --target buildDependencies all
 
       - name: Install ViennaRay
-        run: cmake --install ./build
+        run: cmake --install build
 
       - name: Compress Installation
-        run: tar -cpzf ${{github.workspace}}/viennaray.tar.gz ./install ./embree
+        run: tar -cpzf "${{github.workspace}}\viennaray.tar.gz" install embree
 
       - name: Save Build Artifacts
         uses: actions/upload-artifact@v3
         with:
           name: viennaray-${{runner.os}}-${{env.BUILD_TYPE}}
-          path: ${{github.workspace}}/viennaray.tar.gz
+          path: ${{github.workspace}}\viennaray.tar.gz
 
   build-examples:
     runs-on: windows-latest
