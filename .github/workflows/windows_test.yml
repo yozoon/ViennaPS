@@ -57,7 +57,7 @@ jobs:
         run: cmake -B ${{github.workspace}}/viennals/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DVTK_DIR=${{github.workspace}}/viennals/dependencies/Install/vtk_external/lib/cmake/vtk-9.1/ -DViennaHRLE_DIR=${{github.workspace}}/viennals/dependencies/Install/viennahrle_external/lib/cmake/ViennaHRLE/ -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/viennals/install
 
       - name: Build ViennaLS
-        run: cmake --build ${{github.workspace}}/viennals/build --config ${{env.BUILD_TYPE}} --target buildDependencies all
+        run: cmake --build ${{github.workspace}}/viennals/build --config ${{env.BUILD_TYPE}}
 
       - name: Install ViennaLS
         run: cmake --install ${{github.workspace}}/viennals/build --config ${{env.BUILD_TYPE}}
@@ -104,10 +104,10 @@ jobs:
 
       - name: Configure ViennaRay
         run: |
-          cmake -B ${{github.workspace}}/viennaray/build -D CMAKE_BUILD_TYPE=${{env.build_type}} -D embree_DIR=${{github.workspace}}/viennaray/embree/lib/cmake/embree-3.13.0 -D CMAKE_INSTALL_PREFIX=${{github.workspace}}/viennaray/install
+          cmake -B ${{github.workspace}}/viennaray/build -DCMAKE_BUILD_TYPE=${{env.build_type}} -Dembree_DIR=${{github.workspace}}/viennaray/embree/lib/cmake/embree-3.13.0 -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/viennaray/install
 
       - name: Build ViennaRay
-        run: cmake --build ${{github.workspace}}/viennaray/build --config ${{env.BUILD_TYPE}} --target buildDependencies all
+        run: cmake --build ${{github.workspace}}/viennaray/build --config ${{env.BUILD_TYPE}}
 
       - name: Install ViennaRay
         run: cmake --install ${{github.workspace}}/viennaray/build --config ${{env.BUILD_TYPE}}
