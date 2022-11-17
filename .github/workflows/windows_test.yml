@@ -97,7 +97,7 @@ jobs:
 
       - name: Download and Unpack embree
         if: ${{ steps.cache-dependencies.outputs.cache-hit != 'true' }}
-        run: curl -v -L -O "https://github.com/embree/embree/releases/download/v3.13.0/embree-3.13.0.x64.vc14.windows.zip"; dir; tar -xf "${{github.workspace}}\embree-3.13.0.x64.vc14.windows.zip"; mv "${{github.workspace}}\embree-3.13.0.x64.vc14.windows" "${{github.workspace}}\embree\"
+        run: curl -L -O "https://github.com/embree/embree/releases/download/v3.13.0/embree-3.13.0.x64.vc14.windows.zip"; tar -xf "${{github.workspace}}\viennaray\embree-3.13.0.x64.vc14.windows.zip"; mv "${{github.workspace}}\viennaray\embree-3.13.0.x64.vc14.windows" "${{github.workspace}}\viennaray\embree\"
 
       - name: Add embree to path
         run: echo "${{github.workspace}}\embree\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
