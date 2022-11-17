@@ -7,13 +7,16 @@ on:
     branches: [master]
   repository_dispatch:
     types: [webhook]
+  # Run this workflow every Sunday at 18:30 to refresh caches
+  schedule:
+    - cron: "30 18 * * 0"
   workflow_dispatch:
 
 env:
   BUILD_TYPE: Debug
   CACHE_TAG: 0
 
-concurrency: 
+concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
@@ -29,6 +32,16 @@ jobs:
         with:
           repository: yozoon/ViennaLS
           path: ./viennals
+
+      - name: Clear Cache
+        if: ${{ github.event_name == 'schedule' }}
+        run: |
+          curl \
+            -X DELETE \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer ${{ secrets.PAT_CACHE }}" \
+            https://api.github.com/repos/yozoon/viennaps/actions/caches?key=viennals-dependencies-cache-${{ runner.os }}-${{env.BUILD_TYPE}}-${{ hashFiles( './viennals/external/upstream/**CMakeLists.txt' ) }}-${{env.CACHE_TAG}} \
+          && sleep 10
 
       - name: Setup Cache for Build Dependencies
         uses: actions/cache@v3
@@ -81,6 +94,16 @@ jobs:
           repository: ViennaTools/ViennaRay
           path: ./viennaray
 
+      - name: Clear Cache
+        if: ${{ github.event_name == 'schedule' }}
+        run: |
+          curl \
+            -X DELETE \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer ${{ secrets.PAT_CACHE }}" \
+            https://api.github.com/repos/yozoon/viennaps/actions/caches?key=viennaray-dependencies-cache-${{ runner.os }}-${{env.BUILD_TYPE}}-${{ hashFiles( './viennaray/external/upstream/**CMakeLists.txt' ) }}-${{env.CACHE_TAG}} \
+          && sleep 10
+
       - name: Setup Cache for Build Dependencies
         uses: actions/cache@v3
         id: cache-dependencies
@@ -120,6 +143,7 @@ jobs:
   build-examples:
     runs-on: ubuntu-latest
     needs: [setup-viennals, setup-viennaray]
+    if: ${{ github.event_name != 'schedule' }}
 
     steps:
       - name: Checkout ViennaPS
