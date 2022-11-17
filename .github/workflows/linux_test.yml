@@ -6,7 +6,9 @@ on:
   pull_request:
     branches: [master]
   repository_dispatch:
-    types: [webhook]
+    types:
+      - viennals-update-linux
+      - viennaray-update-linux
   # Run this workflow every Sunday at 18:30 to refresh caches
   schedule:
     - cron: "30 18 * * 0"
