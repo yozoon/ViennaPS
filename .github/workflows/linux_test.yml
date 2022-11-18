@@ -1,4 +1,4 @@
-name: Test Examples on Linux
+name: Linux
 
 on:
   push:
