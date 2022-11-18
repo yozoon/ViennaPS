@@ -47,6 +47,7 @@ jobs:
         with:
           key: viennals-dependencies-cache-${{ runner.os }}-${{env.BUILD_TYPE}}-${{ hashFiles( './viennals/external/upstream/**CMakeLists.txt' ) }}-${{env.CACHE_TAG}}
           path: |
+            ${{github.workspace}}/viennals/dependencies/Source
             ${{github.workspace}}/viennals/dependencies/Build
             ${{github.workspace}}/viennals/dependencies/Install
 
@@ -66,7 +67,7 @@ jobs:
         run: cmake --install ${{github.workspace}}/viennals/build
 
       - name: Compress Installation
-        run: tar -cpzf "${{github.workspace}}\viennals.tar.gz" install "dependencies\Install\" "dependencies\Build\"
+        run: tar -cpzf "${{github.workspace}}\viennals.tar.gz" install "dependencies\Install\" "dependencies\Build\" "dependencies\Source\"
 
       - name: Save Build Artifacts
         uses: actions/upload-artifact@v3
