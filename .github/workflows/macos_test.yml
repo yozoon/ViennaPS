@@ -1,4 +1,4 @@
-name: Test Examples on Linux
+name: Test Examples on macOS
 
 on:
   push:
@@ -7,8 +7,8 @@ on:
     branches: [master]
   repository_dispatch:
     types:
-      - viennals-update-linux
-      - viennaray-update-linux
+      - viennals-update-macos
+      - viennaray-update-macos
   # Run this workflow every Sunday at 18:30 to refresh caches
   schedule:
     - cron: "30 18 * * 0"
@@ -24,7 +24,7 @@ concurrency:
 
 jobs:
   setup-viennals:
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     defaults:
       run:
         working-directory: ./viennals
@@ -66,10 +66,15 @@ jobs:
         shell: bash
         run: |
           cmake -B ./build \
-            -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} \
-            -DVTK_DIR=${{github.workspace}}/viennals/dependencies/Build/vtk_external/lib/cmake/vtk-9.1/ \
-            -DViennaHRLE_DIR=${{github.workspace}}/viennals/dependencies/Install/viennahrle_external/lib/cmake/ViennaHRLE/ \
-            -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/viennals/install
+            -D CMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} \
+            -D VTK_DIR=${{github.workspace}}/viennals/dependencies/Build/vtk_external/lib/cmake/vtk-9.1/ \
+            -D ViennaHRLE_DIR=${{github.workspace}}/viennals/dependencies/Install/viennahrle_external/lib/cmake/ViennaHRLE/ \
+            -D OpenMP_C_FLAGS="-Xpreprocessor -fopenmp -I$(brew --prefix libomp)/include" \
+            -D OpenMP_CXX_FLAGS="-Xpreprocessor -fopenmp -I$(brew --prefix libomp)/include" \
+            -D OpenMP_C_LIB_NAMES="omp" \
+            -D OpenMP_CXX_LIB_NAMES="omp" \
+            -D OpenMP_omp_LIBRARY="$(brew --prefix libomp)/lib/libomp.a" \
+            -D CMAKE_INSTALL_PREFIX=${{github.workspace}}/viennals/install
 
       - name: Build ViennaLS
         run: cmake --build ./build --target buildDependencies all
@@ -87,7 +92,7 @@ jobs:
           path: ${{github.workspace}}/viennals.tar.gz
 
   setup-viennaray:
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     defaults:
       run:
         working-directory: ./viennaray
@@ -127,6 +132,11 @@ jobs:
           cmake -B ./build \
             -D CMAKE_BUILD_TYPE=${{env.build_type}} \
             -D embree_DIR=${{github.workspace}}/viennaray/embree/lib/cmake/embree-3.13.0 \
+            -D OpenMP_C_FLAGS="-Xpreprocessor -fopenmp -I$(brew --prefix libomp)/include" \
+            -D OpenMP_CXX_FLAGS="-Xpreprocessor -fopenmp -I$(brew --prefix libomp)/include" \
+            -D OpenMP_C_LIB_NAMES="omp" \
+            -D OpenMP_CXX_LIB_NAMES="omp" \
+            -D OpenMP_omp_LIBRARY="$(brew --prefix libomp)/lib/libomp.a" \
             -D CMAKE_INSTALL_PREFIX=${{github.workspace}}/viennaray/install
 
       - name: Build ViennaRay
@@ -145,7 +155,7 @@ jobs:
           path: ${{github.workspace}}/viennaray.tar.gz
 
   build-examples:
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     needs: [setup-viennals, setup-viennaray]
     if: ${{ github.event_name != 'schedule' }}
 
@@ -175,6 +185,11 @@ jobs:
           cmake -B ./build \
             -D ViennaLS_DIR=${{github.workspace}}/viennals/install/lib/cmake/ViennaLS/ \
             -D ViennaRay_DIR=${{github.workspace}}/viennaray/install/lib/cmake/ViennaRay/ \
+            -D OpenMP_C_FLAGS="-Xpreprocessor -fopenmp -I$(brew --prefix libomp)/include" \
+            -D OpenMP_CXX_FLAGS="-Xpreprocessor -fopenmp -I$(brew --prefix libomp)/include" \
+            -D OpenMP_C_LIB_NAMES="omp" \
+            -D OpenMP_CXX_LIB_NAMES="omp" \
+            -D OpenMP_omp_LIBRARY="$(brew --prefix libomp)/lib/libomp.a" \
             -D VIENNAPS_BUILD_EXAMPLES=ON
 
       - name: Build Examples
