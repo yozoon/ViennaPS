@@ -36,44 +36,37 @@ jobs:
           repository: yozoon/ViennaLS
           path: ./viennals
 
-      # - name: Clear Cache
-      #   if: ${{ github.event_name == 'schedule' }}
-      #   run: |
-      #     curl -X DELETE -H "Accept: application/vnd.github+json" -H "Authorization: Bearer ${{ secrets.PAT_CACHE }}" https://api.github.com/repos/yozoon/viennaps/actions/caches?key=viennals-dependencies-cache-${{ runner.os }}-${{env.BUILD_TYPE}}-${{ hashFiles( './viennals/external/upstream/**CMakeLists.txt' ) }}-${{env.CACHE_TAG}}
+      - name: Clear Cache
+        if: ${{ github.event_name == 'schedule' }}
+        run: |
+          curl -X DELETE -H "Accept: application/vnd.github+json" -H "Authorization: Bearer ${{ secrets.PAT_CACHE }}" https://api.github.com/repos/yozoon/viennaps/actions/caches?key=viennals-dependencies-cache-${{ runner.os }}-${{env.BUILD_TYPE}}-${{ hashFiles( './viennals/external/upstream/**CMakeLists.txt' ) }}-${{env.CACHE_TAG}}
 
-      # - name: Setup Cache for Build Dependencies
-      #   uses: actions/cache@v3
-      #   id: cache-dependencies
-      #   with:
-      #     key: viennals-dependencies-cache-${{ runner.os }}-${{env.BUILD_TYPE}}-${{ hashFiles( './viennals/external/upstream/**CMakeLists.txt' ) }}-${{env.CACHE_TAG}}
-      #     path: ${{github.workspace}}/viennals/dependencies/Install
-
-      - name: Install VTK using pip
-        run: pip3 install -U vtk==9.1.0
-
-      - name: Get python sitelib
-        run: echo ("PYTHON_SITELIB=" + $(python3 -c "from distutils.sysconfig import get_python_lib; print(get_python_lib(plat_specific=True,standard_lib=False))")) >> $env:GITHUB_ENV
-
-      - name: Print directory content
-        run: dir "${{env.PYTHON_SITELIB}}"
+      - name: Setup Cache for Build Dependencies
+        uses: actions/cache@v3
+        id: cache-dependencies
+        with:
+          key: viennals-dependencies-cache-${{ runner.os }}-${{env.BUILD_TYPE}}-${{ hashFiles( './viennals/external/upstream/**CMakeLists.txt' ) }}-${{env.CACHE_TAG}}
+          path: |
+            ${{github.workspace}}/viennals/dependencies/Build
+            ${{github.workspace}}/viennals/dependencies/Install
 
       - name: Configure ViennaLS
-        # if: ${{ steps.cache-dependencies.outputs.cache-hit != 'true' }}
-        run: cmake -B ./build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/viennals/install -DVTK_DIR=${{env.PYTHON_SITELIB}}
+        if: ${{ steps.cache-dependencies.outputs.cache-hit != 'true' }}
+        run: cmake -B ${{github.workspace}}/viennals/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/viennals/install
 
-      # - name: Configure ViennaLS (cached dependencies)
-      #   if: ${{ steps.cache-dependencies.outputs.cache-hit == 'true' }}
-      #   shell: bash
-      #   run: cmake -B ${{github.workspace}}/viennals/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DVTK_DIR=${{github.workspace}}/viennals/dependencies/Install/vtk_external/lib/cmake/vtk-9.1/ -DViennaHRLE_DIR=${{github.workspace}}/viennals/dependencies/Install/viennahrle_external/lib/cmake/ViennaHRLE/ -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/viennals/install
+      - name: Configure ViennaLS (cached dependencies)
+        if: ${{ steps.cache-dependencies.outputs.cache-hit == 'true' }}
+        shell: bash
+        run: cmake -B ${{github.workspace}}/viennals/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DVTK_DIR=${{github.workspace}}/viennals/dependencies/Build/vtk_external/lib/cmake/vtk-9.1/ -DViennaHRLE_DIR=${{github.workspace}}/viennals/dependencies/Install/viennahrle_external/lib/cmake/ViennaHRLE/ -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/viennals/install
 
       - name: Build ViennaLS
-        run: cmake --build ${{github.workspace}}/viennals/build --config ${{env.BUILD_TYPE}}
+        run: cmake --build ${{github.workspace}}/viennals/build
 
       - name: Install ViennaLS
-        run: cmake --install ${{github.workspace}}/viennals/build --config ${{env.BUILD_TYPE}}
+        run: cmake --install ${{github.workspace}}/viennals/build
 
       - name: Compress Installation
-        run: tar -cpzf "${{github.workspace}}\viennals.tar.gz" install "dependencies\Install\"
+        run: tar -cpzf "${{github.workspace}}\viennals.tar.gz" install "dependencies\Install\" "dependencies\Build\"
 
       - name: Save Build Artifacts
         uses: actions/upload-artifact@v3

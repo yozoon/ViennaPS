@@ -1,4 +1,7 @@
 # ViennaPS
+[![Linux](https://github.com/yozoon/ViennaPS/actions/workflows/linux_test.yml/badge.svg)](https://github.com/yozoon/ViennaPS/actions/workflows/linux_test.yml)
+[![macOS](https://github.com/yozoon/ViennaPS/actions/workflows/macos_test.yml/badge.svg)](https://github.com/yozoon/ViennaPS/actions/workflows/macos_test.yml)
+[![Windows](https://github.com/yozoon/ViennaPS/actions/workflows/windows_test.yml/badge.svg)](https://github.com/yozoon/ViennaPS/actions/workflows/windows_test.yml)
 
 ViennaPS is a header-only C++ process simulation library, which includes surface and volume representations, a ray tracer, and physical models for the simulation of microelectronic fabrication processes. 
 
