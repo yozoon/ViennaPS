@@ -54,6 +54,9 @@ jobs:
         if: ${{ steps.cache-dependencies.outputs.cache-hit != 'true' }}
         run: cmake -B ${{github.workspace}}/viennals/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/viennals/install
 
+      - name: Add VTK library directory to path
+        run: echo "${{github.workspace}}\viennals\dependencies\Build\vtk_external\lib\" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+
       - name: Build ViennaLS
         run: cmake --build ${{github.workspace}}/viennals/build
 
@@ -61,7 +64,7 @@ jobs:
         run: cmake --install ${{github.workspace}}/viennals/build
 
       - name: Compress Installation
-        run: tar -cpzf "${{github.workspace}}\viennals.tar.gz" install "dependencies\Install\" "dependencies\Build\" "dependencies\Source\"
+        run: tar -cpzf "${{github.workspace}}\viennals.tar.gz" install dependencies/Install dependencies/Build dependencies/Source
 
       - name: Save Build Artifacts
         uses: actions/upload-artifact@v3
@@ -141,6 +144,12 @@ jobs:
       - name: Decompress Build Artifacts
         run: |
           mkdir -p viennals; mkdir -p viennaray; tar -xzf viennals.tar.gz -C "${{github.workspace}}\viennals"; tar -xzf viennaray.tar.gz -C "${{github.workspace}}\viennaray"
+
+      - name: Add VTK library directory to path
+        run: echo "${{github.workspace}}\viennals\dependencies\Build\vtk_external\lib\" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+
+      - name: Add embree to path
+        run: echo "${{github.workspace}}\embree\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
 
       - name: Configure CMake
         run: |
