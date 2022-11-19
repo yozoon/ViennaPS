@@ -37,8 +37,7 @@ class psCSVDataSource : public psDataSource<NumericType, D> {
       const std::string &input,
       std::unordered_map<std::string, NumericType> &namedParameters) {
     const std::string regexPattern =
-        "^[\\ \\t]*([0-9a-zA-Z\\_\\-]+)[\\ \\t]*=[\\ "
-        "\\t]*([0-9eE\\.\\-\\+]+)[\\ \\t]*$";
+        R"rgx(^[ \t]*([0-9a-zA-Z_-]+)[ \t]*=[ \t]*([0-9eE\.\-+]+)[ \t]*$)rgx";
     const std::regex rgx(regexPattern);
 
     std::smatch smatch;
