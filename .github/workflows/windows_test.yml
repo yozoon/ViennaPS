@@ -55,11 +55,6 @@ jobs:
         if: ${{ steps.cache-dependencies.outputs.cache-hit != 'true' }}
         run: cmake -B ${{github.workspace}}/viennals/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/viennals/install
 
-      - name: Configure ViennaLS (cached dependencies)
-        if: ${{ steps.cache-dependencies.outputs.cache-hit == 'true' }}
-        shell: bash
-        run: cmake -B ${{github.workspace}}/viennals/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DVTK_DIR=${{github.workspace}}/viennals/dependencies/Build/vtk_external/lib/cmake/vtk-9.1/ -DViennaHRLE_DIR=${{github.workspace}}/viennals/dependencies/Install/viennahrle_external/lib/cmake/ViennaHRLE/ -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/viennals/install
-
       - name: Build ViennaLS
         run: cmake --build ${{github.workspace}}/viennals/build
 
