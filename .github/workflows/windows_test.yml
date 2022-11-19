@@ -25,7 +25,6 @@ concurrency:
 jobs:
   setup-viennals:
     runs-on: windows-latest
-    if: ${{ github.event_name != 'schedule' }}
     defaults:
       run:
         working-directory: ./viennals
