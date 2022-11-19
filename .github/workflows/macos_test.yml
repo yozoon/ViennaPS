@@ -113,9 +113,9 @@ jobs:
       - name: Download and Unpack embree
         if: ${{ steps.cache-dependencies.outputs.cache-hit != 'true' }}
         run: |
-          curl -L -O https://github.com/embree/embree/releases/download/v3.13.0/embree-3.13.0.x86_64.linux.tar.gz \
-            && tar -xf embree-3.13.0.x86_64.linux.tar.gz \
-            && mv embree-3.13.0.x86_64.linux embree
+          curl -L -O https://github.com/embree/embree/releases/download/v3.13.0/embree-3.13.0.x86_64.macosx.zip \
+            && tar -xf embree-3.13.0.x86_64.macosx.zip \
+            && mv embree-3.13.0.x86_64.macosx embree
 
       - name: Configure ViennaRay
         run: |
