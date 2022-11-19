@@ -74,9 +74,8 @@ readConfigFile(const std::string &filename) {
 
   // Regular expression for extracting key and value separated by '=' as two
   // separate capture groups
-  const auto keyValueRegex =
-      std::regex("([0-9a-zA-Z\\_\\-\\.\\+]+)[\\ \\t]*=[\\ "
-                 "\\t]*([0-9a-zA-Z\\_\\-\\.\\+]+)[\\ \\t\\#]*$");
+  const auto keyValueRegex = std::regex(
+      R"rgx([ \t]*([0-9a-zA-Z_\-\.+]+)[ \t]*=[ \t]*([0-9a-zA-Z_\-\.+]+).*$)rgx");
 
   std::unordered_map<std::string, std::string> paramMap;
   std::string line;
