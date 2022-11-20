@@ -51,7 +51,6 @@ jobs:
             ${{github.workspace}}/viennals/dependencies/Install
 
       - name: Configure ViennaLS
-        if: ${{ steps.cache-dependencies.outputs.cache-hit != 'true' }}
         run: cmake -B ${{github.workspace}}/viennals/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/viennals/install
 
       - name: Add VTK library directory to path
