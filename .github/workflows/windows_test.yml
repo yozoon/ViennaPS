@@ -54,7 +54,7 @@ jobs:
         run: cmake -B ${{github.workspace}}/viennals/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/viennals/install
 
       - name: Add VTK to PATH
-        run: echo "${{github.workspace}}\viennals\dependencies\Build\vtk_external\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+        run: echo "${{github.workspace}}\viennals\dependencies\Build\vtk_external\bin\${{env.BUILD_TYPE}}" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
 
       - name: Build ViennaLS
         run: cmake --build ${{github.workspace}}/viennals/build
@@ -145,7 +145,7 @@ jobs:
           mkdir -p viennals; mkdir -p viennaray; tar -xzf viennals.tar.gz -C "${{github.workspace}}\viennals"; tar -xzf viennaray.tar.gz -C "${{github.workspace}}\viennaray"
 
       - name: Add VTK to PATH
-        run: echo "${{github.workspace}}\viennals\dependencies\Build\vtk_external\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+        run: echo "${{github.workspace}}\viennals\dependencies\Build\vtk_external\bin\${{env.BUILD_TYPE}}" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
 
       - name: Add embree to PATH
         run: echo "${{github.workspace}}\embree\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
@@ -155,7 +155,7 @@ jobs:
           cmake -B ${{github.workspace}}/build -D ViennaLS_DIR=${{github.workspace}}/viennals/install/lib/cmake/ViennaLS/ -D ViennaRay_DIR=${{github.workspace}}/viennaray/install/lib/cmake/ViennaRay/ -D VIENNAPS_BUILD_EXAMPLES=ON
 
       - name: Build Examples
-        run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}} --target buildExamples
+        run: cmake --build ${{github.workspace}}/build --target buildExamples --config ${{env.BUILD_TYPE}}
 
       - name: Run
         working-directory: ${{github.workspace}}/build/Examples/InterpolationDemo
