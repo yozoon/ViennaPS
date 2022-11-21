@@ -17,6 +17,9 @@ outputs:
 runs:
   using: composite
   steps:
+    - shell: bash
+      run: echo ${{inputs.cache-key}}
+
     - id: check
       shell: bash
       run: |
