@@ -97,8 +97,6 @@ public:
     auto dat = data;
 
     std::vector<NumericType> distances(triSize);
-
-#pragma omp parallel private(distances)
     for (int i = 0; i < D; ++i) {
       {
 #pragma omp parallel for default(none) firstprivate(i, size)                   \

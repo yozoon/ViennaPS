@@ -6,7 +6,9 @@
  * extrapolation outside of the provided domain (by calling the constructor with
  * `true`)
  */
+#include <filesystem>
 #include <iostream>
+#include <string>
 
 #include <psCSVDataSource.hpp>
 #include <psCSVWriter.hpp>
@@ -15,8 +17,16 @@
 
 #include <psDataScaler.hpp>
 
-int main() {
+namespace fs = std::filesystem;
+
+int main(int argc, char *argv[]) {
   using NumericType = double;
+
+  fs::path dataPath = ".";
+
+  if (argc > 1) {
+    dataPath = fs::path{argv[1]};
+  }
 
   static constexpr int InputDim = 3;
   static constexpr int TargetDim = 1;
@@ -28,7 +38,7 @@ int main() {
   {
     auto dataSource =
         psSmartPointer<psCSVDataSource<NumericType, DataDim>>::New();
-    dataSource->setFilename("griddata.csv");
+    dataSource->setFilename(dataPath / "griddata.csv");
 
     psRectilinearGridInterpolation<NumericType, InputDim, TargetDim>
         interpolation;
@@ -78,7 +88,7 @@ int main() {
   {
     auto dataSource =
         psSmartPointer<psCSVDataSource<NumericType, DataDim>>::New();
-    dataSource->setFilename("scatterdata.csv");
+    dataSource->setFilename(dataPath / "scatterdata.csv");
 
     int numberOfNeighbors = 5;
     NumericType distanceExponent = 1. / 5.;
@@ -113,7 +123,7 @@ int main() {
   {
     auto dataSource =
         psSmartPointer<psCSVDataSource<NumericType, DataDim>>::New();
-    dataSource->setFilename("scatterdata.csv");
+    dataSource->setFilename(dataPath / "scatterdata.csv");
 
     int numberOfNeighbors = 5;
     NumericType distanceExponent = 1. / 5.;
