@@ -19,4 +19,5 @@ runs:
   steps:
     - id: check
       shell: bash
-      run: python3 ./.github/actions/cache-check/check.py "${{inputs.repository}}" "${{inputs.token}}" "${{inputs.cache-key}}" >> $GITHUB_OUTPUT
+      run: |
+        echo cache-hit=$(curl -s -H "Accept: application/vnd.github+json" -H "Authorization: Bearer ${{ inputs.token }}" https://api.github.com/repos/${{inputs.repository}}/actions/caches | jq -r '.actions_caches|any(.key == "${{inputs.cache-key}}")') >> $GITHUB_ENV
