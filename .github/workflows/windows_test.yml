@@ -8,7 +8,6 @@ on:
 
 env:
   BUILD_TYPE: Debug
-  CACHE_TAG: 0
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -30,13 +29,14 @@ jobs:
         uses: actions/cache@v3
         id: viennals-dependency-cache
         with:
-          key: viennals-dependency-cache-${{ runner.os }}-${{env.BUILD_TYPE}}-${{ hashFiles( './viennals/external/upstream/**CMakeLists.txt' ) }}-${{env.CACHE_TAG}}
+          key: viennals-dependency-cache-${{ runner.os }}-${{env.BUILD_TYPE}}-${{ hashFiles( './viennals/external/upstream/**CMakeLists.txt' ) }}
           path: |
             ${{github.workspace}}/viennals/dependencies/Source
             ${{github.workspace}}/viennals/dependencies/Build
             ${{github.workspace}}/viennals/dependencies/Install
 
       - name: Configure ViennaLS
+        working-directory: ${{github.workspace}}/viennals
         run: cmake -B ${{github.workspace}}/viennals/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/viennals/install
 
       - name: Add VTK to PATH
@@ -59,11 +59,12 @@ jobs:
         uses: actions/cache@v3
         id: viennaray-dependency-cache
         with:
-          key: viennaray-dependency-cache-${{ runner.os }}-${{env.BUILD_TYPE}}-${{ hashFiles( './viennaray/external/upstream/**CMakeLists.txt' ) }}-${{env.CACHE_TAG}}
+          key: viennaray-dependency-cache-${{ runner.os }}-${{env.BUILD_TYPE}}-${{ hashFiles( './viennaray/external/upstream/**CMakeLists.txt' ) }}
           path: |
             ${{github.workspace}}/viennaray/embree
 
       - name: Configure ViennaRay
+        working-directory: ${{github.workspace}}/viennaray
         run: |
           cmake -B ${{github.workspace}}/viennaray/build -DCMAKE_BUILD_TYPE=${{env.build_type}} -Dembree_DIR=${{github.workspace}}/viennaray/embree/lib/cmake/embree-3.13.0 -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/viennaray/install
 

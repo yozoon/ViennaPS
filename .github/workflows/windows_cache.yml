@@ -16,7 +16,6 @@ on:
 
 env:
   BUILD_TYPE: Debug
-  CACHE_TAG: 0
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -38,13 +37,13 @@ jobs:
       - name: Clear Cache
         if: ${{ github.event_name == 'schedule' }}
         run: |
-          curl -X DELETE -H "Accept: application/vnd.github+json" -H "Authorization: Bearer ${{ secrets.PAT_CACHE }}" https://api.github.com/repos/yozoon/viennaps/actions/caches?key=viennals-dependencies-cache-${{ runner.os }}-${{env.BUILD_TYPE}}-${{ hashFiles( './viennals/external/upstream/**CMakeLists.txt' ) }}-${{env.CACHE_TAG}}
+          curl -X DELETE -H "Accept: application/vnd.github+json" -H "Authorization: Bearer ${{ secrets.PAT_CACHE }}" https://api.github.com/repos/yozoon/viennaps/actions/caches?key=viennals-dependency-cache-${{ runner.os }}-${{env.BUILD_TYPE}}-${{ hashFiles( './viennals/external/upstream/**CMakeLists.txt' ) }}
 
       - name: Setup Cache for Build Dependencies
         uses: actions/cache@v3
         id: viennals-dependency-cache
         with:
-          key: viennals-dependency-cache-${{ runner.os }}-${{env.BUILD_TYPE}}-${{ hashFiles( './viennals/external/upstream/**CMakeLists.txt' ) }}-${{env.CACHE_TAG}}
+          key: viennals-dependency-cache-${{ runner.os }}-${{env.BUILD_TYPE}}-${{ hashFiles( './viennals/external/upstream/**CMakeLists.txt' ) }}
           path: |
             ${{github.workspace}}/viennals/dependencies/Source
             ${{github.workspace}}/viennals/dependencies/Build
@@ -74,13 +73,13 @@ jobs:
       - name: Clear Cache
         if: ${{ github.event_name == 'schedule' }}
         run: |
-          curl -X DELETE -H "Accept: application/vnd.github+json" -H "Authorization: Bearer ${{ secrets.PAT_CACHE }}" https://api.github.com/repos/yozoon/viennaps/actions/caches?key=viennaray-dependencies-cache-${{ runner.os }}-${{env.BUILD_TYPE}}-${{ hashFiles( './viennaray/external/upstream/**CMakeLists.txt' ) }}-${{env.CACHE_TAG}}
+          curl -X DELETE -H "Accept: application/vnd.github+json" -H "Authorization: Bearer ${{ secrets.PAT_CACHE }}" https://api.github.com/repos/yozoon/viennaps/actions/caches?key=viennaray-dependency-cache-${{ runner.os }}-${{env.BUILD_TYPE}}-${{ hashFiles( './viennaray/external/upstream/**CMakeLists.txt' ) }}
 
       - name: Setup Cache for Build Dependencies
         uses: actions/cache@v3
         id: viennaray-dependency-cache
         with:
-          key: viennaray-dependency-cache-${{ runner.os }}-${{env.BUILD_TYPE}}-${{ hashFiles( './viennaray/external/upstream/**CMakeLists.txt' ) }}-${{env.CACHE_TAG}}
+          key: viennaray-dependency-cache-${{ runner.os }}-${{env.BUILD_TYPE}}-${{ hashFiles( './viennaray/external/upstream/**CMakeLists.txt' ) }}
           path: ${{github.workspace}}/viennaray/embree
 
       - name: Download and Unpack embree
