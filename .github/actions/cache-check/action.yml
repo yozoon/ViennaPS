@@ -1,5 +1,5 @@
 name: Check If Cache Item Exists
-description: Checks if the
+description: Checks if the the cache item with the provided key exists
 inputs:
   cache-key:
     description: Cache key
@@ -12,7 +12,7 @@ inputs:
     required: true
 outputs:
   cache-hit:
-    description: "The time we greeted you"
+    description: "Whether the provided key exists or not"
     value: ${{ steps.check.outputs.cache-hit }}
 runs:
   using: composite
