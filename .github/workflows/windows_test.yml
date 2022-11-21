@@ -88,10 +88,6 @@ jobs:
       - name: Build ViennaPS Examples
         run: cmake --build ${{github.workspace}}/build/Examples --config ${{env.BUILD_TYPE}}
 
-      - name: Print directories
-        run: |
-          dir ${{github.workspace}}/build/Examples/InterpolationDemo/; dir ${{github.workspace}}/build/Examples/InterpolationDemo/${{env.BUILD_TYPE}}/
-
       - name: Run ViennaPS Example
         working-directory: ${{github.workspace}}/build/Examples/InterpolationDemo/${{env.BUILD_TYPE}}
         shell: bash

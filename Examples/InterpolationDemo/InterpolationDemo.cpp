@@ -38,7 +38,7 @@ int main(int argc, char *argv[]) {
   {
     auto dataSource =
         psSmartPointer<psCSVDataSource<NumericType, DataDim>>::New();
-    dataSource->setFilename(dataPath / "griddata.csv");
+    dataSource->setFilename((dataPath / "griddata.csv").string());
 
     psRectilinearGridInterpolation<NumericType, InputDim, TargetDim>
         interpolation;
@@ -88,7 +88,7 @@ int main(int argc, char *argv[]) {
   {
     auto dataSource =
         psSmartPointer<psCSVDataSource<NumericType, DataDim>>::New();
-    dataSource->setFilename(dataPath / "scatterdata.csv");
+    dataSource->setFilename((dataPath / "scatterdata.csv").string());
 
     int numberOfNeighbors = 5;
     NumericType distanceExponent = 1. / 5.;
@@ -123,7 +123,7 @@ int main(int argc, char *argv[]) {
   {
     auto dataSource =
         psSmartPointer<psCSVDataSource<NumericType, DataDim>>::New();
-    dataSource->setFilename(dataPath / "scatterdata.csv");
+    dataSource->setFilename((dataPath / "scatterdata.csv").string());
 
     int numberOfNeighbors = 5;
     NumericType distanceExponent = 1. / 5.;
