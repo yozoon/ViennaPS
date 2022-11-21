@@ -34,16 +34,27 @@ jobs:
           repository: yozoon/ViennaLS
           path: ./viennals
 
+      - name: Store cache key in ENV
+        shell: bash
+        run: echo "VIENNALS_CACHE_KEY=viennals-dependency-cache-${{ runner.os }}-${{env.BUILD_TYPE}}-${{ hashFiles( './viennals/external/upstream/**CMakeLists.txt' ) }}" >> $GITHUB_ENV
+
       - name: Clear Cache
         if: ${{ github.event_name == 'schedule' }}
         run: |
-          curl -X DELETE -H "Accept: application/vnd.github+json" -H "Authorization: Bearer ${{ secrets.PAT_CACHE }}" https://api.github.com/repos/yozoon/viennaps/actions/caches?key=viennals-dependency-cache-${{ runner.os }}-${{env.BUILD_TYPE}}-${{ hashFiles( './viennals/external/upstream/**CMakeLists.txt' ) }}
+          curl -X DELETE -H "Accept: application/vnd.github+json" -H "Authorization: Bearer ${{ secrets.PAT_CACHE }}" https://api.github.com/repos/yozoon/viennaps/actions/caches?key=${{env.VIENNALS_CACHE_KEY}}
+
+      # - name: Check if cache key exists
+      #   if: ${{ github.event_name != 'schedule' }}
+      #   shell: bash
+      #   id: cache-check
+      #   run: |
+      #     cat /tmp/test.json | python3 -c "import sys, json; ret = json.load(sys.stdin); cache_list = ret['actions_caches']; cache_keys = [e['key'] for e in cache_list]; contains = len(list(filter(lambda e: e == '${{env.VIENNALS_CACHE_KEY}}', cache_keys))) > 0; print(1) if contains else print(0)" >> $GITHUB_OUTPUT
 
       - name: Setup Cache for Build Dependencies
         uses: actions/cache@v3
         id: viennals-dependency-cache
         with:
-          key: viennals-dependency-cache-${{ runner.os }}-${{env.BUILD_TYPE}}-${{ hashFiles( './viennals/external/upstream/**CMakeLists.txt' ) }}
+          key: ${{env.VIENNALS_CACHE_KEY}}
           path: |
             ${{github.workspace}}/viennals/dependencies/Source
             ${{github.workspace}}/viennals/dependencies/Build
@@ -70,16 +81,20 @@ jobs:
           repository: ViennaTools/ViennaRay
           path: ./viennaray
 
+      - name: Store cache key in ENV
+        shell: bash
+        run: echo "VIENNARAY_CACHE_KEY=viennaray-dependency-cache-${{ runner.os }}-${{env.BUILD_TYPE}}-${{ hashFiles( './viennaray/external/upstream/**CMakeLists.txt' ) }}" >> $GITHUB_ENV
+
       - name: Clear Cache
         if: ${{ github.event_name == 'schedule' }}
         run: |
-          curl -X DELETE -H "Accept: application/vnd.github+json" -H "Authorization: Bearer ${{ secrets.PAT_CACHE }}" https://api.github.com/repos/yozoon/viennaps/actions/caches?key=viennaray-dependency-cache-${{ runner.os }}-${{env.BUILD_TYPE}}-${{ hashFiles( './viennaray/external/upstream/**CMakeLists.txt' ) }}
+          curl -X DELETE -H "Accept: application/vnd.github+json" -H "Authorization: Bearer ${{ secrets.PAT_CACHE }}" https://api.github.com/repos/yozoon/viennaps/actions/caches?key=${{env.VIENNARAY_CACHE_KEY}}
 
       - name: Setup Cache for Build Dependencies
         uses: actions/cache@v3
         id: viennaray-dependency-cache
         with:
-          key: viennaray-dependency-cache-${{ runner.os }}-${{env.BUILD_TYPE}}-${{ hashFiles( './viennaray/external/upstream/**CMakeLists.txt' ) }}
+          key: ${{env.VIENNARAY_CACHE_KEY}}
           path: ${{github.workspace}}/viennaray/embree
 
       - name: Download and Unpack embree
