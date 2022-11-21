@@ -28,6 +28,9 @@ jobs:
       run:
         working-directory: ./viennals
     steps:
+      - name: Checkout ViennaPS
+        uses: actions/checkout@v3
+
       - name: Checkout ViennaLS
         uses: actions/checkout@v3
         with:
@@ -39,7 +42,7 @@ jobs:
         run: echo "VIENNALS_CACHE_KEY=viennals-dependency-cache-${{ runner.os }}-${{env.BUILD_TYPE}}-${{ hashFiles( './viennals/external/upstream/**CMakeLists.txt' ) }}" >> $GITHUB_ENV
 
       - name: Check if cache key exists
-        uses: yozoon/ViennaPS/.github/actions/cache-check
+        uses: ./.github/actions/cache-check
         id: cache-check
         with:
           cache-key: ${{env.VIENNALS_CACHE_KEY}}
@@ -80,6 +83,9 @@ jobs:
       run:
         working-directory: ./viennaray
     steps:
+      - name: Checkout ViennaPS
+        uses: actions/checkout@v3
+
       - name: Checkout ViennaRay
         uses: actions/checkout@v3
         with:
@@ -91,7 +97,7 @@ jobs:
         run: echo "VIENNARAY_CACHE_KEY=viennaray-dependency-cache-${{ runner.os }}-${{env.BUILD_TYPE}}-${{ hashFiles( './viennaray/external/upstream/**CMakeLists.txt' ) }}" >> $GITHUB_ENV
 
       - name: Check if cache key exists
-        uses: yozoon/ViennaPS/.github/actions/cache-check
+        uses: ./.github/actions/cache-check
         id: cache-check
         with:
           cache-key: ${{env.VIENNARAY_CACHE_KEY}}
