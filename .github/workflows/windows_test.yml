@@ -94,4 +94,4 @@ jobs:
 
       - name: Run
         working-directory: ${{github.workspace}}/build/Examples/InterpolationDemo
-        run: ./InterpolationDemo
+        run: InterpolationDemo.exe
