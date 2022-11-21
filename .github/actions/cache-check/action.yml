@@ -19,4 +19,4 @@ runs:
   steps:
     - id: check
       shell: bash
-      run: python3 check.py "${{inputs.repository}}" "${{inputs.token}}" "${{inputs.cache-key}}" >> $GITHUB_OUTPUT
+      run: python3 ./.github/actions/cache-check/check.py "${{inputs.repository}}" "${{inputs.token}}" "${{inputs.cache-key}}" >> $GITHUB_OUTPUT
