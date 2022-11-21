@@ -1,175 +1,95 @@
 name: macOS
 
 on:
-  push:
-    branches: [master]
-  pull_request:
-    branches: [master]
-  repository_dispatch:
+  workflow_run:
+    workflows: [Build Dependencies on macOS]
     types:
-      - viennals-update-macos
-      - viennaray-update-macos
-  # Run this workflow every Sunday at 18:30 to refresh caches
-  schedule:
-    - cron: "30 18 * * 0"
-  workflow_dispatch:
+      - completed
 
 env:
   BUILD_TYPE: Debug
-  CACHE_TAG: 0
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  setup-viennals:
+  build-examples:
     runs-on: macos-latest
-    defaults:
-      run:
-        working-directory: ./viennals
+
     steps:
+      - name: Checkout ViennaPS
+        uses: actions/checkout@v3
+
+      # ViennaLS
       - name: Checkout ViennaLS
         uses: actions/checkout@v3
         with:
           repository: yozoon/ViennaLS
           path: ./viennals
 
-      - name: Clear Cache
-        if: ${{ github.event_name == 'schedule' }}
-        run: |
-          curl \
-            -X DELETE \
-            -H "Accept: application/vnd.github+json" \
-            -H "Authorization: Bearer ${{ secrets.PAT_CACHE }}" \
-            https://api.github.com/repos/yozoon/viennaps/actions/caches?key=viennals-dependencies-cache-${{ runner.os }}-${{env.BUILD_TYPE}}-${{ hashFiles( './viennals/external/upstream/**CMakeLists.txt' ) }}-${{env.CACHE_TAG}} \
-          && sleep 10
-
       - name: Setup Cache for Build Dependencies
         uses: actions/cache@v3
-        id: cache-dependencies
+        id: viennals-dependency-cache
         with:
-          key: viennals-dependencies-cache-${{ runner.os }}-${{env.BUILD_TYPE}}-${{ hashFiles( './viennals/external/upstream/**CMakeLists.txt' ) }}-${{env.CACHE_TAG}}
+          key: viennals-dependency-cache-${{ runner.os }}-${{env.BUILD_TYPE}}-${{ hashFiles( './viennals/external/upstream/**CMakeLists.txt' ) }}
           path: |
             ${{github.workspace}}/viennals/dependencies/Source
             ${{github.workspace}}/viennals/dependencies/Build
             ${{github.workspace}}/viennals/dependencies/Install
 
       - name: Configure ViennaLS
-        run: |
-          cmake -B ./build \
-            -D CMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} \
-            -D OpenMP_C_FLAGS="-Xpreprocessor -fopenmp -I$(brew --prefix libomp)/include" \
-            -D OpenMP_CXX_FLAGS="-Xpreprocessor -fopenmp -I$(brew --prefix libomp)/include" \
-            -D OpenMP_C_LIB_NAMES="omp" \
-            -D OpenMP_CXX_LIB_NAMES="omp" \
-            -D OpenMP_omp_LIBRARY="$(brew --prefix libomp)/lib/libomp.a" \
-            -D CMAKE_INSTALL_PREFIX=${{github.workspace}}/viennals/install
+        run: cmake -B ${{github.workspace}}/viennals/build \
+          -D OpenMP_C_FLAGS="-Xpreprocessor -fopenmp -I$(brew --prefix libomp)/include" \
+          -D OpenMP_CXX_FLAGS="-Xpreprocessor -fopenmp -I$(brew --prefix libomp)/include" \
+          -D OpenMP_C_LIB_NAMES="omp" \
+          -D OpenMP_CXX_LIB_NAMES="omp" \
+          -D OpenMP_omp_LIBRARY="$(brew --prefix libomp)/lib/libomp.a" \
+          -D CMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} \
+          -D CMAKE_INSTALL_PREFIX=${{github.workspace}}/viennals/install
 
       - name: Build ViennaLS
-        run: cmake --build ./build --target buildDependencies all
+        if: ${{steps.cache-check.outputs.cache-hit == false}}
+        run: cmake --build ${{github.workspace}}/viennals/build
 
       - name: Install ViennaLS
-        run: cmake --install ./build
+        run: cmake --install ${{github.workspace}}/viennals/build
 
-      - name: Compress Installation
-        run: tar -cpzf ${{github.workspace}}/viennals.tar.gz ./install ./dependencies/Install/ ./dependencies/Build/ ./dependencies/Source/
-
-      - name: Save Build Artifacts
-        uses: actions/upload-artifact@v3
-        with:
-          name: viennals-${{runner.os}}-${{env.BUILD_TYPE}}
-          path: ${{github.workspace}}/viennals.tar.gz
-
-  setup-viennaray:
-    runs-on: macos-latest
-    defaults:
-      run:
-        working-directory: ./viennaray
-    steps:
+      # ViennaRay
       - name: Checkout ViennaRay
         uses: actions/checkout@v3
         with:
-          repository: ViennaTools/ViennaRay
+          repository: yozoon/ViennaRay
           path: ./viennaray
 
-      - name: Clear Cache
-        if: ${{ github.event_name == 'schedule' }}
-        run: |
-          curl \
-            -X DELETE \
-            -H "Accept: application/vnd.github+json" \
-            -H "Authorization: Bearer ${{ secrets.PAT_CACHE }}" \
-            https://api.github.com/repos/yozoon/viennaps/actions/caches?key=viennaray-dependencies-cache-${{ runner.os }}-${{env.BUILD_TYPE}}-${{ hashFiles( './viennaray/external/upstream/**CMakeLists.txt' ) }}-${{env.CACHE_TAG}} \
-          && sleep 10
-
-      - name: Setup Cache for Build Dependencies
+      - name: Restore ViennaRay build cache
         uses: actions/cache@v3
-        id: cache-dependencies
+        id: viennaray-dependency-cache
         with:
-          key: viennaray-dependencies-cache-${{ runner.os }}-${{env.BUILD_TYPE}}-${{ hashFiles( './viennaray/external/upstream/**CMakeLists.txt' ) }}-${{env.CACHE_TAG}}
-          path: ${{github.workspace}}/viennaray/embree
-
-      - name: Download and Unpack embree
-        if: ${{ steps.cache-dependencies.outputs.cache-hit != 'true' }}
-        run: |
-          curl -L -O https://github.com/embree/embree/releases/download/v3.13.0/embree-3.13.0.x86_64.macosx.zip \
-            && tar -xf embree-3.13.0.x86_64.macosx.zip \
-            && mv embree-3.13.0.x86_64.macosx embree
+          key: viennaray-dependency-cache-${{ runner.os }}-${{env.BUILD_TYPE}}-${{ hashFiles( './viennaray/external/upstream/**CMakeLists.txt' ) }}
+          path: |
+            ${{github.workspace}}/viennaray/embree
 
       - name: Configure ViennaRay
+        working-directory: ${{github.workspace}}/viennaray
         run: |
-          cmake -B ./build \
+          cmake -B ${{github.workspace}}/viennaray/build \
             -D CMAKE_BUILD_TYPE=${{env.build_type}} \
-            -D embree_DIR=${{github.workspace}}/viennaray/embree/lib/cmake/embree-3.13.0 \
             -D OpenMP_C_FLAGS="-Xpreprocessor -fopenmp -I$(brew --prefix libomp)/include" \
             -D OpenMP_CXX_FLAGS="-Xpreprocessor -fopenmp -I$(brew --prefix libomp)/include" \
             -D OpenMP_C_LIB_NAMES="omp" \
             -D OpenMP_CXX_LIB_NAMES="omp" \
             -D OpenMP_omp_LIBRARY="$(brew --prefix libomp)/lib/libomp.a" \
+            -D embree_DIR=${{github.workspace}}/viennaray/embree/lib/cmake/embree-3.13.0 \
             -D CMAKE_INSTALL_PREFIX=${{github.workspace}}/viennaray/install
 
       - name: Build ViennaRay
-        run: cmake --build ./build --target buildDependencies all
+        run: cmake --build ${{github.workspace}}/viennaray/build
 
       - name: Install ViennaRay
-        run: cmake --install ./build
+        run: cmake --install ${{github.workspace}}/viennaray/build
 
-      - name: Compress Installation
-        run: tar -cpzf ${{github.workspace}}/viennaray.tar.gz ./install ./embree
-
-      - name: Save Build Artifacts
-        uses: actions/upload-artifact@v3
-        with:
-          name: viennaray-${{runner.os}}-${{env.BUILD_TYPE}}
-          path: ${{github.workspace}}/viennaray.tar.gz
-
-  build-examples:
-    runs-on: macos-latest
-    needs: [setup-viennals, setup-viennaray]
-    if: ${{ github.event_name != 'schedule' }}
-
-    steps:
-      - name: Checkout ViennaPS
-        uses: actions/checkout@v3
-
-      - name: Download ViennaLS Build Artifacts
-        uses: actions/download-artifact@v3
-        with:
-          name: viennals-${{runner.os}}-${{env.BUILD_TYPE}}
-
-      - name: Download ViennaRay Build Artifacts
-        uses: actions/download-artifact@v3
-        with:
-          name: viennaray-${{runner.os}}-${{env.BUILD_TYPE}}
-
-      - name: Decompress Build Artifacts
-        run: |
-          mkdir -p viennals \
-          && mkdir -p viennaray \
-          && tar -xzf viennals.tar.gz -C ${{github.workspace}}/viennals \
-          && tar -xzf viennaray.tar.gz -C ${{github.workspace}}/viennaray
-
+      # ViennaPS
       - name: Configure CMake
         run: |
           cmake -B ./build \
