@@ -52,8 +52,6 @@ class psKDTree : psPointLocator<NumericType, D, Dim> {
   SizeType N;
   SizeType treeSize = 0;
 
-  int numThreads = 1;
-
   std::array<NumericType, D> scalingFactors{1.};
 
   NumericType gridDelta;
@@ -336,10 +334,10 @@ public:
       return;
     }
 
-#pragma omp parallel default(none)                                             \
-    shared(numThreads, std::cout, rootNode, treeSize, nodes)
+#pragma omp parallel default(none) shared(rootNode, treeSize, nodes)
     {
       int threadID = 0;
+      int numThreads = 1;
 #pragma omp single
       {
 #ifdef _OPENMP
