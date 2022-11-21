@@ -70,13 +70,14 @@ jobs:
 
       - name: Configure ViennaLS
         if: ${{steps.cache-check.outputs.cache-hit == false}}
-        run: cmake -B ./build \
-          -D OpenMP_C_FLAGS="-Xpreprocessor -fopenmp -I$(brew --prefix libomp)/include" \
-          -D OpenMP_CXX_FLAGS="-Xpreprocessor -fopenmp -I$(brew --prefix libomp)/include" \
-          -D OpenMP_C_LIB_NAMES="omp" \
-          -D OpenMP_CXX_LIB_NAMES="omp" \
-          -D OpenMP_omp_LIBRARY="$(brew --prefix libomp)/lib/libomp.a" \
-          -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
+        run: |
+          cmake -B ./build \
+            -D OpenMP_C_FLAGS="-Xpreprocessor -fopenmp -I$(brew --prefix libomp)/include" \
+            -D OpenMP_CXX_FLAGS="-Xpreprocessor -fopenmp -I$(brew --prefix libomp)/include" \
+            -D OpenMP_C_LIB_NAMES="omp" \
+            -D OpenMP_CXX_LIB_NAMES="omp" \
+            -D OpenMP_omp_LIBRARY="$(brew --prefix libomp)/lib/libomp.a" \
+            -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
 
       - name: Build ViennaLS
         if: ${{steps.cache-check.outputs.cache-hit == false}}
