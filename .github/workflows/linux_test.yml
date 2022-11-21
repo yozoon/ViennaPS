@@ -40,9 +40,9 @@ jobs:
 
       - name: Configure ViennaLS
         working-directory: ${{github.workspace}}/viennals
-        run: cmake -B ${{github.workspace}}/viennals/build \
-          -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} \
-          -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/viennals/install
+        run: cmake -B ./build \
+          -D CMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} \
+          -D CMAKE_INSTALL_PREFIX=${{github.workspace}}/viennals/install
 
       - name: Build ViennaLS
         run: cmake --build ${{github.workspace}}/viennals/build
@@ -68,10 +68,10 @@ jobs:
       - name: Configure ViennaRay
         working-directory: ${{github.workspace}}/viennaray
         run: |
-          cmake -B ${{github.workspace}}/viennaray/build \
-            -DCMAKE_BUILD_TYPE=${{env.build_type}} \
-            -Dembree_DIR=${{github.workspace}}/viennaray/embree/lib/cmake/embree-3.13.0 \
-            -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/viennaray/install
+          cmake -B ./build \
+            -D CMAKE_BUILD_TYPE=${{env.build_type}} \
+            -D embree_DIR=${{github.workspace}}/viennaray/embree/lib/cmake/embree-3.13.0 \
+            -D CMAKE_INSTALL_PREFIX=${{github.workspace}}/viennaray/install
 
       - name: Build ViennaRay
         run: cmake --build ${{github.workspace}}/viennaray/build

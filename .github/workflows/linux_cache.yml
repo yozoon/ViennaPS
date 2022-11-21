@@ -92,7 +92,6 @@ jobs:
           path: ./viennaray
 
       - name: Store cache key in ENV
-        shell: bash
         run: echo "VIENNARAY_CACHE_KEY=viennaray-dependency-cache-${{ runner.os }}-${{env.BUILD_TYPE}}-${{ hashFiles( './viennaray/external/upstream/**CMakeLists.txt' ) }}" >> $GITHUB_ENV
 
       - name: Check if cache key exists
@@ -135,4 +134,4 @@ jobs:
 
       - name: Build ViennaRay
         if: ${{steps.cache-check.outputs.cache-hit == false}}
-        run: cmake --build ${{github.workspace}}/viennaray/build --config ${{env.BUILD_TYPE}}
+        run: cmake --build ${{github.workspace}}/viennaray/build
