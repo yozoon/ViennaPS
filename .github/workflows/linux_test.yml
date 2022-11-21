@@ -40,9 +40,10 @@ jobs:
 
       - name: Configure ViennaLS
         working-directory: ${{github.workspace}}/viennals
-        run: cmake -B ./build \
-          -D CMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} \
-          -D CMAKE_INSTALL_PREFIX=${{github.workspace}}/viennals/install
+        run: |
+          cmake -B ./build \
+            -D CMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} \
+            -D CMAKE_INSTALL_PREFIX=${{github.workspace}}/viennals/install
 
       - name: Build ViennaLS
         run: cmake --build ${{github.workspace}}/viennals/build

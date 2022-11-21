@@ -39,14 +39,15 @@ jobs:
             ${{github.workspace}}/viennals/dependencies/Install
 
       - name: Configure ViennaLS
-        run: cmake -B ./build \
-          -D CMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} \
-          -D CMAKE_INSTALL_PREFIX=${{github.workspace}}/viennals/install \
-          -D OpenMP_C_FLAGS="-Xpreprocessor -fopenmp -I$(brew --prefix libomp)/include" \
-          -D OpenMP_CXX_FLAGS="-Xpreprocessor -fopenmp -I$(brew --prefix libomp)/include" \
-          -D OpenMP_C_LIB_NAMES="omp" \
-          -D OpenMP_CXX_LIB_NAMES="omp" \
-          -D OpenMP_omp_LIBRARY="$(brew --prefix libomp)/lib/libomp.a"
+        run: |
+          cmake -B ./build \
+            -D CMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} \
+            -D CMAKE_INSTALL_PREFIX=${{github.workspace}}/viennals/install \
+            -D OpenMP_C_FLAGS="-Xpreprocessor -fopenmp -I$(brew --prefix libomp)/include" \
+            -D OpenMP_CXX_FLAGS="-Xpreprocessor -fopenmp -I$(brew --prefix libomp)/include" \
+            -D OpenMP_C_LIB_NAMES="omp" \
+            -D OpenMP_CXX_LIB_NAMES="omp" \
+            -D OpenMP_omp_LIBRARY="$(brew --prefix libomp)/lib/libomp.a"
 
       - name: Build ViennaLS
         if: ${{steps.cache-check.outputs.cache-hit == false}}
