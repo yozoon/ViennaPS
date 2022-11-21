@@ -23,4 +23,19 @@ runs:
     - id: check
       shell: bash
       run: |
-        curl -s -H "Accept: application/vnd.github+json" -H "Authorization: Bearer ${{ inputs.token }}" https://api.github.com/repos/${{inputs.repository}}/actions/caches | python3 -c "import sys, json; ret = json.load(sys.stdin); cache_list = ret['actions_caches']; cache_keys = [e['key'] for e in cache_list]; contains = len(list(filter(lambda e: e == '${{inputs.cache-key}}', cache_keys))) > 0; print('cache-hit=true') if contains else print('cache-hit=false')" >> $GITHUB_OUTPUT
+        python3 - <<EOF
+        import requests
+        import json
+
+        url = "https://api.github.com/repos/${{inputs.repository}}/actions/caches"
+        ret = requests.post(url, headers={"Accept": "application/vnd.github+json", "Authorization": "Bearer ${{ inputs.token }}"})
+
+        ret = ret.json()
+
+        cache_list = ret["actions_caches"]
+        cache_keys = [e["key"] for e in cache_list]
+        if len(list(filter(lambda e: e == "${{inputs.cache-key}}"", cache_keys))) > 0:
+          print("cache-hit=true")
+        else:
+          print("cache-hit=false")
+        EOF >> $GITHUB_OUTPUT
