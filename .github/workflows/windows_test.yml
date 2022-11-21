@@ -81,10 +81,6 @@ jobs:
         run: cmake --install ${{github.workspace}}/viennaray/build --config ${{env.BUILD_TYPE}}
 
       # ViennaPS
-      - name: Print directories
-        run: |
-          dir ${{github.workspace}}/viennals/install/lib/cmake/ViennaLS/; dir ${{github.workspace}}/viennaray/install/lib/cmake/ViennaRay/
-
       - name: Configure CMake
         run: |
           cmake -B ${{github.workspace}}/build -DViennaLS_DIR=${{github.workspace}}/viennals/install/lib/cmake/ViennaLS/ -DViennaRay_DIR=${{github.workspace}}/viennaray/install/lib/cmake/ViennaRay/ -D CMAKE_CXX_FLAGS="-openmp:llvm" -D VIENNAPS_BUILD_EXAMPLES=ON
@@ -92,6 +88,10 @@ jobs:
       - name: Build Examples
         run: cmake --build ${{github.workspace}}/build/Examples --config ${{env.BUILD_TYPE}}
 
+      - name: Print directories
+        run: |
+          dir ${{github.workspace}}/build/Examples/; dir ${{github.workspace}}/build/Examples/InterpolationDemo/
+
       - name: Run
         working-directory: ${{github.workspace}}/build/Examples/InterpolationDemo
-        run: InterpolationDemo.exe
+        run: ./InterpolationDemo.exe
