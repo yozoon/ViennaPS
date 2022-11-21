@@ -70,7 +70,7 @@ jobs:
 
       - name: Configure ViennaLS
         if: ${{steps.cache-check.outputs.cache-hit == false}}
-        run: cmake -B ${{github.workspace}}/viennals/build \
+        run: cmake -B ./build \
           -D OpenMP_C_FLAGS="-Xpreprocessor -fopenmp -I$(brew --prefix libomp)/include" \
           -D OpenMP_CXX_FLAGS="-Xpreprocessor -fopenmp -I$(brew --prefix libomp)/include" \
           -D OpenMP_C_LIB_NAMES="omp" \

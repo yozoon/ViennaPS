@@ -39,14 +39,14 @@ jobs:
             ${{github.workspace}}/viennals/dependencies/Install
 
       - name: Configure ViennaLS
-        run: cmake -B ${{github.workspace}}/viennals/build \
+        run: cmake -B ./build \
+          -D CMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} \
+          -D CMAKE_INSTALL_PREFIX=${{github.workspace}}/viennals/install \
           -D OpenMP_C_FLAGS="-Xpreprocessor -fopenmp -I$(brew --prefix libomp)/include" \
           -D OpenMP_CXX_FLAGS="-Xpreprocessor -fopenmp -I$(brew --prefix libomp)/include" \
           -D OpenMP_C_LIB_NAMES="omp" \
           -D OpenMP_CXX_LIB_NAMES="omp" \
-          -D OpenMP_omp_LIBRARY="$(brew --prefix libomp)/lib/libomp.a" \
-          -D CMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} \
-          -D CMAKE_INSTALL_PREFIX=${{github.workspace}}/viennals/install
+          -D OpenMP_omp_LIBRARY="$(brew --prefix libomp)/lib/libomp.a"
 
       - name: Build ViennaLS
         if: ${{steps.cache-check.outputs.cache-hit == false}}
@@ -73,15 +73,15 @@ jobs:
       - name: Configure ViennaRay
         working-directory: ${{github.workspace}}/viennaray
         run: |
-          cmake -B ${{github.workspace}}/viennaray/build \
+          cmake -B ./build \
             -D CMAKE_BUILD_TYPE=${{env.build_type}} \
+            -D CMAKE_INSTALL_PREFIX=${{github.workspace}}/viennaray/install \
             -D OpenMP_C_FLAGS="-Xpreprocessor -fopenmp -I$(brew --prefix libomp)/include" \
             -D OpenMP_CXX_FLAGS="-Xpreprocessor -fopenmp -I$(brew --prefix libomp)/include" \
             -D OpenMP_C_LIB_NAMES="omp" \
             -D OpenMP_CXX_LIB_NAMES="omp" \
             -D OpenMP_omp_LIBRARY="$(brew --prefix libomp)/lib/libomp.a" \
-            -D embree_DIR=${{github.workspace}}/viennaray/embree/lib/cmake/embree-3.13.0 \
-            -D CMAKE_INSTALL_PREFIX=${{github.workspace}}/viennaray/install
+            -D embree_DIR=${{github.workspace}}/viennaray/embree/lib/cmake/embree-3.13.0
 
       - name: Build ViennaRay
         run: cmake --build ${{github.workspace}}/viennaray/build
