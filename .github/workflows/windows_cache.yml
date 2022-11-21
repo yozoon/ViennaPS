@@ -44,7 +44,7 @@ jobs:
           curl -X DELETE -H "Accept: application/vnd.github+json" -H "Authorization: Bearer ${{ secrets.PAT_CACHE }}" https://api.github.com/repos/yozoon/viennaps/actions/caches?key=${{env.VIENNALS_CACHE_KEY}}
 
       - name: Check if cache key exists
-        uses: ${{github.workspace}}/.github/cache-check
+        uses: ./.github/cache-check
         id: cache-check
         with:
           cache-key: ${{env.VIENNALS_CACHE_KEY}}
