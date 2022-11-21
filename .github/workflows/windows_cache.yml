@@ -43,15 +43,16 @@ jobs:
         run: |
           curl -X DELETE -H "Accept: application/vnd.github+json" -H "Authorization: Bearer ${{ secrets.PAT_CACHE }}" https://api.github.com/repos/yozoon/viennaps/actions/caches?key=${{env.VIENNALS_CACHE_KEY}}
 
-      # - name: Check if cache key exists
-      #   if: ${{ github.event_name != 'schedule' }}
-      #   shell: bash
-      #   id: cache-check
-      #   run: |
-      #     cat /tmp/test.json | python3 -c "import sys, json; ret = json.load(sys.stdin); cache_list = ret['actions_caches']; cache_keys = [e['key'] for e in cache_list]; contains = len(list(filter(lambda e: e == '${{env.VIENNALS_CACHE_KEY}}', cache_keys))) > 0; print(1) if contains else print(0)" >> $GITHUB_OUTPUT
+      - name: Check if cache key exists
+        if: ${{ github.event_name != 'schedule' }}
+        shell: bash
+        id: cache-check
+        run: |
+          curl -s -H "Accept: application/vnd.github+json" -H "Authorization: Bearer ${{ secrets.PAT_CACHE }}" https://api.github.com/repos/yozoon/ViennaPS/actions/caches | python3 -c "import sys, json; ret = json.load(sys.stdin); cache_list = ret['actions_caches']; cache_keys = [e['key'] for e in cache_list]; contains = len(list(filter(lambda e: e == '${{env.VIENNALS_CACHE_KEY}}', cache_keys))) > 0; print('cache-hit=true') if contains else print('cache-hit=false')" >> $GITHUB_OUTPUT
 
       - name: Setup Cache for Build Dependencies
         uses: actions/cache@v3
+        if: ${{steps.cache-check.outputs.cache-hit == false}}
         id: viennals-dependency-cache
         with:
           key: ${{env.VIENNALS_CACHE_KEY}}
@@ -61,12 +62,15 @@ jobs:
             ${{github.workspace}}/viennals/dependencies/Install
 
       - name: Configure ViennaLS
+        if: ${{steps.cache-check.outputs.cache-hit == false}}
         run: cmake -B ${{github.workspace}}/viennals/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/viennals/install
 
       - name: Add VTK to PATH
+        if: ${{steps.cache-check.outputs.cache-hit == false}}
         run: echo "${{github.workspace}}\viennals\dependencies\Build\vtk_external\bin\${{env.BUILD_TYPE}}" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
 
       - name: Build ViennaLS
+        if: ${{steps.cache-check.outputs.cache-hit == false}}
         run: cmake --build ${{github.workspace}}/viennals/build
 
   setup-viennaray:
