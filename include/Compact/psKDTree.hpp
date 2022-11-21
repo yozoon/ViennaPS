@@ -53,8 +53,6 @@ class psKDTree : psPointLocator<NumericType, D, Dim> {
   SizeType treeSize = 0;
 
   int numThreads = 1;
-  int maxParallelDepth = 0;
-  int surplusWorkers = 0;
 
   std::array<NumericType, D> scalingFactors{1.};
 
@@ -142,8 +140,8 @@ class psKDTree : psPointLocator<NumericType, D, Dim> {
   }
 
   void build(Node *parent, typename std::vector<Node>::iterator start,
-             typename std::vector<Node>::iterator end, int depth,
-             bool isLeft) const {
+             typename std::vector<Node>::iterator end, int depth, bool isLeft,
+             int surplusWorkers, int maxParallelDepth) const {
     SizeType size = end - start;
 
     int axis = depth % D;
@@ -174,8 +172,8 @@ class psKDTree : psPointLocator<NumericType, D, Dim> {
               start,               // Data start
               start + medianIndex, // Data end
               depth + 1,           // Depth
-              true                 // Left
-        );
+              true,                // Left
+              surplusWorkers, maxParallelDepth);
       }
 
       //  Right Subtree
@@ -183,8 +181,8 @@ class psKDTree : psPointLocator<NumericType, D, Dim> {
             start + medianIndex + 1, // Data start
             end,                     // Data end
             depth + 1,               // Depth
-            false                    // Right
-      );
+            false,                   // Right
+            surplusWorkers, maxParallelDepth);
 #pragma omp taskwait
     } else if (size == 1) {
       Node *current = toRawPointer(start);
@@ -339,18 +337,17 @@ public:
     }
 
 #pragma omp parallel default(none)                                             \
-    shared(numThreads, maxParallelDepth, surplusWorkers, std::cout, rootNode,  \
-           treeSize, nodes)
+    shared(numThreads, std::cout, rootNode, treeSize, nodes)
     {
       int threadID = 0;
 #pragma omp single
       {
 #ifdef _OPENMP
-        numThreads = omp_get_num_threads();
         threadID = omp_get_thread_num();
+        numThreads = omp_get_num_threads();
 #endif
-        maxParallelDepth = intLog2(numThreads);
-        surplusWorkers = numThreads - 1 << maxParallelDepth;
+        int maxParallelDepth = intLog2(numThreads);
+        int surplusWorkers = numThreads - (1 << maxParallelDepth);
 
         SizeType size = nodes.end() - nodes.begin();
         SizeType medianIndex = (size + 1) / 2 - 1;
@@ -374,8 +371,8 @@ public:
                 nodes.begin(),               // Data start
                 nodes.begin() + medianIndex, // Data end
                 1,                           // Depth
-                true                         // Left
-          );
+                true,                        // Left
+                surplusWorkers, maxParallelDepth);
         }
 
         // Right Subtree
@@ -383,8 +380,8 @@ public:
               nodes.begin() + medianIndex + 1, // Data start
               nodes.end(),                     // Data end
               1,                               // Depth
-              false                            // Right
-        );
+              false,                           // Right
+              surplusWorkers, maxParallelDepth);
 #pragma omp taskwait
       }
     }
