@@ -17,25 +17,6 @@ outputs:
 runs:
   using: composite
   steps:
-    - shell: bash
-      run: echo ${{inputs.cache-key}}
-
     - id: check
       shell: bash
-      run: |
-        python3 - <<EOF
-        import requests
-        import json
-
-        url = "https://api.github.com/repos/${{inputs.repository}}/actions/caches"
-        ret = requests.post(url, headers={"Accept": "application/vnd.github+json", "Authorization": "Bearer ${{ inputs.token }}"})
-
-        ret = ret.json()
-
-        cache_list = ret["actions_caches"]
-        cache_keys = [e["key"] for e in cache_list]
-        if len(list(filter(lambda e: e == "${{inputs.cache-key}}"", cache_keys))) > 0:
-          print("cache-hit=true")
-        else:
-          print("cache-hit=false")
-        EOF >> $GITHUB_OUTPUT
+      run: python3 check.py "${{inputs.repository}}" "${{inputs.token}}" "${{inputs.cache-key}}" >> $GITHUB_OUTPUT
