@@ -95,4 +95,4 @@ jobs:
       - name: Run ViennaPS Example
         working-directory: ${{github.workspace}}/build/Examples/InterpolationDemo/${{env.BUILD_TYPE}}
         shell: bash
-        run: ./InterpolationDemo.exe
+        run: ./InterpolationDemo.exe ${{github.workspace}}/build/Examples/InterpolationDemo/
