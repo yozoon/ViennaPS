@@ -334,7 +334,12 @@ public:
       return;
     }
 
-#pragma omp parallel default(none) shared(rootNode, treeSize, nodes)
+    // Local variable definitions of class member variables. These are needed
+    // for the omp sharing costruct to work under MSVC
+    Node *myRootNode = nullptr;
+    std::vector<Node> &myNodes = nodes;
+
+#pragma omp parallel default(none) shared(myNodes, myRootNode)
     {
       int threadID = 0;
       int numThreads = 1;
@@ -347,15 +352,15 @@ public:
         int maxParallelDepth = intLog2(numThreads);
         int surplusWorkers = numThreads - (1 << maxParallelDepth);
 
-        SizeType size = nodes.end() - nodes.begin();
+        SizeType size = myNodes.end() - myNodes.begin();
         SizeType medianIndex = (size + 1) / 2 - 1;
 
         std::nth_element(
-            nodes.begin(), nodes.begin() + medianIndex, nodes.end(),
+            myNodes.begin(), myNodes.begin() + medianIndex, myNodes.end(),
             [](Node &a, Node &b) { return a.value[0] < b.value[0]; });
 
-        rootNode = &nodes[medianIndex];
-        rootNode->axis = 0;
+        myRootNode = &myNodes[medianIndex];
+        myRootNode->axis = 0;
 
 #ifdef _OPENMP
         bool dontSpawnMoreThreads = 0 > maxParallelDepth + 1 ||
@@ -365,24 +370,26 @@ public:
 #pragma omp task final(dontSpawnMoreThreads)
         {
           // Left Subtree
-          build(rootNode,                    // Use rootNode as parent
-                nodes.begin(),               // Data start
-                nodes.begin() + medianIndex, // Data end
-                1,                           // Depth
-                true,                        // Left
+          build(myRootNode,                    // Use rootNode as parent
+                myNodes.begin(),               // Data start
+                myNodes.begin() + medianIndex, // Data end
+                1,                             // Depth
+                true,                          // Left
                 surplusWorkers, maxParallelDepth);
         }
 
         // Right Subtree
-        build(rootNode,                        // Use rootNode as parent
-              nodes.begin() + medianIndex + 1, // Data start
-              nodes.end(),                     // Data end
-              1,                               // Depth
-              false,                           // Right
+        build(myRootNode,                        // Use rootNode as parent
+              myNodes.begin() + medianIndex + 1, // Data start
+              myNodes.end(),                     // Data end
+              1,                                 // Depth
+              false,                             // Right
               surplusWorkers, maxParallelDepth);
 #pragma omp taskwait
       }
     }
+
+    rootNode = myRootNode;
   }
 
   std::pair<SizeType, NumericType>
