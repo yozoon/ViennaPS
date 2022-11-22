@@ -1,0 +1,20 @@
+name: Test step output
+
+on:
+  workflow_dispatch:
+
+jobs:
+  setup-viennals:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout ViennaPS
+        uses: actions/checkout@v3
+
+      - name: Run command
+        id: run-command
+        run: |
+          export STATUS=false && echo "hit=$STATUS" >> $GITHUB_OUTPUT
+
+      - name: Print command output
+        run: |
+          echo ${{steps.run-command.outputs.hit}}
