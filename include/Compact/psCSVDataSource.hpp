@@ -24,10 +24,10 @@ class psCSVDataSource : public psDataSource<NumericType, D> {
   processPositionalParam(const std::string &input,
                          std::vector<NumericType> &positionalParameters) {
     // Positional parameter
-    try {
-      NumericType num = psUtils::convertToNumeric<NumericType>(input);
-      positionalParameters.push_back(num);
-    } catch (const std::invalid_argument &) {
+    auto v = psUtils::safeConvert<NumericType>(input);
+    if (v.has_value())
+      positionalParameters.push_back(v.value());
+    else {
       std::cout << "Error while converting parameter '" << input
                 << "' to numeric type.\n";
     }
@@ -42,14 +42,15 @@ class psCSVDataSource : public psDataSource<NumericType, D> {
 
     std::smatch smatch;
     if (std::regex_search(input, smatch, rgx) && smatch.size() == 3) {
-      try {
-        NumericType value = psUtils::convertToNumeric<NumericType>(smatch[2]);
-        namedParameters.insert({smatch[1], value});
-      } catch (const std::invalid_argument &) {
-        std::cout << "Error while parsing parameter '" << input << "'\n";
+      auto v = psUtils::safeConvert<NumericType>(smatch[2]);
+      if (v.has_value())
+        namedParameters.insert({smatch[1], v.value()});
+      else {
+        std::cout << "Error while converting value of parameter '" << smatch[1]
+                  << "'\n";
       }
     } else {
-      std::cout << "Error while parsing parameter '" << input << "'\n";
+      std::cout << "Error while parsing parameter line '" << input << "'\n";
     }
   }
 

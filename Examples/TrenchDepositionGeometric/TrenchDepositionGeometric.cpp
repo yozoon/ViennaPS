@@ -2,19 +2,33 @@
 #include <Geometries/psMakeTrench.hpp>
 #include <psProcess.hpp>
 #include <psToSurfaceMesh.hpp>
+#include <psUtils.hpp>
 #include <psVTKWriter.hpp>
+
+#include "Parameters.hpp"
 
 int main(int argc, char *argv[]) {
   using NumericType = double;
-  constexpr int D = 2;
+  static constexpr int D = 2;
+
+  // Parse the parameters
+  Parameters<NumericType> params;
+  if (argc > 1) {
+    auto config = psUtils::readConfigFile(argv[1]);
+    if (config.empty()) {
+      std::cerr << "Empty config provided" << std::endl;
+      return -1;
+    }
+    params.fromMap(config);
+  }
 
   auto geometry = psSmartPointer<psDomain<NumericType, D>>::New();
-  psMakeTrench<NumericType, D>(geometry, 0.2 /* grid delta */, 15 /*x extent*/,
-                               15 /*y extent*/, 5 /*trench width*/,
-                               10 /*trench height*/, false /*create mask*/)
+  psMakeTrench<NumericType, D>(geometry, params.gridDelta, params.xExtent,
+                               params.yExtent, params.trenchWidth,
+                               params.trenchHeight, false /*create mask*/)
       .apply();
 
-  GeometricUniformDeposition<NumericType, D> model(2.0 /*layer thickness*/);
+  GeometricUniformDeposition<NumericType, D> model(params.layerThickness);
 
   psProcess<NumericType, D> process;
   process.setDomain(geometry);

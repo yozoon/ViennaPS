@@ -1,6 +1,5 @@
 #include <Geometries/psMakeHole.hpp>
 #include <SF6O2Etching.hpp>
-#include <psConfigParser.hpp>
 #include <psProcess.hpp>
 #include <psToSurfaceMesh.hpp>
 #include <psUtils.hpp>
@@ -33,18 +32,19 @@ int main(int argc, char *argv[]) {
       params.taperAngle /* tapering angle in degrees */, true /*create mask*/)
       .apply();
 
-  SF6O2Etching<NumericType, D> model(
-      params.totalIonFlux /*ion flux*/,
-      params.totalEtchantFlux /*etchant flux*/,
-      params.totalOxygenFlux /*oxygen flux*/, 100 /*min ion energy (eV)*/,
-      3 /*oxy sputter yield*/, 0 /*mask material ID*/);
+  SF6O2Etching<NumericType, D> model(params.totalIonFlux /*ion flux*/,
+                                     params.totalEtchantFlux /*etchant flux*/,
+                                     params.totalOxygenFlux /*oxygen flux*/,
+                                     params.ionEnergy /*min ion energy (eV)*/,
+                                     params.A_O /*oxy sputter yield*/,
+                                     0 /*mask material ID*/);
 
   psProcess<NumericType, D> process;
   process.setDomain(geometry);
   process.setProcessModel(model.getProcessModel());
   process.setMaxCoverageInitIterations(10);
-  process.setNumberOfRaysPerPoint(50);
-  process.setProcessDuration(processTime);
+  process.setNumberOfRaysPerPoint(1000);
+  process.setProcessDuration(params.processTime);
 
   auto mesh = psSmartPointer<lsMesh<NumericType>>::New();
   psToSurfaceMesh<NumericType, D>(geometry, mesh).apply();

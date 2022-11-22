@@ -77,7 +77,7 @@ The examples can then be executed in their respective folders with the config fi
 
 ### Trench Deposition
 
-This example contains a single particle deposition process in a trench geometry. By default, a 2D representation of the trench is simulated. However, 3D simulations are also possible by changing the constant variable _D_ in __TrenchDeposition.cpp__. In the __config.txt__ file the process and geometry parameters can be varied. 
+This example contains a single particle deposition process in a trench geometry. By default, a 2D representation of the trench is simulated. However, 3D simulations are also possible by setting the value of the constant _D_ in __TrenchDeposition.cpp__ to 3. In the __config.txt__ file the process and geometry parameters can be varied. 
 The picture show an example of the trench deposition process for various value of the particle sticking probability _s_.
 <div align="center">
   <img src="https://raw.githubusercontent.com/ViennaTools/ViennaPS/master/data/images/deposition.svg" width=700 style="background-color:white;">

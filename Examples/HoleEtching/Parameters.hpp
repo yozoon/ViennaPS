@@ -5,64 +5,43 @@
 
 #include <psUtils.hpp>
 
-template <typename Callback>
-bool doIfFound(const std::unordered_map<std::string, std::string> &m,
-               const std::string &key, Callback callback) {
-  if (auto item = m.find(key); item != m.end()) {
-    callback(item->second);
-    return true;
-  }
-  return false;
-}
-
 template <typename T> struct Parameters {
+  // Domain
+  T gridDelta = 0.02;
+  T xExtent = 1.0;
+  T yExtent = 1.0;
+
+  // Geometry
+  T holeRadius = 0.2;
   T topRadius;
   T maskHeight;
   T taperAngle;
+
+  // Process
   T processTime;
   T totalEtchantFlux;
   T totalOxygenFlux;
   T totalIonFlux;
+  T ionEnergy;
   T A_O;
-  T bottomRadius = -1;
 
   Parameters() {}
 
   void fromMap(const std::unordered_map<std::string, std::string> &m) {
-    doIfFound(m, "topRadius", [&](const auto &value) {
-      topRadius = psUtils::convertToNumeric<T>(value);
-    });
-
-    doIfFound(m, "maskHeight", [&](const auto &value) {
-      maskHeight = psUtils::convertToNumeric<T>(value);
-    });
-
-    doIfFound(m, "taperAngle", [&](const auto &value) {
-      taperAngle = psUtils::convertToNumeric<T>(value);
-    });
-
-    doIfFound(m, "processTime", [&](const auto &value) {
-      processTime = psUtils::convertToNumeric<T>(value);
-    });
-
-    doIfFound(m, "totalEtchantFlux", [&](const auto &value) {
-      totalEtchantFlux = psUtils::convertToNumeric<T>(value);
-    });
-
-    doIfFound(m, "totalOxygenFlux", [&](const auto &value) {
-      totalOxygenFlux = psUtils::convertToNumeric<T>(value);
-    });
-
-    doIfFound(m, "totalIonFlux", [&](const auto &value) {
-      totalIonFlux = psUtils::convertToNumeric<T>(value);
-    });
-
-    doIfFound(m, "A_O", [&](const auto &value) {
-      A_O = psUtils::convertToNumeric<T>(value);
-    });
-
-    doIfFound(m, "bottomRadius", [&](const auto &value) {
-      bottomRadius = psUtils::convertToNumeric<T>(value);
-    });
+    psUtils::AssignItems(                                    //
+        m,                                                   //
+        psUtils::Item{"gridDelta", gridDelta},               //
+        psUtils::Item{"xExtent", xExtent},                   //
+        psUtils::Item{"yExtent", yExtent},                   //
+        psUtils::Item{"holeRadius", holeRadius},             //
+        psUtils::Item{"topRadius", topRadius},               //
+        psUtils::Item{"maskHeight", maskHeight},             //
+        psUtils::Item{"taperAngle", taperAngle},             //
+        psUtils::Item{"totalEtchantFlux", totalEtchantFlux}, //
+        psUtils::Item{"totalOxygenFlux", totalOxygenFlux},   //
+        psUtils::Item{"totalIonFlux", totalIonFlux},         //
+        psUtils::Item{"ionEnergy", ionEnergy},               //
+        psUtils::Item{"A_O", A_O}                            //
+    );
   }
 };

@@ -62,7 +62,16 @@ public:
         std::array<NumericType, NumCols> a{0};
         int i = 0;
         while (std::getline(iss, tmp, delimiter) && i < NumCols) {
-          a[i] = psUtils::convertToNumeric<NumericType>(tmp);
+          auto v = psUtils::safeConvert<NumericType>(tmp);
+          if (v.has_value())
+            a[i] = v.value();
+          else {
+            // TODO: We could add an option to ignore this kind of error and
+            // simply continue execution
+            std::cout << "Error while reading line " << lineCount - 1 << "in '"
+                      << filename << "'\n";
+            return {nullptr, ""};
+          }
           ++i;
         }
         data->push_back(a);

@@ -1,21 +1,26 @@
 #include <Geometries/psMakeTrench.hpp>
 #include <SimpleDeposition.hpp>
-#include <psConfigParser.hpp>
 #include <psProcess.hpp>
 #include <psToSurfaceMesh.hpp>
+#include <psUtils.hpp>
 #include <psVTKWriter.hpp>
 #include <psWriteVisualizationMesh.hpp>
+
+#include "Parameters.hpp"
 
 int main(int argc, char *argv[]) {
   using NumericType = double;
   constexpr int D = 2;
 
   // Parse the parameters
-  psProcessParameters<NumericType> params;
+  Parameters<NumericType> params;
   if (argc > 1) {
-    psConfigParser<NumericType> parser(argv[1]);
-    parser.apply();
-    params = parser.getParameters();
+    auto config = psUtils::readConfigFile(argv[1]);
+    if (config.empty()) {
+      std::cerr << "Empty config provided" << std::endl;
+      return -1;
+    }
+    params.fromMap(config);
   }
 
   auto geometry = psSmartPointer<psDomain<NumericType, D>>::New();
@@ -50,7 +55,7 @@ int main(int argc, char *argv[]) {
   psToSurfaceMesh<NumericType, D>(geometry, mesh).apply();
   psVTKWriter<NumericType>(mesh, "final.vtp").apply();
 
-  if (D == 2)
+  if constexpr (D == 2)
     psWriteVisualizationMesh<NumericType, D>(geometry, "final").apply();
 
   return EXIT_SUCCESS;

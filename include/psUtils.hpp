@@ -3,6 +3,7 @@
 
 #include <fstream>
 #include <iostream>
+#include <optional>
 #include <regex>
 #include <string>
 #include <type_traits>
@@ -21,7 +22,7 @@ bool is_signed(const std::string &s) {
 }
 
 // Converts string to the given numeric datatype
-template <typename T> T convertToNumeric(const std::string &s) {
+template <typename T> T convert(const std::string &s) {
   if constexpr (std::is_same_v<T, int>) {
     return std::stoi(s);
   } else if constexpr (std::is_same_v<T, unsigned int>) {
@@ -59,6 +60,20 @@ template <typename T> T convertToNumeric(const std::string &s) {
   }
 }
 
+// safeConvert wraps the convert function to catch exceptions. If an error
+// occurs the default initialized value is returned.
+template <typename T> std::optional<T> safeConvert(const std::string &s) {
+  T value;
+  try {
+    value = convert<T>(s);
+  } catch (std::exception &e) {
+    std::cout << '\'' << s << "' couldn't be converted to type  '"
+              << typeid(value).name() << "'\n";
+    return std::nullopt;
+  }
+  return {value};
+}
+
 // Reads a simple config file containing a single <key>=<value> pair per line
 // and returns the content as an unordered map
 std::unordered_map<std::string, std::string>
@@ -83,7 +98,7 @@ readConfigFile(const std::string &filename) {
     // Remove trailing and leading whitespaces
     line = std::regex_replace(line, wsRegex, "$1");
     // Skip this line if it is marked as a comment
-    if (line.rfind('#') == 0)
+    if (line.rfind('#') == 0 || line.empty())
       continue;
 
     // Extract key and value
@@ -99,5 +114,51 @@ readConfigFile(const std::string &filename) {
   }
   return paramMap;
 }
+
+// Class that can be used during the assigning process of a param map to the
+// param struct
+template <typename K, typename V, typename C = decltype(&convert<V>)>
+class Item {
+private:
+  C conv;
+
+public:
+  K key;
+  V &value;
+
+  Item(K key_, V &value_) : key(key_), value(value_), conv(&convert<V>) {}
+
+  Item(K key_, V &value_, C conv_) : key(key_), value(value_), conv(conv_) {}
+
+  void operator()(const std::string &k) {
+    try {
+      value = conv(k);
+    } catch (std::exception &e) {
+      std::cout << '\'' << k << "' couldn't be converted to type of parameter '"
+                << key << "'\n";
+    }
+  }
+};
+
+// If the key is found inthe unordered_map, then the
+template <typename K, typename V, typename C>
+void AssignItems(const std::unordered_map<std::string, std::string> &map,
+                 Item<K, V, C> &&item) {
+  if (auto it = map.find(item.key); it != map.end()) {
+    item(it->second);
+  } else {
+    std::cout << "Couldn't find '" << item.key
+              << "' in parameter file. Using default value instead.\n";
+  }
+}
+
+// Peels off items from parameter pack
+template <typename K, typename V, typename C, typename... ARGS>
+void AssignItems(const std::unordered_map<std::string, std::string> &map,
+                 Item<K, V, C> &&item, ARGS &&...args) {
+  AssignItems(map, std::forward<Item<K, V, C>>(item));
+  AssignItems(map, std::forward<ARGS>(args)...);
+}
+
 }; // namespace psUtils
 #endif
