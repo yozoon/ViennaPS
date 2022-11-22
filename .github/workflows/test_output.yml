@@ -13,7 +13,7 @@ jobs:
       - name: Run command
         id: run-command
         run: |
-          export STATUS=false && echo "hit=$STATUS" >> $GITHUB_OUTPUT
+          export EXISTS=$(curl -s -H "Accept: application/vnd.github+json" -H "Authorization: Bearer ${{ secrets.PAT_CACHE }}" https://api.github.com/repos/yozoon/ViennaPS/actions/caches | jq -r '.actions_caches|any(.key == "A")') && echo "cache-hit=$EXISTS" >> $GITHUB_OUTPUT
 
       - name: Print command output
         run: |
