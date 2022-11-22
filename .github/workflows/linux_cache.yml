@@ -50,7 +50,7 @@ jobs:
           repository: yozoon/ViennaPS
 
       - name: Clear Cache
-        if: ${{ github.event_name == 'schedule' && steps.cache-check.outputs.exists == true}}
+        if: ${{ github.event_name == 'schedule' && steps.cache-check.outputs.exists == 'true'}}
         uses: ./.github/actions/cache-delete
         with:
           cache-key: ${{env.VIENNALS_CACHE_KEY}}
@@ -59,7 +59,7 @@ jobs:
 
       - name: Setup Cache for Build Dependencies
         uses: actions/cache@v3
-        if: ${{steps.cache-check.outputs.exists != true}}
+        if: ${{steps.cache-check.outputs.exists != 'true'}}
         id: viennals-dependency-cache
         with:
           key: ${{env.VIENNALS_CACHE_KEY}}
@@ -69,11 +69,11 @@ jobs:
             ${{github.workspace}}/viennals/dependencies/Install
 
       - name: Configure ViennaLS
-        if: ${{steps.cache-check.outputs.exists != true}}
+        if: ${{steps.cache-check.outputs.exists != 'true'}}
         run: cmake -B ${{github.workspace}}/viennals/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
 
       - name: Build ViennaLS
-        if: ${{steps.cache-check.outputs.exists != true}}
+        if: ${{steps.cache-check.outputs.exists != 'true'}}
         run: cmake --build ${{github.workspace}}/viennals/build
 
   setup-viennaray:
@@ -103,7 +103,7 @@ jobs:
           repository: yozoon/ViennaPS
 
       - name: Clear Cache
-        if: ${{ github.event_name == 'schedule' && steps.cache-check.outputs.exists == true}}
+        if: ${{ github.event_name == 'schedule' && steps.cache-check.outputs.exists == 'true'}}
         uses: ./.github/actions/cache-delete
         with:
           cache-key: ${{env.VIENNARAY_CACHE_KEY}}
@@ -111,7 +111,7 @@ jobs:
           repository: yozoon/ViennaPS
 
       - name: Setup Cache for Build Dependencies
-        if: ${{steps.cache-check.outputs.exists != true}}
+        if: ${{steps.cache-check.outputs.exists != 'true'}}
         uses: actions/cache@v3
         id: viennaray-dependency-cache
         with:
@@ -119,19 +119,19 @@ jobs:
           path: ${{github.workspace}}/viennaray/embree
 
       - name: Download and Unpack embree
-        if: ${{steps.cache-check.outputs.exists != true}}
+        if: ${{steps.cache-check.outputs.exists != 'true'}}
         run: |
           curl -L -O https://github.com/embree/embree/releases/download/v3.13.0/embree-3.13.0.x86_64.linux.tar.gz \
             && tar -xf embree-3.13.0.x86_64.linux.tar.gz \
             && mv embree-3.13.0.x86_64.linux embree
 
       - name: Configure ViennaRay
-        if: ${{steps.cache-check.outputs.exists != true}}
+        if: ${{steps.cache-check.outputs.exists != 'true'}}
         run: |
           cmake -B ./build \
             -D CMAKE_BUILD_TYPE=${{env.build_type}} \
             -D embree_DIR=${{github.workspace}}/viennaray/embree/lib/cmake/embree-3.13.0
 
       - name: Build ViennaRay
-        if: ${{steps.cache-check.outputs.exists != true}}
+        if: ${{steps.cache-check.outputs.exists != 'true'}}
         run: cmake --build ${{github.workspace}}/viennaray/build
