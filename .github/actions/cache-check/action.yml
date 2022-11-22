@@ -11,13 +11,13 @@ inputs:
     description: The repository "username/repo"
     required: true
 outputs:
-  cache-hit:
+  exists:
     description: "Whether the provided key exists or not"
-    value: ${{ steps.check.outputs.cache-hit }}
+    value: ${{ steps.check.outputs.exists }}
 runs:
   using: composite
   steps:
     - id: check
       shell: bash
       run: |
-        export EXISTS=$(curl -s -H "Accept: application/vnd.github+json" -H "Authorization: Bearer ${{ inputs.token }}" https://api.github.com/repos/${{inputs.repository}}/actions/caches | jq -r '.actions_caches|any(.key == "${{inputs.cache-key}}")') && echo "cache-hit=$EXISTS" >> $GITHUB_OUTPUT
+        echo exists=$(curl -s -H "Accept: application/vnd.github+json" -H "Authorization: Bearer ${{ inputs.token }}" https://api.github.com/repos/${{inputs.repository}}/actions/caches | jq -r '.actions_caches|any(.key == "${{inputs.cache-key}}")') >> $GITHUB_OUTPUT
