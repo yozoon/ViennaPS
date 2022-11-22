@@ -23,4 +23,4 @@ runs:
         echo exists=$(curl -s -H "Accept: application/vnd.github+json" -H "Authorization: Bearer ${{ inputs.token }}" https://api.github.com/repos/${{inputs.repository}}/actions/caches | jq -r '.actions_caches|any(.key == "${{inputs.cache-key}}")') >> $GITHUB_OUTPUT
 
     - shell: bash
-      run: echo ${{steps.cache-check.outputs.exists}}
+      run: echo ${{steps.check.outputs.exists}}
