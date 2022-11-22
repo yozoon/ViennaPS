@@ -124,14 +124,7 @@ jobs:
         id: viennaray-dependency-cache
         with:
           key: ${{env.VIENNARAY_CACHE_KEY}}
-          path: ${{github.workspace}}/viennaray/embree
-
-      - name: Download and Unpack embree
-        if: ${{steps.cache-check.outputs.exists != 'true'}}
-        run: |
-          curl -L -O https://github.com/embree/embree/releases/download/v3.13.0/embree-3.13.0.x86_64.macosx.zip \
-            && tar -xf embree-3.13.0.x86_64.macosx.zip \
-            && mv embree-3.13.0.x86_64.macosx embree
+          path: ${{github.workspace}}/viennaray/dependencies/Install
 
       - name: Configure ViennaRay
         if: ${{steps.cache-check.outputs.exists != 'true'}}
@@ -142,8 +135,7 @@ jobs:
             -D OpenMP_CXX_FLAGS="-Xpreprocessor -fopenmp -I$(brew --prefix libomp)/include" \
             -D OpenMP_C_LIB_NAMES="omp" \
             -D OpenMP_CXX_LIB_NAMES="omp" \
-            -D OpenMP_omp_LIBRARY="$(brew --prefix libomp)/lib/libomp.a" \
-            -D embree_DIR=${{github.workspace}}/viennaray/embree/lib/cmake/embree-3.13.0
+            -D OpenMP_omp_LIBRARY="$(brew --prefix libomp)/lib/libomp.a"
 
       - name: Build ViennaRay
         if: ${{steps.cache-check.outputs.exists != 'true'}}

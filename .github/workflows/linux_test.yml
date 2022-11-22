@@ -64,14 +64,13 @@ jobs:
         with:
           key: viennaray-dependency-cache-${{ runner.os }}-${{env.BUILD_TYPE}}-${{ hashFiles( './viennaray/external/upstream/**CMakeLists.txt' ) }}
           path: |
-            ${{github.workspace}}/viennaray/embree
+            ${{github.workspace}}/viennaray/dependencies/Install
 
       - name: Configure ViennaRay
         working-directory: ${{github.workspace}}/viennaray
         run: |
           cmake -B ./build \
             -D CMAKE_BUILD_TYPE=${{env.build_type}} \
-            -D embree_DIR=${{github.workspace}}/viennaray/embree/lib/cmake/embree-3.13.0 \
             -D CMAKE_INSTALL_PREFIX=${{github.workspace}}/viennaray/install
 
       - name: Build ViennaRay

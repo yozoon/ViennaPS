@@ -116,21 +116,11 @@ jobs:
         id: viennaray-dependency-cache
         with:
           key: ${{env.VIENNARAY_CACHE_KEY}}
-          path: ${{github.workspace}}/viennaray/embree
-
-      - name: Download and Unpack embree
-        if: ${{steps.cache-check.outputs.exists != 'true'}}
-        run: |
-          curl -L -O https://github.com/embree/embree/releases/download/v3.13.0/embree-3.13.0.x86_64.linux.tar.gz \
-            && tar -xf embree-3.13.0.x86_64.linux.tar.gz \
-            && mv embree-3.13.0.x86_64.linux embree
+          path: ${{github.workspace}}/viennaray/dependencies/Install
 
       - name: Configure ViennaRay
         if: ${{steps.cache-check.outputs.exists != 'true'}}
-        run: |
-          cmake -B ./build \
-            -D CMAKE_BUILD_TYPE=${{env.build_type}} \
-            -D embree_DIR=${{github.workspace}}/viennaray/embree/lib/cmake/embree-3.13.0
+        run: cmake -B ./build -D CMAKE_BUILD_TYPE=${{env.build_type}}
 
       - name: Build ViennaRay
         if: ${{steps.cache-check.outputs.exists != 'true'}}
