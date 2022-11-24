@@ -105,7 +105,7 @@ public:
           }
           ++i;
         }
-        if (i != NumCols + 1) {
+        if (i != NumCols) {
           std::cout << "Invalid number of columns in line " << lineCount - 1
                     << " in '" << filename << "'\n";
           if constexpr (!continueOnError)
