@@ -17,6 +17,10 @@
 #define endian_swap_short(w) (((w & 0xff) << 8) | ((w & 0xff00) >> 8))
 #endif
 
+#ifdef _MSC_VER
+#define
+#endif
+
 template <typename NumericType, int D> class psGDSReader {
   using PSPtrType = psSmartPointer<psGDSGeometry<NumericType, D>>;
 
@@ -245,7 +249,7 @@ private:
   }
 
   void parseXYRef() {
-    bool flipped = ((u_int16_t)(currentSTrans & 0x8000) == (u_int16_t)0x8000);
+    bool flipped = ((uint16_t)(currentSTrans & 0x8000) == (uint16_t)0x8000);
 
     if (currentElement == elSRef) {
       float X = units * (float)readFourByteSignedInt();
