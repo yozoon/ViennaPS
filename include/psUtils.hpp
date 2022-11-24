@@ -74,16 +74,8 @@ template <typename T> std::optional<T> safeConvert(const std::string &s) {
   return {value};
 }
 
-// Reads a simple config file containing a single <key>=<value> pair per line
-// and returns the content as an unordered map
 std::unordered_map<std::string, std::string>
-readConfigFile(const std::string &filename) {
-  std::ifstream f(filename);
-  if (!f.is_open()) {
-    std::cout << "Failed to open config file '" << filename << "'\n";
-    return {};
-  }
-
+parseConfigStream(std::istream &input) {
   // Regex to find trailing and leading whitespaces
   const auto wsRegex = std::regex("^ +| +$|( ) +");
 
@@ -92,9 +84,11 @@ readConfigFile(const std::string &filename) {
   const auto keyValueRegex = std::regex(
       R"rgx([ \t]*([0-9a-zA-Z_\-\.+]+)[ \t]*=[ \t]*([0-9a-zA-Z_\-\.+]+).*$)rgx");
 
+  // Reads a simple config file containing a single <key>=<value> pair per line
+  // and returns the content as an unordered map
   std::unordered_map<std::string, std::string> paramMap;
   std::string line;
-  while (std::getline(f, line)) {
+  while (std::getline(input, line)) {
     // Remove trailing and leading whitespaces
     line = std::regex_replace(line, wsRegex, "$1");
     // Skip this line if it is marked as a comment
@@ -113,6 +107,17 @@ readConfigFile(const std::string &filename) {
     }
   }
   return paramMap;
+}
+
+// Opens a file and forwards its stream to the config stream parser.
+std::unordered_map<std::string, std::string>
+readConfigFile(const std::string &filename) {
+  std::ifstream f(filename);
+  if (!f.is_open()) {
+    std::cout << "Failed to open config file '" << filename << "'\n";
+    return {};
+  }
+  return parseConfigStream(f);
 }
 
 // Class that can be used during the assigning process of a param map to the
