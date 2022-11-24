@@ -17,11 +17,11 @@ template <typename T> struct Parameters {
   T taperAngle = 0.;
 
   // Process
-  T layerThickness = 5.;
+  T layerThickness = .15;
 
   Parameters() {}
 
-  void fromMap(const std::unordered_map<std::string, std::string> &m) {
+  void fromMap(std::unordered_map<std::string, std::string> &m) {
     psUtils::AssignItems(                               //
         m,                                              //
         psUtils::Item{"gridDelta", gridDelta},          //

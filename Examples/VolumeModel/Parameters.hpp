@@ -17,11 +17,11 @@ template <typename T> struct Parameters {
 
   // Process
   T meanFreePath = 0.75;
-  T ionEnergy;
+  T ionEnergy = 100.;
 
   Parameters() {}
 
-  void fromMap(const std::unordered_map<std::string, std::string> &m) {
+  void fromMap(std::unordered_map<std::string, std::string> &m) {
     psUtils::AssignItems(                            //
         m,                                           //
         psUtils::Item{"gridDelta", gridDelta},       //

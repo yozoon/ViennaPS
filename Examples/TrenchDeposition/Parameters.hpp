@@ -23,7 +23,7 @@ template <typename T> struct Parameters {
 
   Parameters() {}
 
-  void fromMap(const std::unordered_map<std::string, std::string> &m) {
+  void fromMap(std::unordered_map<std::string, std::string> &m) {
     psUtils::AssignItems(                                          //
         m,                                                         //
         psUtils::Item{"gridDelta", gridDelta},                     //

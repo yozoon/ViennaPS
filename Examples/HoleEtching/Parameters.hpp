@@ -13,21 +13,21 @@ template <typename T> struct Parameters {
 
   // Geometry
   T holeRadius = 0.2;
-  T topRadius;
-  T maskHeight;
-  T taperAngle;
+  T topRadius = 0.2;
+  T maskHeight = 0.2;
+  T taperAngle = 0.;
 
   // Process
-  T processTime;
-  T totalEtchantFlux;
-  T totalOxygenFlux;
-  T totalIonFlux;
-  T ionEnergy;
-  T A_O;
+  T processTime = 150;
+  T totalEtchantFlux = 4.5e16;
+  T totalOxygenFlux = 1e18;
+  T totalIonFlux = 2e16;
+  T ionEnergy = 100;
+  T A_O = 3.;
 
   Parameters() {}
 
-  void fromMap(const std::unordered_map<std::string, std::string> &m) {
+  void fromMap(std::unordered_map<std::string, std::string> &m) {
     psUtils::AssignItems(                                    //
         m,                                                   //
         psUtils::Item{"gridDelta", gridDelta},               //

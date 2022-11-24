@@ -4,6 +4,7 @@
 #include <psToSurfaceMesh.hpp>
 #include <psUtils.hpp>
 #include <psVTKWriter.hpp>
+#include <psWriteVisualizationMesh.hpp>
 
 #include "Parameters.hpp"
 
@@ -28,6 +29,11 @@ int main(int argc, char *argv[]) {
                                params.trenchHeight, false /*create mask*/)
       .apply();
 
+  // copy top layer to capture deposition
+  auto depoLayer = psSmartPointer<lsDomain<NumericType, D>>::New(
+      geometry->getLevelSets()->back());
+  geometry->insertNextLevelSet(depoLayer);
+
   GeometricUniformDeposition<NumericType, D> model(params.layerThickness);
 
   psProcess<NumericType, D> process;
@@ -42,6 +48,9 @@ int main(int argc, char *argv[]) {
 
   psToSurfaceMesh<NumericType, D>(geometry, mesh).apply();
   psVTKWriter<NumericType>(mesh, "final.vtp").apply();
+
+  if constexpr (D == 2)
+    psWriteVisualizationMesh<NumericType, D>(geometry, "final").apply();
 
   return EXIT_SUCCESS;
 }

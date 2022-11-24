@@ -147,10 +147,12 @@ public:
 
 // If the key is found inthe unordered_map, then the
 template <typename K, typename V, typename C>
-void AssignItems(const std::unordered_map<std::string, std::string> &map,
+void AssignItems(std::unordered_map<std::string, std::string> &map,
                  Item<K, V, C> &&item) {
   if (auto it = map.find(item.key); it != map.end()) {
     item(it->second);
+    // Remove the item from the map, since it is now 'consumed'.
+    map.erase(it);
   } else {
     std::cout << "Couldn't find '" << item.key
               << "' in parameter file. Using default value instead.\n";
@@ -159,7 +161,7 @@ void AssignItems(const std::unordered_map<std::string, std::string> &map,
 
 // Peels off items from parameter pack
 template <typename K, typename V, typename C, typename... ARGS>
-void AssignItems(const std::unordered_map<std::string, std::string> &map,
+void AssignItems(std::unordered_map<std::string, std::string> &map,
                  Item<K, V, C> &&item, ARGS &&...args) {
   AssignItems(map, std::forward<Item<K, V, C>>(item));
   AssignItems(map, std::forward<ARGS>(args)...);
