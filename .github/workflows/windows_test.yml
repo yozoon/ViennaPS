@@ -8,6 +8,7 @@ on:
 
 env:
   BUILD_TYPE: Debug
+  ORG: yozoon
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -25,7 +26,7 @@ jobs:
       - name: Checkout ViennaLS
         uses: actions/checkout@v3
         with:
-          repository: yozoon/ViennaLS
+          repository: ${{env.ORG}}/ViennaLS
           path: ./viennals
 
       - name: Restore ViennaLS build cache
@@ -55,7 +56,7 @@ jobs:
       - name: Checkout ViennaRay
         uses: actions/checkout@v3
         with:
-          repository: yozoon/ViennaRay
+          repository: ${{env.ORG}}/ViennaRay
           path: ./viennaray
 
       - name: Restore ViennaRay build cache

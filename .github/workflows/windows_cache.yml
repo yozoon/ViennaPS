@@ -16,6 +16,7 @@ on:
 
 env:
   BUILD_TYPE: Debug
+  ORG: yozoon
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -34,7 +35,7 @@ jobs:
       - name: Checkout ViennaLS
         uses: actions/checkout@v3
         with:
-          repository: yozoon/ViennaLS
+          repository: ${{env.ORG}}/ViennaLS
           path: ./viennals
 
       - name: Store cache key in ENV
@@ -47,7 +48,7 @@ jobs:
         with:
           cache-key: ${{env.VIENNALS_CACHE_KEY}}
           token: ${{ secrets.PAT_CACHE }}
-          repository: yozoon/ViennaPS
+          repository: ${{env.ORG}}/ViennaPS
 
       - name: Clear Cache
         if: ${{ github.event_name == 'schedule' && steps.cache-check.outputs.exists == 'true'}}
@@ -55,7 +56,7 @@ jobs:
         with:
           cache-key: ${{env.VIENNALS_CACHE_KEY}}
           token: ${{ secrets.PAT_CACHE }}
-          repository: yozoon/ViennaPS
+          repository: ${{env.ORG}}/ViennaPS
 
       - name: Setup Cache for Build Dependencies
         uses: actions/cache@v3
@@ -105,7 +106,7 @@ jobs:
         with:
           cache-key: ${{env.VIENNARAY_CACHE_KEY}}
           token: ${{ secrets.PAT_CACHE }}
-          repository: yozoon/ViennaPS
+          repository: ${{env.ORG}}/ViennaPS
 
       - name: Clear Cache
         if: ${{ github.event_name == 'schedule' && steps.cache-check.outputs.exists == 'true'}}
@@ -113,7 +114,7 @@ jobs:
         with:
           cache-key: ${{env.VIENNARAY_CACHE_KEY}}
           token: ${{ secrets.PAT_CACHE }}
-          repository: yozoon/ViennaPS
+          repository: ${{env.ORG}}/ViennaPS
 
       - name: Setup Cache for Build Dependencies
         if: ${{steps.cache-check.outputs.exists != 'true'}}
