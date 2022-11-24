@@ -74,19 +74,20 @@ class psCSVDataSource : public psDataSource<NumericType, D> {
     }
   }
 
-  static void processComments(
-      const std::string &comments,
-      std::vector<NumericType> &positionalParameters,
-      std::unordered_map<std::string, NumericType> &namedParameters) {
-    std::istringstream cmt(comments);
-    std::string line;
+  void processHeader() {
+    auto header = reader.readHeader();
+    if (header.has_value()) {
+      std::istringstream cmt(header.value());
+      std::string line;
 
-    // Go over each comment line
-    while (std::getline(cmt, line)) {
-      // Check if the line is marked as a parameter line
-      if (line.rfind("#!") == 0) {
-        processParamLine(line, positionalParameters, namedParameters);
+      // Go over each comment line
+      while (std::getline(cmt, line)) {
+        // Check if the line is marked as a parameter line
+        if (line.rfind("#!") == 0) {
+          processParamLine(line, positionalParameters, namedParameters);
+        }
       }
+      parametersInitialized = true;
     }
   }
 
@@ -106,28 +107,17 @@ public:
 
   void setOffset(int passedOffset) { reader.setOffset(passedOffset); }
 
-  DataPtr getAll() override {
-    auto [data, comments] = reader.apply();
-    if (data) {
-      processComments(comments, positionalParameters, namedParameters);
-      parametersInitialized = true;
-    }
+  DataPtr getAll() override { return reader.apply(); }
 
-    return data;
-  }
-
-  std::vector<NumericType> getPositionalParameters() const override {
+  std::vector<NumericType> getPositionalParameters() override {
     if (!parametersInitialized)
-      std::cout << "Parameters have not been initialized yet! Call `getAll()` "
-                   "first.\n";
+      processHeader();
     return positionalParameters;
   }
 
-  std::unordered_map<std::string, NumericType>
-  getNamedParameters() const override {
+  std::unordered_map<std::string, NumericType> getNamedParameters() override {
     if (!parametersInitialized)
-      std::cout << "Parameters have not been initialized yet! Call `getAll()` "
-                   "first.\n";
+      processHeader();
     return namedParameters;
   }
 };

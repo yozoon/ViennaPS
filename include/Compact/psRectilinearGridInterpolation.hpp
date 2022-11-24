@@ -107,13 +107,26 @@ public:
     //     }
     // #endif
 
+    if (!equalSize) {
+      std::cout << "Data is not arranged in a rectilinear grid!\n";
+      return false;
+    }
+
+    for (int i = 0; i < InputDim; ++i)
+      if (uniqueValues[i].empty()) {
+        std::cout << "The grid has no values along dimension " << i
+                  << std::endl;
+        return false;
+      }
+
     initialized = true;
     return true;
   }
 
   std::tuple<OutputType, bool> estimate(const InputType &input) override {
     if (!initialized)
-      initialize();
+      if (!initialize())
+        return {{}, {}};
 
     bool isInside = true;
     for (int i = 0; i < InputDim; ++i)
@@ -124,8 +137,6 @@ public:
           isInside = false;
         }
       } else {
-        std::cout << "The grid has no values along dimension " << i
-                  << std::endl;
         return {{}, {}};
       }
 

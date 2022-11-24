@@ -74,6 +74,9 @@ public:
     if (!data)
       return false;
 
+    if (data->size() == 0)
+      return false;
+
     DataScaler scaler;
     scaler.setData(data);
     scaler.apply();
@@ -90,7 +93,8 @@ public:
   std::tuple<OutputType, NumericType>
   estimate(const InputType &input) override {
     if (!initialized)
-      initialize();
+      if (!initialize())
+        return {{}, {}};
 
     auto neighbors = locator.findKNearest(input, numberOfNeighbors);
     OutputType result{0};

@@ -14,12 +14,9 @@ public:
   using DataPtr = psSmartPointer<std::vector<std::array<NumericType, D>>>;
   virtual DataPtr getAll() = 0;
 
-  virtual std::vector<NumericType> getPositionalParameters() const {
-    return {};
-  }
+  virtual std::vector<NumericType> getPositionalParameters() { return {}; }
 
-  virtual std::unordered_map<std::string, NumericType>
-  getNamedParameters() const {
+  virtual std::unordered_map<std::string, NumericType> getNamedParameters() {
     return {};
   }
 };
