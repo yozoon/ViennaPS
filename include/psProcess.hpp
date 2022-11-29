@@ -43,6 +43,10 @@ public:
     processDuration = passedDuration;
   }
 
+  void setIntegrationScheme(lsIntegrationSchemeEnum passedIntegrationScheme) {
+    integrationScheme = passedIntegrationScheme;
+  }
+
   void setNumberOfRaysPerPoint(long numRays) { raysPerPoint = numRays; }
 
   void setMaxCoverageInitIterations(size_t maxIt) { maxIterations = maxIt; }
@@ -474,6 +478,8 @@ private:
   bool useRandomSeeds = true;
   size_t maxIterations = 20;
   bool coveragesInitialized = false;
+  lsIntegrationSchemeEnum integrationScheme =
+      lsIntegrationSchemeEnum::ENGQUIST_OSHER_1ST_ORDER;
 };
 
 #endif
