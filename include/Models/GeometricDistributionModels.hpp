@@ -68,7 +68,7 @@ public:
 };
 
 template <typename NumericType, int D> class BoxDistribution {
-  using LSPtr = psSmartPointer<psDomain<NumericType, D>>;
+  using LSPtr = psSmartPointer<lsDomain<NumericType, D>>;
 
   psSmartPointer<psProcessModel<NumericType, D>> processModel = nullptr;
 
