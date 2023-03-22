@@ -4,7 +4,6 @@
 #include <fstream>
 #include <iostream>
 #include <optional>
-#include <regex>
 #include <string>
 #include <type_traits>
 #include <unordered_map>
@@ -93,37 +92,43 @@ template <typename T> std::optional<T> safeConvert(const std::string &s) {
   return {value};
 }
 
+std::string trim(const std::string &str,
+                 const std::string &whitespace = " \t") {
+  const auto strBegin = str.find_first_not_of(whitespace);
+  if (strBegin == std::string::npos)
+    return std::string("");
+
+  const auto strEnd = str.find_last_not_of(whitespace);
+  const auto strRange = strEnd - strBegin + 1;
+
+  return str.substr(strBegin, strRange);
+}
+
 std::unordered_map<std::string, std::string>
 parseConfigStream(std::istream &input) {
-  // Regex to find trailing and leading whitespaces
-  const auto wsRegex = std::regex("^ +| +$|( ) +");
-
-  // Regular expression for extracting key and value separated by '=' as two
-  // separate capture groups
-  const auto keyValueRegex = std::regex(
-      R"rgx([ \t]*([0-9a-zA-Z_\-\.+]+)[ \t]*=[ \t]*([0-9a-zA-Z_\-\.+]+).*$)rgx");
-
   // Reads a simple config file containing a single <key>=<value> pair per line
   // and returns the content as an unordered map
   std::unordered_map<std::string, std::string> paramMap;
   std::string line;
   while (std::getline(input, line)) {
     // Remove trailing and leading whitespaces
-    line = std::regex_replace(line, wsRegex, "$1");
+    line = trim(line);
+
     // Skip this line if it is marked as a comment
-    if (line.rfind('#') == 0 || line.empty())
+    if (line.find('#') == 0 || line.empty())
       continue;
 
-    // Extract key and value
-    std::smatch smatch;
-    if (std::regex_search(line, smatch, keyValueRegex)) {
-      if (smatch.size() < 3) {
-        std::cerr << "Malformed line:\n " << line;
-        continue;
-      }
+    auto splitPos = line.find("=");
+    if (splitPos == std::string::npos)
+      continue;
 
-      paramMap.insert({smatch[1], smatch[2]});
-    }
+    auto keyStr = trim(line.substr(0, splitPos));
+    auto valStr = trim(line.substr(splitPos + 1, line.length()));
+
+    if (keyStr.empty() || valStr.empty())
+      continue;
+
+    paramMap.insert({keyStr, valStr});
   }
   return paramMap;
 }
