@@ -1,11 +1,11 @@
-build*
+build*/
 old_*
 *a.out
 install*
 *.vtk
 *.vtu
 *.vtp
-*.vscode
+*.vscode/
 .vs
 CMakeSettings.json
 docs/doxygen/*.txt

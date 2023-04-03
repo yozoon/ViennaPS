@@ -143,7 +143,7 @@ setup(
     license="MIT",
     url="https://github.com/ViennaTools/ViennaPS",
     description="A fully-fledged semiconductor fabrication process simulation library.",
-    long_description="ViennaPS is a header-only C++ process simulation library, which includes surface and volume representations, a ray tracer, and physical models for the simulation of microelectronic fabrication processes. The main design goals are simplicity and efficiency, tailored towards scientific simulations.",
+    long_description="ViennaPS is a process simulation library, which includes surface and volume representations, a ray tracer, and physical models for the simulation of microelectronic fabrication processes. The main design goals are simplicity and efficiency, tailored towards scientific simulations.",
     ext_modules=[CMakeExtension("viennaps")],
     cmdclass={"build_ext": CMakeBuild},
     zip_safe=False,
