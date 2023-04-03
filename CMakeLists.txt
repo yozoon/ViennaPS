@@ -2,6 +2,10 @@ cmake_minimum_required(VERSION 3.12 FATAL_ERROR)
 
 project("ViennaPS" VERSION 1.0.0)
 
+set(VIENNAPS_VERSION
+    ${PROJECT_VERSION}
+    CACHE STRING "The version of ViennaPS" FORCE)
+
 include(GNUInstallDirs)
 
 # c++17 for inline constexpr variables
@@ -84,6 +88,14 @@ option(VIENNAPS_BUILD_APPLICATION "Build ViennaPS application." OFF)
 if(VIENNAPS_BUILD_APPLICATION)
   add_subdirectory(app)
 endif(VIENNAPS_BUILD_APPLICATION)
+
+# ##################################################################################################
+# BUILD PYTHON MODULE
+# ##################################################################################################
+# TODO: Properly integrate the python externalproject with this cmake configuration
+if(VIENNAPS_BUILD_PYTHON)
+  add_subdirectory(Python)
+endif()
 
 # ##################################################################################################
 # INSTALL
