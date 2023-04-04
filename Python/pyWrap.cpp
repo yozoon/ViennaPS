@@ -14,6 +14,8 @@
 #define STRINGIZE(s) STRINGIZE2(s)
 #define VIENNAPS_MODULE_VERSION STRINGIZE(VIENNAPS_VERSION)
 
+#include <optional>
+
 #include <pybind11/iostream.h>
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
@@ -239,6 +241,17 @@ PYBIND11_MODULE(VIENNAPS_MODULE_NAME, module) {
       // methods
       .def("insertNextLevelSet", &psDomain<T, D>::insertNextLevelSet,
            "Insert a level set to domain.")
+      .def("getLevelSetAtIndex",
+           [](psDomain<T, D> &d, const int layerIndex)
+               -> std::optional<psSmartPointer<lsDomain<T, D>>> {
+             auto levelsets = d.getLevelSets();
+             if (levelsets) {
+               if (levelsets->size() > layerIndex) {
+                 return {levelsets->at(layerIndex)};
+               }
+             }
+             return std::nullopt;
+           })
       .def("printSurface", &psDomain<T, D>::printSurface,
            "Print the surface of the domain.");
 
