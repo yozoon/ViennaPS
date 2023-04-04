@@ -58,7 +58,7 @@ class CMakeBuild(build_ext):
             cmake_args += [
                 item for item in os.environ["CMAKE_ARGS"].split(" ") if item]
 
-        cmake_args += ["-DVIENNAPS_VERBOSE=OFF"]
+        # cmake_args += ["-DVIENNAPS_VERBOSE=OFF"]
 
         # Install the dependencies alongside the platform libraries
         # dependencies_dir = os.path.join(sysconfig.get_path('platlib'), f"{ext.name}-dependencies")

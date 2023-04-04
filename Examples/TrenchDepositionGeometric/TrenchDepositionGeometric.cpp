@@ -2,31 +2,24 @@
 #include <Geometries/psMakeTrench.hpp>
 #include <psProcess.hpp>
 #include <psToSurfaceMesh.hpp>
-#include <psUtils.hpp>
 #include <psVTKWriter.hpp>
 #include <psWriteVisualizationMesh.hpp>
 
-#include "Parameters.hpp"
-
-int main(int argc, char *argv[]) {
+int main() {
   using NumericType = double;
   static constexpr int D = 2;
 
-  // Parse the parameters
-  Parameters<NumericType> params;
-  if (argc > 1) {
-    auto config = psUtils::readConfigFile(argv[1]);
-    if (config.empty()) {
-      std::cerr << "Empty config provided" << std::endl;
-      return -1;
-    }
-    params.fromMap(config);
-  }
+  const NumericType gridDelta = 0.02;
+  const NumericType xExtent = 1;
+  const NumericType yExtent = 1;
+  const NumericType trenchWidth = 0.4;
+  const NumericType trenchHeight = 0.8;
+  const NumericType taperAngle = 0;
+  const NumericType radius = .15;
 
   auto geometry = psSmartPointer<psDomain<NumericType, D>>::New();
-  psMakeTrench<NumericType, D>(geometry, params.gridDelta, params.xExtent,
-                               params.yExtent, params.trenchWidth,
-                               params.trenchHeight)
+  psMakeTrench<NumericType, D>(geometry, gridDelta, xExtent, yExtent,
+                               trenchWidth, trenchHeight)
       .apply();
 
   // copy top layer to capture deposition
@@ -34,8 +27,7 @@ int main(int argc, char *argv[]) {
       geometry->getLevelSets()->back());
   geometry->insertNextLevelSet(depoLayer);
 
-  SphereDistribution<NumericType, D> model(params.layerThickness,
-                                           params.gridDelta);
+  SphereDistribution<NumericType, D> model(radius, gridDelta);
 
   psProcess<NumericType, D> process;
   process.setDomain(geometry);

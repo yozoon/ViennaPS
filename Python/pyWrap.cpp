@@ -36,9 +36,10 @@
 #include <psMakeTrench.hpp>
 
 // models
-// #include <GeometricDistributionModels.hpp>
+#include <GeometricDistributionModels.hpp>
 #include <SF6O2Etching.hpp>
 #include <SimpleDeposition.hpp>
+#include <WetEtching.hpp>
 
 // other
 #include <lsDomain.hpp>
@@ -375,8 +376,8 @@ PYBIND11_MODULE(VIENNAPS_MODULE_NAME, module) {
       .def("setMaxCoverageInitIerations",
            &psProcess<T, D>::setMaxCoverageInitIterations,
            "Set the number of iterations to initialize the coverages.")
-      // .def("setPrintIntermediate", &psProcess<T, D>::setPrintIntermediate,
-      //      "Set whether to print disk meshes in the intermediate steps.")
+      .def("setPrintIntermediate", &psProcess<T, D>::setPrintIntermediate,
+           "Set whether to print disk meshes in the intermediate steps.")
       .def("setProcessModel",
            &psProcess<T, D>::setProcessModel<psProcessModel<T, D>>,
            "Set the process model.")
@@ -406,15 +407,27 @@ PYBIND11_MODULE(VIENNAPS_MODULE_NAME, module) {
       .def("getProcessModel", &SF6O2Etching<T, D>::getProcessModel,
            "Returns the etching process model");
 
-  // pybind11::class_<GeometricDistributionModels<T, D>,
-  // psSmartPointer<GeometricDistributionModels<T, D>>>(
-  // module, "GeometricDistributionModels")
-  //.def(pybind11::init(
-  //         &psSmartPointer<GeometricDistributionModels<T, D>>::New<const T>),
-  //         pybind11::arg("layerThickness") = 1.)
-  //.def("getProcessModel",
-  //&GeometricDistributionModels<T, D>::getProcessModel,
-  //"Return the deposition process model.");
+  // TODO: Add mask parameter in init
+  pybind11::class_<SphereDistribution<T, D>,
+                   psSmartPointer<SphereDistribution<T, D>>>(
+      module, "SphereDistribution")
+      .def(
+          pybind11::init(
+              &psSmartPointer<SphereDistribution<T, D>>::New<const T, const T>),
+          pybind11::arg("radius"), pybind11::arg("gridDelta"))
+      .def("getProcessModel", &SphereDistribution<T, D>::getProcessModel,
+           "Return the process process model.");
+
+  // TODO: Add mask parameter in init
+  pybind11::class_<BoxDistribution<T, D>,
+                   psSmartPointer<BoxDistribution<T, D>>>(
+      module, "BoxDistribution")
+      .def(
+          pybind11::init(
+              &psSmartPointer<BoxDistribution<T, D>>::New<const std::array<T, 3> &, const T>),
+          pybind11::arg("halfAxes"), pybind11::arg("gridDelta"))
+      .def("getProcessModel", &BoxDistribution<T, D>::getProcessModel,
+           "Return the process process model.");
 
 #if VIENNAPS_PYTHON_DIMENSION > 2
   // GDS file parsing
@@ -426,13 +439,31 @@ PYBIND11_MODULE(VIENNAPS_MODULE_NAME, module) {
            pybind11::arg("gridDelta"))
       // methods
       .def("setGridDelta", &psGDSGeometry<T, D>::setGridDelta,
-           "Set the gird spacing.")
+           "Set the grid spacing.")
+      .def(
+          "setBoundaryConditions",
+          [](psGDSGeometry<T, D> &gds,
+             std::vector<typename lsDomain<T, D>::BoundaryType> &bcs) {
+            if (bcs.size() == D)
+              gds.setBoundaryConditions(bcs.data());
+          },
+          "Set the boundary conditions")
       .def("setBoundaryPadding", &psGDSGeometry<T, D>::setBoundaryPadding,
            "Set padding between the largest point of the geometry and the "
            "boundary of the domain.")
       .def("print", &psGDSGeometry<T, D>::print, "Print the geometry contents.")
       .def("layerToLevelSet", &psGDSGeometry<T, D>::layerToLevelSet,
-           "Convert a layer of the GDS geometry to a level set domain.");
+           "Convert a layer of the GDS geometry to a level set domain.")
+      .def(
+          "getBounds",
+          [](psGDSGeometry<T, D> &gds) -> std::array<double, 6> {
+            auto b = gds.getBounds();
+            std::array<double, 6> bounds;
+            for (unsigned i = 0; i < 6; ++i)
+              bounds[i] = b[i];
+            return bounds;
+          },
+          "Get the bounds of the geometry.");
 
   pybind11::class_<psGDSReader<T, D>, psSmartPointer<psGDSReader<T, D>>>(
       module, "psGDSReader")
@@ -446,6 +477,13 @@ PYBIND11_MODULE(VIENNAPS_MODULE_NAME, module) {
       .def("setFileName", &psGDSReader<T, D>::setFileName,
            "Set name of the GDS file.")
       .def("apply", &psGDSReader<T, D>::apply, "Parse the GDS file.");
+
+  pybind11::class_<WetEtching<T, D>, psSmartPointer<WetEtching<T, D>>>(
+      module, "WetEtching")
+      .def(pybind11::init(&psSmartPointer<WetEtching<T, D>>::New<const int>),
+           pybind11::arg("maskId") = 0)
+      .def("getProcessModel", &WetEtching<T, D>::getProcessModel,
+           "Return the etching process model.");
 #endif
 }
 //   // ViennaLS domain setup
