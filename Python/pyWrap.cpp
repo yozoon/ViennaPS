@@ -17,6 +17,7 @@
 #include <optional>
 
 #include <pybind11/iostream.h>
+#include <pybind11/numpy.h>
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 
@@ -241,15 +242,12 @@ PYBIND11_MODULE(VIENNAPS_MODULE_NAME, module) {
       // methods
       .def("insertNextLevelSet", &psDomain<T, D>::insertNextLevelSet,
            "Insert a level set to domain.")
-      .def("getLevelSetAtIndex",
-           [](psDomain<T, D> &d, const int layerIndex)
-               -> std::optional<psSmartPointer<lsDomain<T, D>>> {
+      .def("getLevelSets",
+           [](psDomain<T, D> &d)
+               -> std::optional<std::vector<psSmartPointer<lsDomain<T, D>>>> {
              auto levelsets = d.getLevelSets();
-             if (levelsets) {
-               if (levelsets->size() > layerIndex) {
-                 return {levelsets->at(layerIndex)};
-               }
-             }
+             if (levelsets)
+               return *levelsets;
              return std::nullopt;
            })
       .def("printSurface", &psDomain<T, D>::printSurface,

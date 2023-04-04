@@ -58,7 +58,7 @@ class CMakeBuild(build_ext):
             cmake_args += [
                 item for item in os.environ["CMAKE_ARGS"].split(" ") if item]
 
-        cmake_args += ["-DVIENNAPS_BUILD_PYTHON=ON", "-DVIENNAPS_VERBOSE=OFF"]
+        cmake_args += ["-DVIENNAPS_VERBOSE=OFF"]
 
         # Install the dependencies alongside the platform libraries
         # dependencies_dir = os.path.join(sysconfig.get_path('platlib'), f"{ext.name}-dependencies")
@@ -130,6 +130,15 @@ class CMakeBuild(build_ext):
         subprocess.run(
             ["cmake", "--build", ".", "--target=buildDependencies"], cwd=build_temp, check=True
         )
+
+        cmake_args += ["-DVIENNAPS_BUILD_PYTHON=ON"]
+
+        # Configure again
+        subprocess.run(
+            ["cmake", ext.sourcedir, *cmake_args], cwd=build_temp, check=True
+        )
+
+        # Build python bindings
         subprocess.run(
             ["cmake", "--build", ".", *build_args], cwd=build_temp, check=True
         )
@@ -148,7 +157,8 @@ setup(
     long_description="ViennaPS is a process simulation library, which includes surface and volume representations, a ray tracer, and physical models for the simulation of microelectronic fabrication processes. The main design goals are simplicity and efficiency, tailored towards scientific simulations.",
     ext_modules=[CMakeExtension("viennaps")],
     cmdclass={"build_ext": CMakeBuild},
-    install_requires=[
+    requires=[
+        'numpy',
         'viennals',
     ],
     zip_safe=False,

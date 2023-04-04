@@ -2,13 +2,14 @@ cmake_minimum_required(VERSION 3.12 FATAL_ERROR)
 
 project("ViennaPS" VERSION 1.0.0)
 
+# Store version in cache
 set(VIENNAPS_VERSION
     ${PROJECT_VERSION}
     CACHE STRING "The version of ViennaPS" FORCE)
 
 include(GNUInstallDirs)
 
-# c++17 for inline constexpr variables
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_CXX_STANDARD "17")
 
 # Set default build type
@@ -23,7 +24,7 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
                                                "RelWithDebInfo")
 endif()
 
-# tell VS to export all symbols to its dll files
+# Tell VS to export all symbols to its dll files
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
   set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS
       TRUE
@@ -31,25 +32,86 @@ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
   add_compile_definitions(_USE_MATH_DEFINES)
 endif()
 
+# ##################################################################################################
+# CONFIGURATION OPTIONS
+# ##################################################################################################
+# Build the included examples
+option(VIENNAPS_BUILD_EXAMPLES "Build examples." OFF)
+
+# Build the stand-alone application
+option(VIENNAPS_BUILD_APPLICATION "Build ViennaPS application." OFF)
+
+# Build Python bindings
+option(VIENNALS_BUILD_PYTHON "Build for python3.x." OFF)
+
+# Whether the library should print additional messages when running
+option(VIENNAPS_VERBOSE "Get verbose output and intermediate results." ON)
+
+# ##################################################################################################
+# AUTOMATIC DEPENDENCY PREPARATION
+# ##################################################################################################
+
+# With the stampfile mechanism, cmake automatically retriggers the configure step after
+# the buildDependencies targed has been executed. Thus all dependencies that were built
+# with buildDependencies should then be made available by the find_package calls.
+set(STAMPFILE ${CMAKE_BINARY_DIR}/target.stamp)
+# When the buildDependencies target is executed, the stamp file is touched
+add_custom_target(buildDependencies COMMAND ${CMAKE_COMMAND} -E touch ${STAMPFILE})
+
+# Include the external dependencies
+include(ExternalProject)
+set(DEPENDENCIES_DIR ${CMAKE_SOURCE_DIR}/dependencies)
+add_subdirectory(external/upstream)
+
+# Create the initial stamp file
+file(TOUCH ${STAMPFILE})
+# Include the stamp file, so that cmake is forced to re-run once the file has been touched
+include(${STAMPFILE})
+
 set(ViennaPS_BINARY_DIR
     ${PROJECT_BINARY_DIR}
     CACHE PATH "Path to local ViennaPS installation" FORCE)
 
-# build dependencies
-set(DEPENDENCIES_DIR ${CMAKE_SOURCE_DIR}/dependencies)
+# ##################################################################################################
+# DEPENDENCY CHECKS
+# ##################################################################################################
+set(DEPENDENCIES_FOUND TRUE)
 
-# Include all external dependencies
-include(ExternalProject)
-add_custom_target(buildDependencies)
-add_subdirectory(external/upstream)
+find_package(OpenMP REQUIRED)
+list(APPEND VIENNAPS_LIBRARIES OpenMP::OpenMP_CXX)
 
-option(VIENNAPS_VERBOSE "Get verbose output and intermediate results." ON)
+list(APPEND VIENNAPS_DEPENDENCIES "viennals_external")
+find_package(ViennaLS QUIET CONFIG PATHS ${ViennaLS_DIR} NO_DEFAULT_PATH)
+if(NOT ViennaLS_FOUND)
+  set(DEPENDENCIES_FOUND FALSE)
+endif()
+list(APPEND VIENNAPS_DEPENDENCIES "viennaray_external")
+find_package(ViennaRay QUIET CONFIG PATHS ${ViennaRay_DIR} NO_DEFAULT_PATH)
+if(NOT ViennaRay_FOUND)
+  set(DEPENDENCIES_FOUND FALSE)
+endif()
+
+if(DEPENDENCIES_FOUND)
+  # Remove the buildDependencies target from the ALL target to prevent unnecessary re-builds
+  set_target_properties(buildDependencies PROPERTIES EXCLUDE_FROM_ALL true)
+else()
+  message(WARNING "Not all dependencies were found. Execute buildDependencies target first.")
+  # Add the buildDependencies target to the ALL target
+  set_target_properties(buildDependencies PROPERTIES EXCLUDE_FROM_ALL false)
+endif()
+
+# ##################################################################################################
+# SETUP MAIN LIBRARY TARGET
+# ##################################################################################################
+add_library(${PROJECT_NAME} INTERFACE)
+
 if(VIENNAPS_VERBOSE)
   add_compile_definitions(VIENNAPS_VERBOSE)
 endif(VIENNAPS_VERBOSE)
 
-# install config files locations are provided by GNUInstallDirs
-add_library(${PROJECT_NAME} INTERFACE)
+# ##################################################################################################
+# DIRECTORY CONFIGURATIONS
+# ##################################################################################################
 
 # set the correct paths for installation
 set(LOCAL_CONFIG_DIR "lib/cmake/${PROJECT_NAME}")
@@ -63,6 +125,9 @@ target_include_directories(
 
 target_compile_features(${PROJECT_NAME} INTERFACE cxx_std_17)
 
+# ##################################################################################################
+# CMAKE CONFIG FILE SETUP
+# ##################################################################################################
 include(CMakePackageConfigHelpers)
 write_basic_package_version_file(
   "${PROJECT_NAME}ConfigVersion.cmake"
@@ -76,24 +141,21 @@ configure_package_config_file(
 # ##################################################################################################
 # BUILD EXAMPLES
 # ##################################################################################################
-option(VIENNAPS_BUILD_EXAMPLES "Build examples." OFF)
-if(VIENNAPS_BUILD_EXAMPLES)
+if(VIENNAPS_BUILD_EXAMPLES AND DEPENDENCIES_FOUND)
   add_subdirectory(Examples)
 endif(VIENNAPS_BUILD_EXAMPLES)
 
 # ##################################################################################################
 # BUILD VIENNAPS APPLICATION
 # ##################################################################################################
-option(VIENNAPS_BUILD_APPLICATION "Build ViennaPS application." OFF)
-if(VIENNAPS_BUILD_APPLICATION)
+if(VIENNAPS_BUILD_APPLICATION AND DEPENDENCIES_FOUND)
   add_subdirectory(app)
 endif(VIENNAPS_BUILD_APPLICATION)
 
 # ##################################################################################################
 # BUILD PYTHON MODULE
 # ##################################################################################################
-# TODO: Properly integrate the python externalproject with this cmake configuration
-if(VIENNAPS_BUILD_PYTHON)
+if(VIENNAPS_BUILD_PYTHON AND DEPENDENCIES_FOUND)
   add_subdirectory(Python)
 endif()
 
@@ -117,12 +179,12 @@ install(FILES "${PROJECT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
               "${PROJECT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake"
         DESTINATION ${LOCAL_CONFIG_DIR})
 
-# install include files
+# Install include files
 file(GLOB_RECURSE HEADER_FILES "${PROJECT_SOURCE_DIR}/include/*.hpp")
 
 install(FILES ${HEADER_FILES} DESTINATION "include")
 
-# uninstall target
+# Uninstall target
 if(NOT TARGET uninstall)
   configure_file("${CMAKE_CURRENT_SOURCE_DIR}/cmake/cmake_uninstall.cmake.in"
                  "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake" IMMEDIATE @ONLY)
