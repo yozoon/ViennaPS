@@ -123,19 +123,16 @@ class CMakeBuild(build_ext):
         if not build_temp.exists():
             build_temp.mkdir(parents=True)
 
-        print(cmake_args)
-        subprocess.run(
-            ["cmake", ext.sourcedir, *cmake_args], cwd=build_temp, check=True
-        )
-        subprocess.run(
-            ["cmake", "--build", ".", "--target=buildDependencies"], cwd=build_temp, check=True
-        )
-
         cmake_args += ["-DVIENNAPS_BUILD_PYTHON=ON"]
 
-        # Configure again
+        # Configure the project
         subprocess.run(
             ["cmake", ext.sourcedir, *cmake_args], cwd=build_temp, check=True
+        )
+
+        # Build dependencies if neccesary
+        subprocess.run(
+            ["cmake", "--build", ".", *build_args], cwd=build_temp, check=True
         )
 
         # Build python bindings

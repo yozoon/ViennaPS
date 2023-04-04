@@ -107,7 +107,7 @@ add_library(${PROJECT_NAME} INTERFACE)
 
 if(VIENNAPS_VERBOSE)
   add_compile_definitions(VIENNAPS_VERBOSE)
-endif(VIENNAPS_VERBOSE)
+endif()
 
 # ##################################################################################################
 # DIRECTORY CONFIGURATIONS
@@ -143,14 +143,14 @@ configure_package_config_file(
 # ##################################################################################################
 if(VIENNAPS_BUILD_EXAMPLES AND DEPENDENCIES_FOUND)
   add_subdirectory(Examples)
-endif(VIENNAPS_BUILD_EXAMPLES)
+endif()
 
 # ##################################################################################################
 # BUILD VIENNAPS APPLICATION
 # ##################################################################################################
 if(VIENNAPS_BUILD_APPLICATION AND DEPENDENCIES_FOUND)
   add_subdirectory(app)
-endif(VIENNAPS_BUILD_APPLICATION)
+endif()
 
 # ##################################################################################################
 # BUILD PYTHON MODULE
