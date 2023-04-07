@@ -41,11 +41,11 @@ option(VIENNAPS_BUILD_EXAMPLES "Build examples." OFF)
 # Build the stand-alone application
 option(VIENNAPS_BUILD_APPLICATION "Build ViennaPS application." OFF)
 
-# Build Python bindings
-option(VIENNALS_BUILD_PYTHON "Build for python3.x." OFF)
-
 # Whether the library should print additional messages when running
 option(VIENNAPS_VERBOSE "Get verbose output and intermediate results." ON)
+
+# Build Python bindings
+option(VIENNAPS_BUILD_PYTHON "Build for python3.x." OFF)
 
 # ##################################################################################################
 # AUTOMATIC DEPENDENCY PREPARATION

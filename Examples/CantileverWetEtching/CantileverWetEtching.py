@@ -27,12 +27,13 @@ def main() -> None:
     )
 
     bounds = gds_mask.getBounds()
+    print(bounds)
 
     # create plane
     origin = (0, 0, 0)
-    planeNormal = (0, 0, 1)
+    plane_normal = (0, 0, 1)
     plane = vls.lsDomain(bounds, boundary_conditions, gridDelta)
-    vls.lsMakeGeometry(plane, vls.lsPlane(origin, planeNormal)).apply()
+    vls.lsMakeGeometry(plane, vls.lsPlane(origin, plane_normal)).apply()
 
     geometry = vps.psDomain()
     geometry.insertNextLevelSet(mask, False)

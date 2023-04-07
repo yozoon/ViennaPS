@@ -10,16 +10,12 @@ int main() {
   static constexpr int D = 2;
 
   const NumericType gridDelta = 0.02;
-  const NumericType xExtent = 1;
-  const NumericType yExtent = 1;
-  const NumericType trenchWidth = 0.4;
-  const NumericType trenchHeight = 0.8;
-  const NumericType taperAngle = 0;
   const NumericType radius = .15;
 
   auto geometry = psSmartPointer<psDomain<NumericType, D>>::New();
-  psMakeTrench<NumericType, D>(geometry, gridDelta, xExtent, yExtent,
-                               trenchWidth, trenchHeight)
+  psMakeTrench<NumericType, D>(geometry, gridDelta, 1. /* xExtent */,
+                               1. /* yExtent */, 0.4 /* trenchWidth */,
+                               0.8 /* trenchHeight*/)
       .apply();
 
   // copy top layer to capture deposition

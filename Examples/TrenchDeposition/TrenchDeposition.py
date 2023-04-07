@@ -23,7 +23,8 @@ def main() -> None:
                      trenchWidth, trenchHeight,
                      taperAngle).apply()
 
-    model = vps.SimpleDeposition(stickingProbability, sourcePower)
+    model = vps.SimpleDeposition(
+        stickingProbability=stickingProbability, sourcePower=sourcePower)
 
     process = vps.psProcess()
     process.setDomain(geometry)

@@ -1,6 +1,8 @@
 #ifndef PS_UTIL_HPP
 #define PS_UTIL_HPP
 
+#include <algorithm>
+#include <cmath>
 #include <fstream>
 #include <iostream>
 #include <optional>
@@ -92,6 +94,39 @@ template <typename T> std::optional<T> safeConvert(const std::string &s) {
   return {value};
 }
 
+// Special conversion functions
+template <typename NumericType>
+inline NumericType toStrictlyPositive(const std::string &s) {
+  auto value = psUtils::convert<NumericType>(s);
+  if (value <= 0.0)
+    throw std::invalid_argument("Value must be strictly positive.");
+  return value;
+};
+
+template <typename NumericType>
+inline NumericType toUnitRange(const std::string &s) {
+  auto value = psUtils::convert<NumericType>(s);
+  if (value > 1.0 || value <= 0.0)
+    throw std::invalid_argument("Value must be in the range [1,0).");
+  return value;
+};
+
+bool toBool(const std::string &s) {
+  auto lower = s;
+  std::transform(lower.begin(), lower.end(), lower.begin(),
+                 [](unsigned char c) { return std::tolower(c); });
+  bool value = false;
+  if (lower == "true" || lower == "1") {
+    value = true;
+  } else if (lower == "false" || lower == "0") {
+    value = false;
+  } else {
+    throw std::invalid_argument("Failed to convert value to boolean.");
+  }
+  return value;
+};
+
+// Removes trailing and leading whitespace and tab characters from a string
 std::string trim(const std::string &str,
                  const std::string &whitespace = " \t") {
   const auto strBegin = str.find_first_not_of(whitespace);
@@ -102,6 +137,17 @@ std::string trim(const std::string &str,
   const auto strRange = strEnd - strBegin + 1;
 
   return str.substr(strBegin, strRange);
+}
+
+template <class Iterator>
+std::string join(Iterator begin, Iterator end,
+                 const std::string &separator = ",") {
+  std::ostringstream ostr;
+  if (begin != end)
+    ostr << *begin++;
+  while (begin != end)
+    ostr << separator << *begin++;
+  return ostr.str();
 }
 
 std::unordered_map<std::string, std::string>

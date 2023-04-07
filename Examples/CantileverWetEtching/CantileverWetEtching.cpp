@@ -9,9 +9,6 @@ int main(int argc, char **argv) {
   using NumericType = double;
   constexpr int D = 3;
 
-  // set number threads to be used
-  omp_set_num_threads(12);
-
   std::string maskFileName = "cantilever_mask.gds";
 
   const int minutes = 120 / 5;   // total etch time (2 hours)
@@ -39,6 +36,9 @@ int main(int argc, char **argv) {
   NumericType origin[D] = {0., 0., 0.};   // surface origin
   NumericType normal[D] = {0., 0., 1.};   // surface normal
   double *bounds = gds_mask->getBounds(); // extent of GDS mask
+  for (unsigned i = 0; i < 6; ++i)
+    std::cout << bounds[i] << ", ";
+  std::cout << std::endl;
   auto plane = psSmartPointer<lsDomain<NumericType, D>>::New(
       bounds, boundaryCons, gridDelta);
   lsMakeGeometry<NumericType, D>(

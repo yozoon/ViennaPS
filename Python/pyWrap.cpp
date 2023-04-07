@@ -36,7 +36,10 @@
 #include <psMakeTrench.hpp>
 
 // models
+#include <DirectionalEtching.hpp>
 #include <GeometricDistributionModels.hpp>
+#include <IsotropicProcess.hpp>
+#include <PlasmaDamage.hpp>
 #include <SF6O2Etching.hpp>
 #include <SimpleDeposition.hpp>
 #include <WetEtching.hpp>
@@ -335,7 +338,7 @@ PYBIND11_MODULE(VIENNAPS_MODULE_NAME, module) {
       // I don't know what particle type could be
       //.def("insertNextParticleType",
       //[](psProcessModel<T, D> &pm,
-      //         std::unique_ptr<ParticleType> &passedParticle) {
+      //         std::unique_ptr<ParticleType> passedParticle) {
       // pm.insertNextParticleType(passedParticle);
       // })
 
@@ -407,27 +410,65 @@ PYBIND11_MODULE(VIENNAPS_MODULE_NAME, module) {
       .def("getProcessModel", &SF6O2Etching<T, D>::getProcessModel,
            "Returns the etching process model");
 
-  // TODO: Add mask parameter in init
+  pybind11::class_<IsotropicProcess<T, D>,
+                   psSmartPointer<IsotropicProcess<T, D>>>(module,
+                                                           "IsotropicProcess")
+      .def(pybind11::init(
+               &psSmartPointer<IsotropicProcess<T, D>>::New<const double,
+                                                            const int>),
+           pybind11::arg("isotropic rate"), pybind11::arg("maskId") = 0)
+      .def("getProcessModel", &IsotropicProcess<T, D>::getProcessModel,
+           "Returns the process model");
+
+  pybind11::class_<DirectionalEtching<T, D>,
+                   psSmartPointer<DirectionalEtching<T, D>>>(
+      module, "DirectionalEtching")
+      .def(pybind11::init(
+               &psSmartPointer<DirectionalEtching<T, D>>::New<
+                   const std::array<T, 3> &, const T, const T, const int>),
+           pybind11::arg("direction"),
+           pybind11::arg("directionalVelocity") = 1.,
+           pybind11::arg("isotropicVelocity") = 0., pybind11::arg("maskId") = 0)
+      .def("getProcessModel", &DirectionalEtching<T, D>::getProcessModel,
+           "Returns the process model");
+
   pybind11::class_<SphereDistribution<T, D>,
                    psSmartPointer<SphereDistribution<T, D>>>(
       module, "SphereDistribution")
-      .def(
-          pybind11::init(
-              &psSmartPointer<SphereDistribution<T, D>>::New<const T, const T>),
-          pybind11::arg("radius"), pybind11::arg("gridDelta"))
+      .def(pybind11::init([](const T radius, const T gridDelta,
+                             psSmartPointer<lsDomain<T, D>> mask = nullptr) {
+             return psSmartPointer<SphereDistribution<T, D>>::New(
+                 radius, gridDelta, mask);
+           }),
+           pybind11::arg("radius"), pybind11::arg("gridDelta"),
+           pybind11::arg("maskId") = nullptr)
       .def("getProcessModel", &SphereDistribution<T, D>::getProcessModel,
            "Return the process process model.");
 
-  // TODO: Add mask parameter in init
   pybind11::class_<BoxDistribution<T, D>,
-                   psSmartPointer<BoxDistribution<T, D>>>(
-      module, "BoxDistribution")
+                   psSmartPointer<BoxDistribution<T, D>>>(module,
+                                                          "BoxDistribution")
       .def(
-          pybind11::init(
-              &psSmartPointer<BoxDistribution<T, D>>::New<const std::array<T, 3> &, const T>),
-          pybind11::arg("halfAxes"), pybind11::arg("gridDelta"))
+          pybind11::init([](const std::array<T, 3> &halfAxes, const T gridDelta,
+                            psSmartPointer<lsDomain<T, D>> mask = nullptr) {
+            return psSmartPointer<BoxDistribution<T, D>>::New(halfAxes,
+                                                              gridDelta, mask);
+          }),
+          pybind11::arg("halfAxes"), pybind11::arg("gridDelta"),
+          pybind11::arg("maskId") = nullptr)
       .def("getProcessModel", &BoxDistribution<T, D>::getProcessModel,
            "Return the process process model.");
+
+  pybind11::class_<PlasmaDamage<T, D>, psSmartPointer<PlasmaDamage<T, D>>>(
+      module, "PlasmaDamage")
+      .def(pybind11::init(
+               &psSmartPointer<PlasmaDamage<T, D>>::New<const T, const T,
+                                                        const int>),
+           pybind11::arg("ionEnergy") = 100.,
+           pybind11::arg("meanFreePath") = 1.,
+           pybind11::arg("maskMaterial") = 0)
+      .def("getProcessModel", &PlasmaDamage<T, D>::getProcessModel,
+           "Returns the process model");
 
 #if VIENNAPS_PYTHON_DIMENSION > 2
   // GDS file parsing
@@ -486,74 +527,3 @@ PYBIND11_MODULE(VIENNAPS_MODULE_NAME, module) {
            "Return the etching process model.");
 #endif
 }
-//   // ViennaLS domain setup
-//   // lsDomain
-//   pybind11::class_<lsDomain<T, D>, psSmartPointer<lsDomain<T, D>>>(module,
-// "lsDomain")
-// // constructors
-// .def(pybind11::init(&psSmartPointer<lsDomain<T, D>>::New<>))
-// .def(pybind11::init(&psSmartPointer<lsDomain<T, D>>::New<hrleCoordType>))
-// .def(pybind11::init(
-//         &psSmartPointer<lsDomain<T, D>>::New<hrleCoordType *,
-//         lsDomain<T, D>::BoundaryType *>))
-// .def(pybind11::init( &psSmartPointer<lsDomain<T, D>>::New<hrleCoordType *,
-// lsDomain<T, D>::BoundaryType *, hrleCoordType>)) .def(pybind11::init(
-// &psSmartPointer<lsDomain<T, D>>::New<std::vector<hrleCoordType>>,
-// std::vector<unsigned>, hrleCoordType>))
-// .def(pybind11::init(&psSmartPointer<lsDomain<T, D>>::New<
-//                                                 lsDomain<T,
-//                                                 D>::PointValueVectorType,
-//                                                 hrleCoordType *,
-//                     lsDomain<T, D>::BoundaryType *>))
-// .def(pybind11::init(&psSmartPointer<lsDomain<T, D>>::New<
-//                                                 lsDomain<T,
-//                                                 D>::PointValueVectorType,
-//                                                 hrleCoordType *,
-//                     lsDomain<T, D>::BoundaryType *, hrleCoordType>))
-// .def(pybind11::init(&psSmartPointer<lsDomain<T, D>>::New<
-//                                                 psSmartPointer<lsDomain<T,
-//                                                 D>> &>))
-// // methods
-// .def("deepCopy", &lsDomain<T, D>::deepCopy,
-// "Copy lsDomain in this lsDomain.")
-// .def("getNumberOfSegments", &lsDomain<T, D>::getNumberOfSegments,
-// "Get the number of segments, the level set structure is divided "
-// "into.")
-// .def("getNumberOfPoints", &lsDomain<T, D>::getNumberOfPoints,
-// "Get the number of defined level set values.")
-// .def("getLevelSetWidth", &lsDomain<T, D>::getLevelSetWidth,
-// "Get the number of layers of level set points around the explicit "
-// "surface.")
-// .def("setLevelSetWidth", &lsDomain<T, D>::setLevelSetWidth,
-// "Set the number of layers of level set points which should be "
-// "stored around the explicit surface.")
-// .def("clearMetaData", &lsDomain<T, D>::clearMetaData,
-// "Clear all metadata stored in the level set.")
-// // allow filehandle to be passed and default to python standard output
-// .def("print", [](lsDomain<T, D>& d, pybind11::object fileHandle) {
-// if (!(pybind11::hasattr(fileHandle,"write") &&
-// pybind11::hasattr(fileHandle,"flush") )){
-// throw pybind11::type_error("MyClass::read_from_file_like_object(file):
-// incompatible function argument:  `file` must be a file-like object, but `"
-// +(std::string)(pybind11::repr(fileHandle))+"` provided"
-// );
-// }
-// pybind11::detail::pythonbuf buf(fileHandle);
-// std::ostream stream(&buf);
-// d.print(stream);
-// }, pybind11::arg("stream") = pybind11::module::import("sys").attr("stdout"));
-
-//   // enums
-//   pybind11::enum_<lsBoundaryConditionEnum<D>>(module,
-//   "lsBoundaryConditionEnum")
-//       .value("REFLECTIVE_BOUNDARY",
-//              lsBoundaryConditionEnum<D>::REFLECTIVE_BOUNDARY)
-//       .value("INFINITE_BOUNDARY",
-//       lsBoundaryConditionEnum<D>::INFINITE_BOUNDARY)
-//       .value("PERIODIC_BOUNDARY",
-//       lsBoundaryConditionEnum<D>::PERIODIC_BOUNDARY)
-//       .value("POS_INFINITE_BOUNDARY",
-//              lsBoundaryConditionEnum<D>::POS_INFINITE_BOUNDARY)
-//       .value("NEG_INFINITE_BOUNDARY",
-//              lsBoundaryConditionEnum<D>::NEG_INFINITE_BOUNDARY);
-// }
