@@ -164,7 +164,7 @@ parseConfigStream(std::istream &input) {
     if (line.find('#') == 0 || line.empty())
       continue;
 
-    auto splitPos = line.find("=");
+    auto splitPos = line.find('=');
     if (splitPos == std::string::npos)
       continue;
 

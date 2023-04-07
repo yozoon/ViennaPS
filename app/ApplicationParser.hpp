@@ -1,8 +1,10 @@
 #pragma once
 
 #include <sstream>
+#include <unordered_map>
 
 #include <psSmartPointer.hpp>
+#include <psUtils.hpp>
 
 #include <ApplicationParameters.hpp>
 
@@ -176,36 +178,30 @@ private:
   void parseOutput(std::istringstream &stream) { stream >> params->fileName; }
 
   std::unordered_map<std::string, std::string>
-  parseLineStream(std::istringstream &input) {
-    // Regex to find trailing and leading whitespaces
-    const auto wsRegex = std::regex("^ +| +$|( ) +");
-
-    // Regular expression for extracting key and value separated by '=' as two
-    // separate capture groups
-    const auto keyValueRegex = std::regex(
-        R"rgx([ \t]*([0-9a-zA-Z_\-\.+]+)[ \t]*=[ \t]*([0-9a-zA-Z_\-\.+]+).*$)rgx");
-
+  parseLineStream(std::istream &input) {
     // Reads a simple config file containing a single <key>=<value> pair per
     // line and returns the content as an unordered map
     std::unordered_map<std::string, std::string> paramMap;
-    std::string expression;
-    while (input >> expression) {
+    std::string line;
+    while (input >> line) {
       // Remove trailing and leading whitespaces
-      expression = std::regex_replace(expression, wsRegex, "$1");
-      // Skip this expression if it is marked as a comment
-      if (expression.rfind('#') == 0 || expression.empty())
+      line = psUtils::trim(line);
+
+      // Skip this line if it is marked as a comment
+      if (line.find('#') == 0 || line.empty())
         continue;
 
-      // Extract key and value
-      std::smatch smatch;
-      if (std::regex_search(expression, smatch, keyValueRegex)) {
-        if (smatch.size() < 3) {
-          std::cerr << "Malformed expression:\n " << expression;
-          continue;
-        }
+      auto splitPos = line.find('=');
+      if (splitPos == std::string::npos)
+        continue;
 
-        paramMap.insert({smatch[1], smatch[2]});
-      }
+      auto keyStr = psUtils::trim(line.substr(0, splitPos));
+      auto valStr = psUtils::trim(line.substr(splitPos + 1, line.length()));
+
+      if (keyStr.empty() || valStr.empty())
+        continue;
+
+      paramMap.insert({keyStr, valStr});
     }
     return paramMap;
   }
