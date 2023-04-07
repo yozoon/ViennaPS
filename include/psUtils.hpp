@@ -126,14 +126,14 @@ bool toBool(const std::string &s) {
   return value;
 };
 
-// Removes trailing and leading whitespace and tab characters from a string
-std::string trim(const std::string &str,
-                 const std::string &whitespace = " \t") {
-  const auto strBegin = str.find_first_not_of(whitespace);
+// Removes trailing and leading whitespace, tab characters, newline and carriage
+// return chars from a string
+std::string trim(const std::string &str, const std::string &avoid = " \t\n\r") {
+  const auto strBegin = str.find_first_not_of(avoid);
   if (strBegin == std::string::npos)
     return std::string("");
 
-  const auto strEnd = str.find_last_not_of(whitespace);
+  const auto strEnd = str.find_last_not_of(avoid);
   const auto strRange = strEnd - strBegin + 1;
 
   return str.substr(strBegin, strRange);
