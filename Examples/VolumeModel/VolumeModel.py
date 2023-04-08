@@ -1,15 +1,15 @@
 import viennaps3d as vps
 
-grid_delta = 0.25
-x_extent = 15.0
-y_extent = 7.0
-fin_width = 5.0
-fin_heght = 15.0
-mean_free_path = 0.75
-ion_energy = 100.0
-
 
 def main() -> None:
+    grid_delta = 0.25
+    x_extent = 15.0
+    y_extent = 7.0
+    fin_width = 5.0
+    fin_heght = 15.0
+    mean_free_path = 0.75
+    ion_energy = 100.0
+
     geometry = vps.psDomain()
     vps.psMakeFin(geometry, grid_delta, x_extent,
                   y_extent, fin_width, fin_heght,

@@ -1,20 +1,15 @@
 import viennals2d as vls
 import viennaps2d as vps
 
-gridDelta = 0.02
-xExtent = 1
-yExtent = 1
-
-# Geometry
-trenchWidth = 0.4
-trenchHeight = 0.8
-taperAngle = 0
-
-# Process
-radius = .15
-
 
 def main() -> None:
+    gridDelta = 0.02
+    xExtent = 1
+    yExtent = 1
+    trenchWidth = 0.4
+    trenchHeight = 0.8
+    radius = .15
+
     geometry = vps.psDomain()
     vps.psMakeTrench(geometry, gridDelta, xExtent,
                      yExtent, trenchWidth,

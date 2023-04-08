@@ -1,11 +1,11 @@
 import viennals3d as vls
 import viennaps3d as vps
 
-grid_delta = 0.05
-extrusion_length = 5.0
-
 
 def main() -> None:
+    grid_delta = 0.05
+    extrusion_length = 5.0
+
     geometry = vps.psDomain()
     profile = [
         [1, 1],

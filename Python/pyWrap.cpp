@@ -49,6 +49,9 @@
 // CellSet
 #include <csDenseCellSet.hpp>
 
+// Compact
+#include <psKDTree.hpp>
+
 // other
 #include <lsDomain.hpp>
 #include <rayTraceDirection.hpp>

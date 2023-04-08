@@ -1,11 +1,10 @@
 import viennals3d as vls
 import viennaps3d as vps
 
-grid_delta = 0.01
-mask_file_name = "mask.gds"
-
 
 def main() -> None:
+    grid_delta = 0.01
+    mask_file_name = "mask.gds"
     boundary_conditions = [vls.lsBoundaryConditionEnum.REFLECTIVE_BOUNDARY,
                            vls.lsBoundaryConditionEnum.REFLECTIVE_BOUNDARY,
                            vls.lsBoundaryConditionEnum.INFINITE_BOUNDARY]

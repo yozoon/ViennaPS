@@ -1,14 +1,14 @@
 import viennals3d as vls
 import viennaps3d as vps
 
-mask_file_name = "cantilever_mask.gds"
-process_time = 120   # total etch time in minutes (2 hours)
-x_add = 50.  # add space to domain boundary
-y_add = 50.
-grid_delta = 5.  # um
-
 
 def main() -> None:
+    mask_file_name = "cantilever_mask.gds"
+    process_time = 120   # total etch time in minutes (2 hours)
+    x_add = 50.  # add space to domain boundary
+    y_add = 50.
+    grid_delta = 5.  # um
+
     gds_mask = vps.psGDSGeometry(grid_delta)
 
     boundary_conditions = [vls.lsBoundaryConditionEnum.REFLECTIVE_BOUNDARY,
