@@ -5,11 +5,11 @@ mask_file_name = "cantilever_mask.gds"
 process_time = 120   # total etch time in minutes (2 hours)
 x_add = 50.  # add space to domain boundary
 y_add = 50.
-gridDelta = 5.  # um
+grid_delta = 5.  # um
 
 
 def main() -> None:
-    gds_mask = vps.psGDSGeometry(gridDelta)
+    gds_mask = vps.psGDSGeometry(grid_delta)
 
     boundary_conditions = [vls.lsBoundaryConditionEnum.REFLECTIVE_BOUNDARY,
                            vls.lsBoundaryConditionEnum.REFLECTIVE_BOUNDARY,
@@ -22,17 +22,16 @@ def main() -> None:
     mask = gds_mask.layerToLevelSet(
         1,  # layer in GDS file
         0,  # base z position
-        4 * gridDelta,  # mask height
+        4 * grid_delta,  # mask height
         True,  # invert mask
     )
 
     bounds = gds_mask.getBounds()
-    print(bounds)
 
     # create plane
     origin = (0, 0, 0)
     plane_normal = (0, 0, 1)
-    plane = vls.lsDomain(bounds, boundary_conditions, gridDelta)
+    plane = vls.lsDomain(bounds, boundary_conditions, grid_delta)
     vls.lsMakeGeometry(plane, vls.lsPlane(origin, plane_normal)).apply()
 
     geometry = vps.psDomain()

@@ -7,4 +7,6 @@ target_include_directories(${PROJECT_NAME} PUBLIC ${VIENNAPS_INCLUDE_DIRS})
 target_link_libraries(${PROJECT_NAME} PRIVATE ${VIENNAPS_LIBRARIES})
 configure_file(mask.gds ${CMAKE_CURRENT_BINARY_DIR}/mask.gds COPYONLY)
 
+configure_file(${PROJECT_NAME}.py ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.py COPYONLY)
+
 add_dependencies(buildExamples ${PROJECT_NAME})
