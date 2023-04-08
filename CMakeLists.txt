@@ -90,6 +90,13 @@ find_package(ViennaRay QUIET CONFIG PATHS ${ViennaRay_DIR} NO_DEFAULT_PATH)
 if(NOT ViennaRay_FOUND)
   set(DEPENDENCIES_FOUND FALSE)
 endif()
+if(VIENNAPS_BUILD_PYTHON)
+  list(APPEND VIENNAPS_DEPENDENCIES "pybind11_external")
+  find_package(pybind11 QUIET PATHS ${pybind11_DIR} NO_DEFAULT_PATH)
+  if(NOT pybind11_FOUND)
+    set(DEPENDENCIES_FOUND FALSE)
+  endif()
+endif()
 
 if(DEPENDENCIES_FOUND)
   # Remove the buildDependencies target from the ALL target to prevent unnecessary re-builds
