@@ -201,7 +201,6 @@ setup(
     ext_modules=[CMakeExtension("viennaps")],
     cmdclass={"build_ext": CMakeBuild},
     requires=[
-        'numpy',
         'viennals',
     ],
     zip_safe=False,
