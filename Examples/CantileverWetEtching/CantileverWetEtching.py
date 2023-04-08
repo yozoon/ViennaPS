@@ -35,8 +35,8 @@ def main() -> None:
     vls.lsMakeGeometry(plane, vls.lsPlane(origin, plane_normal)).apply()
 
     geometry = vps.psDomain()
-    geometry.insertNextLevelSet(mask, False)
-    geometry.insertNextLevelSet(plane, False)
+    geometry.insertNextLevelSet(mask)
+    geometry.insertNextLevelSet(plane)
     geometry.printSurface("InitialGeometry.vtp")
 
     model = vps.WetEtching()

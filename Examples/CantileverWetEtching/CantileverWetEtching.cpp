@@ -36,9 +36,7 @@ int main(int argc, char **argv) {
   NumericType origin[D] = {0., 0., 0.};   // surface origin
   NumericType normal[D] = {0., 0., 1.};   // surface normal
   double *bounds = gds_mask->getBounds(); // extent of GDS mask
-  for (unsigned i = 0; i < 6; ++i)
-    std::cout << bounds[i] << ", ";
-  std::cout << std::endl;
+
   auto plane = psSmartPointer<lsDomain<NumericType, D>>::New(
       bounds, boundaryCons, gridDelta);
   lsMakeGeometry<NumericType, D>(

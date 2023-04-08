@@ -5,7 +5,7 @@
 #include <psToDiskMesh.hpp>
 #include <psVTKWriter.hpp>
 
-int main(int argc, char **argv) {
+int main() {
   using NumericType = double;
   constexpr int D = 3;
 
