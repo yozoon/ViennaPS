@@ -250,6 +250,7 @@ PYBIND11_MODULE(VIENNAPS_MODULE_NAME, module) {
 
       // methods
       .def("insertNextLevelSet", &psDomain<T, D>::insertNextLevelSet,
+           pybind11::arg("levelset"), pybind11::arg("wrapLowerLevelSet") = true,
            "Insert a level set to domain.")
       .def("getLevelSets",
            [](psDomain<T, D> &d)
@@ -263,6 +264,7 @@ PYBIND11_MODULE(VIENNAPS_MODULE_NAME, module) {
            "Generate the cell set.")
       .def("getCellSet", &psDomain<T, D>::getCellSet, "Get the cell set.")
       .def("printSurface", &psDomain<T, D>::printSurface,
+           pybind11::arg("filename"), pybind11::arg("addMaterialIds") = false,
            "Print the surface of the domain.");
 
   // csDenseCellSet
@@ -427,7 +429,7 @@ PYBIND11_MODULE(VIENNAPS_MODULE_NAME, module) {
       .def("setNumberOfRaysPerPoint", &psProcess<T, D>::setNumberOfRaysPerPoint,
            "Set the number of rays to traced for each particle in the process. "
            "The number is per point in the process geometry")
-      .def("setMaxCoverageInitIerations",
+      .def("setMaxCoverageInitIterations",
            &psProcess<T, D>::setMaxCoverageInitIterations,
            "Set the number of iterations to initialize the coverages.")
       .def("setPrintIntermediate", &psProcess<T, D>::setPrintIntermediate,

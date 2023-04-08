@@ -38,7 +38,7 @@ def main() -> None:
     geometry = vps.psDomain()
     geometry.insertNextLevelSet(mask, False)
     geometry.insertNextLevelSet(plane, False)
-    geometry.printSurface("InitialGeometry.vtp", False)
+    geometry.printSurface("InitialGeometry.vtp")
 
     model = vps.WetEtching()
 
@@ -56,11 +56,11 @@ def main() -> None:
     n = 0
     while t < process_time:
         process.apply()
-        geometry.printSurface(f"WetEtchingSurface_{n}.vtp", False)
+        geometry.printSurface(f"WetEtchingSurface_{n}.vtp")
         t += timestep
         n += 1
 
-    geometry.printSurface("FinalGeometry.vtp", False)
+    geometry.printSurface("FinalGeometry.vtp")
 
 
 if __name__ == "__main__":

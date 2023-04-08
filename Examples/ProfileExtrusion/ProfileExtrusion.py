@@ -16,7 +16,7 @@ def main() -> None:
 
     vps.psExtrudeProfile(geometry, grid_delta,
                          profile, extrusion_length).apply()
-    geometry.printSurface("output.vtp", False)
+    geometry.printSurface("output.vtp")
 
 
 if __name__ == "__main__":

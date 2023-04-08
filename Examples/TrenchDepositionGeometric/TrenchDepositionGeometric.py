@@ -29,11 +29,11 @@ def main() -> None:
     process.setDomain(geometry)
     process.setProcessModel(model.getProcessModel())
 
-    geometry.printSurface("initial.vtp", False)
+    geometry.printSurface("initial.vtp")
 
     process.apply()
 
-    geometry.printSurface("final.vtp", False)
+    geometry.printSurface("final.vtp")
 
 
 if __name__ == "__main__":
