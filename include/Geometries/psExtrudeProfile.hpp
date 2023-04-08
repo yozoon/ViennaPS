@@ -30,7 +30,7 @@ std::array<NumericType, 2 * D> getBoundsFromGrid(const hrleGrid<D> &grid) {
   return bounds;
 }
 
-template <typename NumericType, int D> class psMakeExtrudedProfile {
+template <typename NumericType, int D> class psExtrudeProfile {
   using LSPtrType = psSmartPointer<lsDomain<NumericType, D>>;
   using PSPtrType = psSmartPointer<psDomain<NumericType, D>>;
 
@@ -46,11 +46,11 @@ public:
   static constexpr int extrusionDir = D - 2;
   static constexpr int verticalDir = D - 1;
 
-  psMakeExtrudedProfile(
-      PSPtrType passedDomain, const NumericType passedGridDelta,
-      const std::vector<std::array<NumericType, 2>> &passedProfile,
-      const NumericType passedExtrusionLength, bool passedFullExtent = false,
-      bool passedPeriodicBoundary = false)
+  psExtrudeProfile(PSPtrType passedDomain, const NumericType passedGridDelta,
+                   const std::vector<std::array<NumericType, 2>> &passedProfile,
+                   const NumericType passedExtrusionLength,
+                   bool passedFullExtent = false,
+                   bool passedPeriodicBoundary = false)
       : domain(passedDomain), gridDelta(passedGridDelta),
         profile(passedProfile), extrusionLength(passedExtrusionLength),
         fullExtent(passedFullExtent), periodicBoundary(passedPeriodicBoundary) {
@@ -142,8 +142,8 @@ public:
       // Insert all points of the profile into the mesh
       for (auto pt : profile) {
         std::array<NumericType, 3> point;
-        point[0] = pt[0];
-        point[1] = pt[1];
+        point[horizontalDir] = pt[horizontalDir];
+        point[verticalDir] = pt[verticalDir];
         mesh->insertNextNode(point);
       }
 
@@ -152,8 +152,8 @@ public:
         mesh->lines.emplace_back(std::array<unsigned, 2>{i, i + 1});
 
       // Close the hull mesh
-      mesh->lines.emplace_back(
-          std::array<unsigned, 2>{mesh->nodes.size() - 1, 0U});
+      mesh->lines.emplace_back(std::array<unsigned, 2>{
+          static_cast<unsigned>(mesh->nodes.size()) - 1U, 0U});
     } else {
       NumericType front = extrusionLength / 2;
       NumericType back = -extrusionLength / 2;

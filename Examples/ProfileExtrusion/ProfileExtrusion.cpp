@@ -1,7 +1,7 @@
 #include <iostream>
 
 #include <psDomain.hpp>
-#include <psMakeExtrudedProfile.hpp>
+#include <psExtrudeProfile.hpp>
 #include <psSmartPointer.hpp>
 
 int main() {
@@ -19,8 +19,8 @@ int main() {
   profile.emplace_back(std::array{-1., -1.});
   profile.emplace_back(std::array{-1., 1.});
 
-  psMakeExtrudedProfile<NumericType, D>(geometry, gridDelta, profile,
-                                        extrusionLength, true)
+  psExtrudeProfile<NumericType, D>(geometry, gridDelta, profile,
+                                   extrusionLength, true)
       .apply();
 
   std::cout << geometry->getLevelSets()->size() << std::endl;

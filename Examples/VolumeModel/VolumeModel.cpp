@@ -4,36 +4,35 @@
 #include <psToSurfaceMesh.hpp>
 #include <psVTKWriter.hpp>
 
-#include "Parameters.hpp"
-
-int main(int argc, char *argv[]) {
+int main() {
   using NumericType = float;
   constexpr int D = 3;
 
-  // Parse the parameters
-  Parameters<NumericType> params;
-  if (argc > 1) {
-    auto config = psUtils::readConfigFile(argv[1]);
-    if (config.empty()) {
-      std::cerr << "Empty config provided" << std::endl;
-      return -1;
-    }
-    params.fromMap(config);
-  }
+  // Domain
+  NumericType gridDelta = 0.25;
+  NumericType xExtent = 15.;
+  NumericType yExtent = 7.;
+
+  // Geometry
+  NumericType finWidth = 5.;
+  NumericType finHeight = 15.;
+
+  // Process
+  NumericType meanFreePath = 0.75;
+  NumericType ionEnergy = 100.;
 
   auto geometry = psSmartPointer<psDomain<NumericType, D>>::New();
-  psMakeFin<NumericType, D>(geometry, params.gridDelta, params.xExtent,
-                            params.yExtent, params.finWidth, params.finHeight,
-                            0. /* base height*/, false /*periodic boundary*/,
-                            false /*create mask*/)
+  psMakeFin<NumericType, D>(geometry, gridDelta, xExtent, yExtent, finWidth,
+                            finHeight, 0. /* base height*/,
+                            false /*periodic boundary*/, false /*create mask*/)
       .apply();
 
   // generate cell set with depth 5 below the lowest point of the surface
   geometry->generateCellSet(5. /*depth*/, false /*cell set below surface*/);
 
   PlasmaDamage<NumericType, D> model(
-      params.ionEnergy /* mean ion energy (eV) */,
-      params.meanFreePath /* damage ion mean free path */,
+      ionEnergy /* mean ion energy (eV) */,
+      meanFreePath /* damage ion mean free path */,
       -1 /*mask material ID (no mask)*/);
 
   psProcess<NumericType, D> process;

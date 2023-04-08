@@ -15,6 +15,7 @@
 #define VIENNAPS_MODULE_VERSION STRINGIZE(VIENNAPS_VERSION)
 
 #include <optional>
+#include <vector>
 
 #include <pybind11/iostream.h>
 #include <pybind11/numpy.h>
@@ -28,9 +29,10 @@
 #include <psProcess.hpp>
 #include <psProcessModel.hpp>
 #include <psSurfaceModel.hpp>
-#include <vector>
 
 // geometries
+#include <psExtrudeProfile.hpp>
+#include <psMakeFin.hpp>
 #include <psMakeHole.hpp>
 #include <psMakePlane.hpp>
 #include <psMakeTrench.hpp>
@@ -43,6 +45,9 @@
 #include <SF6O2Etching.hpp>
 #include <SimpleDeposition.hpp>
 #include <WetEtching.hpp>
+
+// CellSet
+#include <csDenseCellSet.hpp>
 
 // other
 #include <lsDomain.hpp>
@@ -254,8 +259,20 @@ PYBIND11_MODULE(VIENNAPS_MODULE_NAME, module) {
                return *levelsets;
              return std::nullopt;
            })
+      .def("generateCellSet", &psDomain<T, D>::generateCellSet,
+           "Generate the cell set.")
+      .def("getCellSet", &psDomain<T, D>::getCellSet, "Get the cell set.")
       .def("printSurface", &psDomain<T, D>::printSurface,
            "Print the surface of the domain.");
+
+  // csDenseCellSet
+  pybind11::class_<csDenseCellSet<T, D>, psSmartPointer<csDenseCellSet<T, D>>>(
+      module, "csDenseCellSet")
+      // constructors
+      .def(pybind11::init(&psSmartPointer<csDenseCellSet<T, D>>::New<>))
+      // methods
+      .def("writeVTU", &csDenseCellSet<T, D>::writeVTU,
+           "Write the content of the cell set to a VTU file.");
 
   // psMakeTrench
   pybind11::class_<psMakeTrench<T, D>, psSmartPointer<psMakeTrench<T, D>>>(
@@ -294,6 +311,40 @@ PYBIND11_MODULE(VIENNAPS_MODULE_NAME, module) {
            pybind11::arg("periodicBoundary") = false,
            pybind11::arg("makeMask") = false)
       .def("apply", &psMakeHole<T, D>::apply, "Make hole.");
+
+  // psMakeFin
+  pybind11::class_<psMakeFin<T, D>, psSmartPointer<psMakeFin<T, D>>>(
+      module, "psMakeFin")
+      .def(pybind11::init(
+               &psSmartPointer<psMakeFin<T, D>>::New<
+                   psSmartPointer<psDomain<T, D>> &, const T /*GridDelta*/,
+                   const T /*XExtent*/, const T /*YExtent*/,
+                   const T /*FinWidth*/, const T /*FinHeight*/,
+                   const T /*BaseHeight*/, const bool /*PeriodicBoundary*/,
+                   const bool /*MakeMask*/>),
+           pybind11::arg("psDomain"), pybind11::arg("gridDelta"),
+           pybind11::arg("xExtent"), pybind11::arg("yExtent"),
+           pybind11::arg("finWidth"), pybind11::arg("finHeight"),
+           pybind11::arg("baseHeight") = 0.,
+           pybind11::arg("periodicBoundary") = false,
+           pybind11::arg("makeMask") = false)
+      .def("apply", &psMakeFin<T, D>::apply, "Make fin.");
+
+  // psExtrudeProfile
+  pybind11::class_<psExtrudeProfile<T, D>,
+                   psSmartPointer<psExtrudeProfile<T, D>>>(module,
+                                                           "psExtrudeProfile")
+      .def(pybind11::init(
+               &psSmartPointer<psExtrudeProfile<T, D>>::New<
+                   psSmartPointer<psDomain<T, D>> &, const T /*GridDelta*/,
+                   const std::vector<std::array<T, 2>> &,
+                   const T /*extrusion length*/, const bool /*full extent*/,
+                   const bool /*PeriodicBoundary*/>),
+           pybind11::arg("psDomain"), pybind11::arg("gridDelta"),
+           pybind11::arg("profile"), pybind11::arg("extrusionLength"),
+           pybind11::arg("fullExtent") = false,
+           pybind11::arg("periodicBoundary") = false)
+      .def("apply", &psExtrudeProfile<T, D>::apply, "Extrude profile.");
 
   // psMakePlane
   pybind11::class_<psMakePlane<T, D>, psSmartPointer<psMakePlane<T, D>>>(
