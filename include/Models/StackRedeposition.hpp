@@ -39,8 +39,8 @@ public:
 };
 
 template <class T, int D>
-class RedepositionDynamics : public psAdvectionCalback<T, D> {
-  using psAdvectionCalback<T, D>::domain;
+class RedepositionDynamics : public psAdvectionCallback<T, D> {
+  using psAdvectionCallback<T, D>::domain;
 
   psSmartPointer<csDenseCellSet<T, D>> cellSet = nullptr;
   int plasmaMaterial = 0;

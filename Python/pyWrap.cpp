@@ -103,12 +103,13 @@ public:
 };
 
 // psAdvectionCallback
-class PYpsAdvectionCalback : psAdvectionCalback<T, D> {
+class PYAdvectionCallback : public psAdvectionCallback<T, D> {
 protected:
-  using ClassName = psAdvectionCalback<T, D>;
-  using ClassName::domain;
+  using ClassName = psAdvectionCallback<T, D>;
 
 public:
+  using ClassName::domain;
+
   bool applyPreAdvect(const T processTime) override {
     PYBIND11_OVERRIDE(bool, ClassName, applyPreAdvect, processTime);
   }
@@ -132,7 +133,7 @@ public:
   using ParticleTypeList = std::vector<std::unique_ptr<rayAbstractParticle<T>>>;
   psSmartPointer<ParticleTypeList> particles = nullptr;
   psSmartPointer<psSurfaceModel<T>> surfaceModel = nullptr;
-  psSmartPointer<psAdvectionCalback<T, D>> advectionCallback = nullptr;
+  psSmartPointer<psAdvectionCallback<T, D>> advectionCallback = nullptr;
   psSmartPointer<psGeometricModel<T, D>> geometricModel = nullptr;
   psSmartPointer<psVelocityField<T>> velocityField = nullptr;
   std::string processName = "default";
@@ -152,9 +153,9 @@ public:
   //                getParticleTypes,
   //        );
   //    }
-  psSmartPointer<psAdvectionCalback<T, D>> getAdvectionCallback() override {
+  psSmartPointer<psAdvectionCallback<T, D>> getAdvectionCallback() override {
     using SmartPointerAdvectionCalBack_TD =
-        psSmartPointer<psAdvectionCalback<T, D>>;
+        psSmartPointer<psAdvectionCallback<T, D>>;
     PYBIND11_OVERLOAD(SmartPointerAdvectionCalBack_TD, ClassName,
                       getAdvectionCallback, );
   }
@@ -420,7 +421,7 @@ PYBIND11_MODULE(VIENNAPS_MODULE_NAME, module) {
            })
       .def("setAdvectionCallback",
            [](psProcessModel<T, D> &pm,
-              psSmartPointer<psAdvectionCalback<T, D>> &ac) {
+              psSmartPointer<psAdvectionCallback<T, D>> &ac) {
              pm.setAdvectionCallback(ac);
            })
       .def("setGeometricModel",
@@ -458,6 +459,17 @@ PYBIND11_MODULE(VIENNAPS_MODULE_NAME, module) {
            "Set the process model.")
       .def("apply", &psProcess<T, D>::apply, "Run the process.")
       .def("setIntegrationScheme", &psProcess<T, D>::setIntegrationScheme);
+
+  // psAdvectionCallback
+  pybind11::class_<psAdvectionCallback<T, D>,
+                   psSmartPointer<psAdvectionCallback<T, D>>,
+                   PYAdvectionCallback>(module, "psAdvectionCallback")
+      // constructors
+      .def(pybind11::init<>())
+      // functions
+      .def("applyPreAdvect", &psAdvectionCallback<T, D>::applyPreAdvect)
+      .def("applyPostAdvect", &psAdvectionCallback<T, D>::applyPostAdvect)
+      .def_readwrite("domain", &PYAdvectionCallback::domain);
 
   // models
   pybind11::class_<SimpleDeposition<T, D>,
