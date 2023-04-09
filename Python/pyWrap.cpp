@@ -22,6 +22,7 @@
 #include <pybind11/stl.h>
 
 // all header files which define API functions
+#include <psAdvectionCallback.hpp>
 #include <psDomain.hpp>
 #include <psGDSGeometry.hpp>
 #include <psGDSReader.hpp>
@@ -98,6 +99,22 @@ public:
 
   void updateCoverages(psSmartPointer<psPointData<T>> Rates) override {
     PYBIND11_OVERLOAD(void, psSurfaceModel<T>, updateCoverages, Rates);
+  }
+};
+
+// psAdvectionCallback
+class PYpsAdvectionCalback : psAdvectionCalback<T, D> {
+protected:
+  using ClassName = psAdvectionCalback<T, D>;
+  using ClassName::domain;
+
+public:
+  bool applyPreAdvect(const T processTime) override {
+    PYBIND11_OVERRIDE(bool, ClassName, applyPreAdvect, processTime);
+  }
+
+  bool applyPostAdvect(const T advectionTime) override {
+    PYBIND11_OVERRIDE(bool, ClassName, applyPostAdvect, advectionTime);
   }
 };
 
@@ -391,11 +408,11 @@ PYBIND11_MODULE(VIENNAPS_MODULE_NAME, module) {
       .def("getVelocityField", &psProcessModel<T, D>::getVelocityField)
 
       // I don't know what particle type could be
-      //.def("insertNextParticleType",
-      //[](psProcessModel<T, D> &pm,
-      //         std::unique_ptr<ParticleType> passedParticle) {
-      // pm.insertNextParticleType(passedParticle);
-      // })
+      //  .def("insertNextParticleType",
+      //       [](psProcessModel<T, D> &pm,
+      //          std::unique_ptr<ParticleType> &passedParticle) {
+      //         pm.insertNextParticleType(passedParticle);
+      //       })
 
       .def("setSurfaceModel",
            [](psProcessModel<T, D> &pm, psSmartPointer<psSurfaceModel<T>> &sm) {
