@@ -602,7 +602,7 @@ PYBIND11_MODULE(VIENNAPS_MODULE_NAME, module) {
                  radius, gridDelta, mask);
            }),
            pybind11::arg("radius"), pybind11::arg("gridDelta"),
-           pybind11::arg("maskId") = nullptr)
+           pybind11::arg("mask") = nullptr)
       .def("getProcessModel", &SphereDistribution<T, D>::getProcessModel,
            "Return the process process model.");
 

@@ -189,9 +189,9 @@ class CMakeBuild(build_ext):
         # Generate stubs for autocompletion and type hints (*.pyi files)
         try:
             import mypy
-            subprocess.run(["stubgen", "-o", ".", "-p", "viennaps2d"],
+            subprocess.run([sys.executable, "-m", "mypy.stubgen", "-o", ".", "-p", "viennaps2d"],
                            cwd=f"{extdir}", check=True)
-            subprocess.run(["stubgen", "-o", ".", "-p", "viennaps3d"],
+            subprocess.run([sys.executable, "-m", "mypy.stubgen", "-o", ".", "-p", "viennaps3d"],
                            cwd=f"{extdir}", check=True)
         except ImportError:
             pass
