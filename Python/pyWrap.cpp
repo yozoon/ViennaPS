@@ -598,11 +598,9 @@ PYBIND11_MODULE(VIENNAPS_MODULE_NAME, module) {
       module, "SphereDistribution")
       .def(pybind11::init([](const T radius, const T gridDelta,
                              psSmartPointer<lsDomain<T, D>> mask = nullptr) {
-             return psSmartPointer<SphereDistribution<T, D>>::New(
-                 radius, gridDelta, mask);
-           }),
-           pybind11::arg("radius"), pybind11::arg("gridDelta"),
-           pybind11::arg("mask") = nullptr)
+        return psSmartPointer<SphereDistribution<T, D>>::New(radius, gridDelta,
+                                                             mask);
+      }))
       .def("getProcessModel", &SphereDistribution<T, D>::getProcessModel,
            "Return the process process model.");
 
@@ -615,9 +613,7 @@ PYBIND11_MODULE(VIENNAPS_MODULE_NAME, module) {
                             psSmartPointer<lsDomain<T, D>> mask = nullptr) {
             return psSmartPointer<BoxDistribution<T, D>>::New(halfAxes,
                                                               gridDelta, mask);
-          }),
-          pybind11::arg("halfAxes"), pybind11::arg("gridDelta"),
-          pybind11::arg("maskId") = nullptr)
+          }))
       .def("getProcessModel", &BoxDistribution<T, D>::getProcessModel,
            "Return the process process model.");
 
