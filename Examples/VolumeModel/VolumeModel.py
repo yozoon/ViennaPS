@@ -11,10 +11,8 @@ def main() -> None:
     ion_energy = 100.0
 
     geometry = vps.psDomain()
-    vps.psMakeFin(geometry, grid_delta, x_extent,
-                  y_extent, fin_width, fin_heght,
-                  0., False,
-                  False).apply()
+    vps.psMakeFin(geometry, grid_delta, x_extent, y_extent, fin_width,
+                  fin_heght, 0., False, False).apply()
 
     # generate cell set with depth 5 below the lowest point of the surface
     geometry.generateCellSet(5, False)

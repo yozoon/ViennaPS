@@ -11,8 +11,7 @@ def main() -> None:
     radius = 0.15
 
     geometry = vps.psDomain()
-    vps.psMakeTrench(geometry, gridDelta, xExtent,
-                     yExtent, trenchWidth,
+    vps.psMakeTrench(geometry, gridDelta, xExtent, yExtent, trenchWidth,
                      trenchHeight).apply()
 
     depo_layer = vls.lsDomain(geometry.getLevelSets()[-1])

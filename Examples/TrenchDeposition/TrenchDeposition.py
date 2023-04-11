@@ -16,13 +16,11 @@ def main() -> None:
     sourceExponent = 1.0
 
     geometry = vps.psDomain()
-    vps.psMakeTrench(geometry, gridDelta,
-                     xExtent, yExtent,
-                     trenchWidth, trenchHeight,
-                     taperAngle).apply()
+    vps.psMakeTrench(geometry, gridDelta, xExtent, yExtent, trenchWidth,
+                     trenchHeight, taperAngle).apply()
 
-    model = vps.SimpleDeposition(
-        stickingProbability=stickingProbability, sourceExponent=sourceExponent)
+    model = vps.SimpleDeposition(stickingProbability=stickingProbability,
+                                 sourceExponent=sourceExponent)
 
     process = vps.psProcess()
     process.setDomain(geometry)

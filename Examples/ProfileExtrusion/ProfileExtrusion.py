@@ -14,8 +14,8 @@ def main() -> None:
         [-1.0, 1.0],
     ]
 
-    vps.psExtrudeProfile(geometry, grid_delta,
-                         profile, extrusion_length).apply()
+    vps.psExtrudeProfile(geometry, grid_delta, profile,
+                         extrusion_length).apply()
     geometry.printSurface("output.vtp")
 
 

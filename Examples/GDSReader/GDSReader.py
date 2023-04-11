@@ -5,9 +5,11 @@ import viennaps3d as vps
 def main() -> None:
     grid_delta = 0.01
     mask_file_name = "mask.gds"
-    boundary_conditions = [vls.lsBoundaryConditionEnum.REFLECTIVE_BOUNDARY,
-                           vls.lsBoundaryConditionEnum.REFLECTIVE_BOUNDARY,
-                           vls.lsBoundaryConditionEnum.INFINITE_BOUNDARY]
+    boundary_conditions = [
+        vls.lsBoundaryConditionEnum.REFLECTIVE_BOUNDARY,
+        vls.lsBoundaryConditionEnum.REFLECTIVE_BOUNDARY,
+        vls.lsBoundaryConditionEnum.INFINITE_BOUNDARY
+    ]
 
     mask = vps.psGDSGeometry(grid_delta)
     mask.setBoundaryConditions(boundary_conditions)

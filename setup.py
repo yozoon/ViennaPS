@@ -59,12 +59,14 @@ PLAT_TO_CMAKE = {
 # The name must be the _single_ output extension from the CMake build.
 # If you need multiple extensions, see scikit-build.
 class CMakeExtension(Extension):
+
     def __init__(self, name: str) -> None:
         super().__init__(name, sources=[])
         self.sourcedir = os.fspath(Path("").resolve())
 
 
 class CMakeBuild(build_ext):
+
     def build_extension(self, ext: CMakeExtension) -> None:
         # Must be in this form due to bug in .resolve() only fixed in Python 3.10+
         ext_fullpath = Path.cwd() / self.get_ext_fullpath(ext.name)
@@ -73,8 +75,8 @@ class CMakeBuild(build_ext):
         # Using this requires trailing slash for auto-detection & inclusion of
         # auxiliary "native" libs
 
-        debug = int(os.environ.get("DEBUG", 0)
-                    ) if self.debug is None else self.debug
+        debug = int(os.environ.get("DEBUG",
+                                   0)) if self.debug is None else self.debug
         cfg = "Debug" if debug else "Release"
 
         # CMake lets you override the generator - we need to check this.
@@ -95,7 +97,8 @@ class CMakeBuild(build_ext):
         # (needed e.g. to build for ARM OSx on conda-forge)
         if "CMAKE_ARGS" in os.environ:
             cmake_args += [
-                item for item in os.environ["CMAKE_ARGS"].split(" ") if item]
+                item for item in os.environ["CMAKE_ARGS"].split(" ") if item
+            ]
 
         # cmake_args += ["-DVIENNAPS_VERBOSE=OFF"]
 
@@ -123,8 +126,8 @@ class CMakeBuild(build_ext):
 
         else:
             # Single config generators are handled "normally"
-            single_config = any(
-                x in cmake_generator for x in {"NMake", "Ninja"})
+            single_config = any(x in cmake_generator
+                                for x in {"NMake", "Ninja"})
 
             # CMake allows an arch-in-generator style for backward compatibility
             contains_arch = any(x in cmake_generator for x in {"ARM", "Win64"})
@@ -147,7 +150,8 @@ class CMakeBuild(build_ext):
             archs = re.findall(r"-arch (\S+)", os.environ.get("ARCHFLAGS", ""))
             if archs:
                 cmake_args += [
-                    "-DCMAKE_OSX_ARCHITECTURES={}".format(";".join(archs))]
+                    "-DCMAKE_OSX_ARCHITECTURES={}".format(";".join(archs))
+                ]
         # Set CMAKE_BUILD_PARALLEL_LEVEL to control the parallel build level
         # across all generators.
         if "CMAKE_BUILD_PARALLEL_LEVEL" not in os.environ:
@@ -172,27 +176,39 @@ class CMakeBuild(build_ext):
         #     cmake_args += ["-DVIENNAPS_BUILD_VIENNALS_PYTHON=ON"]
 
         # Configure the project
-        subprocess.run(
-            ["cmake", ext.sourcedir, *cmake_args], cwd=build_temp, check=True
-        )
+        subprocess.run(["cmake", ext.sourcedir, *cmake_args],
+                       cwd=build_temp,
+                       check=True)
 
         # Build dependencies if neccesary
-        subprocess.run(
-            ["cmake", "--build", ".", *build_args], cwd=build_temp, check=True
-        )
+        subprocess.run(["cmake", "--build", ".", *build_args],
+                       cwd=build_temp,
+                       check=True)
 
         # Build python bindings
-        subprocess.run(
-            ["cmake", "--build", ".", *build_args], cwd=build_temp, check=True
-        )
+        subprocess.run(["cmake", "--build", ".", *build_args],
+                       cwd=build_temp,
+                       check=True)
 
         # Generate stubs for autocompletion and type hints (*.pyi files)
         try:
             import mypy
-            subprocess.run([sys.executable, "-m", "mypy.stubgen", "-o", ".", "-p", "viennaps2d"],
-                           cwd=f"{extdir}", check=True)
-            subprocess.run([sys.executable, "-m", "mypy.stubgen", "-o", ".", "-p", "viennaps3d"],
-                           cwd=f"{extdir}", check=True)
+            subprocess.run(
+                [
+                    sys.executable, "-m", "mypy.stubgen", "-o", ".", "-p",
+                    "viennaps2d"
+                ],
+                cwd=f"{extdir}",
+                check=True,
+            )
+            subprocess.run(
+                [
+                    sys.executable, "-m", "mypy.stubgen", "-o", ".", "-p",
+                    "viennaps3d"
+                ],
+                cwd=f"{extdir}",
+                check=True,
+            )
         except ImportError:
             pass
 
@@ -206,8 +222,13 @@ setup(
     author_email="viennaps@iue.tuwien.ac.at",
     license="MIT",
     url="https://github.com/ViennaTools/ViennaPS",
-    description="A fully-fledged semiconductor fabrication process simulation library.",
-    long_description="ViennaPS is a process simulation library, which includes surface and volume representations, a ray tracer, and physical models for the simulation of microelectronic fabrication processes. The main design goals are simplicity and efficiency, tailored towards scientific simulations.",
+    description=
+    "A fully-fledged semiconductor fabrication process simulation library.",
+    long_description=
+    "ViennaPS is a process simulation library, which includes surface and volume "
+    "representations, a ray tracer, and physical models for the simulation of "
+    "microelectronic fabrication processes. The main design goals are simplicity and "
+    "efficiency, tailored towards scientific simulations.",
     ext_modules=[CMakeExtension("viennaps")],
     cmdclass={"build_ext": CMakeBuild},
     requires=[

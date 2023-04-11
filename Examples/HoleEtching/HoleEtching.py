@@ -16,18 +16,11 @@ def main() -> None:
     process_time = 150
 
     geometry = vps.psDomain()
-    vps.psMakeHole(
-        geometry, grid_delta, x_extent,
-        y_extent, hole_radius,
-        mask_height,
-        taper_angle, 0.0,
-        False, True).apply()
+    vps.psMakeHole(geometry, grid_delta, x_extent, y_extent, hole_radius,
+                   mask_height, taper_angle, 0.0, False, True).apply()
 
-    model = vps.SF6O2Etching(total_ion_flux,
-                             total_etchant_flux,
-                             total_oxygen_flux,
-                             ion_energy,
-                             oxy_sputter_yield,
+    model = vps.SF6O2Etching(total_ion_flux, total_etchant_flux,
+                             total_oxygen_flux, ion_energy, oxy_sputter_yield,
                              0)
 
     process = vps.psProcess()
