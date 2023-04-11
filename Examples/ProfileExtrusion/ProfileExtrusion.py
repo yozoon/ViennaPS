@@ -8,10 +8,10 @@ def main() -> None:
 
     geometry = vps.psDomain()
     profile = [
-        [1, 1],
-        [1, -1],
-        [-1, -1],
-        [-1, 1],
+        [1.0, 1.0],
+        [1.0, -1.0],
+        [-1.0, -1.0],
+        [-1.0, 1.0],
     ]
 
     vps.psExtrudeProfile(geometry, grid_delta,

@@ -6,14 +6,14 @@ import viennaps2d as vps
 
 def main() -> None:
     gridDelta = 0.02
-    xExtent = 1.
-    yExtent = 1.
+    xExtent = 1.0
+    yExtent = 1.0
     trenchWidth = 0.4
     trenchHeight = 0.8
-    taperAngle = 0.
-    processTime = 5.
+    taperAngle = 0.0
+    processTime = 5.0
     stickingProbability = 0.1
-    sourcePower = 1.
+    sourceExponent = 1.0
 
     geometry = vps.psDomain()
     vps.psMakeTrench(geometry, gridDelta,
@@ -22,7 +22,7 @@ def main() -> None:
                      taperAngle).apply()
 
     model = vps.SimpleDeposition(
-        stickingProbability=stickingProbability, sourcePower=sourcePower)
+        stickingProbability=stickingProbability, sourceExponent=sourceExponent)
 
     process = vps.psProcess()
     process.setDomain(geometry)
