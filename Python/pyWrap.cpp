@@ -11,7 +11,6 @@
 // correct module name macro
 #define TOKENPASTE_INTERNAL(x, y, z) x##y##z
 #define TOKENPASTE(x, y, z) TOKENPASTE_INTERNAL(x, y, z)
-#define VIENNAPS_MODULE_NAME TOKENPASTE(viennaps, VIENNAPS_PYTHON_DIMENSION, d)
 #define STRINGIZE2(s) #s
 #define STRINGIZE(s) STRINGIZE2(s)
 #define VIENNAPS_MODULE_VERSION STRINGIZE(VIENNAPS_VERSION)
