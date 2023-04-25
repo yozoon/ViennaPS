@@ -23,7 +23,7 @@ else()
 
   if(ViennaRay_FOUND
      AND VIENNAPS_STATIC_BUILD
-     AND NOT ${VIENNARAY_STATIC_BUILD})
+     AND NOT VIENNARAY_STATIC_BUILD)
     set(ViennaRay_FOUND FALSE)
     message(
       STATUS "An installation of ViennaRay was found, but it was built without static dependencies."
@@ -53,7 +53,7 @@ else()
                  -DVIENNARAY_BUILD_EXAMPLES=OFF
                  -DVIENNARAY_BUILD_TESTS=OFF
                  -DVIENNARAY_STATIC_BUILD=${VIENNAPS_STATIC_BUILD}
-                 -DDEPENDENCIES_DIR=${DEPENDENCIES_DIR}
+                 -DVIENNARAY_DEPENDENCIES_DIR=${DEPENDENCIES_DIR}
       # Run build twice, such that the dependencies can be built if necessary
       BUILD_COMMAND ${CMAKE_COMMAND} --build . && ${CMAKE_COMMAND} --build .
       USES_TERMINAL_DOWNLOAD 1
