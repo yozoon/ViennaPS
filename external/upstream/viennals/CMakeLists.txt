@@ -1,11 +1,8 @@
-# Check if the variable is a cache variable
-get_property(
-  is_cached
-  CACHE ViennaLS_DIR
-  PROPERTY TYPE)
-# If it is not from cache and defined at this point, the variable was passed as a -D command line
-# argument
-if("${is_cached}" STREQUAL "" AND DEFINED ViennaLS_DIR)
+# ##################################################################################################
+# Check ViennaLS Dependency
+# ##################################################################################################
+# If the path to an installation was provided by the user
+if(DEFINED ViennaLS_DIR AND NOT DEFINED CACHE{ViennaLS_DIR})
   # Required for windows to convert backslashes to forward slashes
   file(TO_CMAKE_PATH "${ViennaLS_DIR}" ViennaLS_DIR)
   set(ViennaLS_DIR

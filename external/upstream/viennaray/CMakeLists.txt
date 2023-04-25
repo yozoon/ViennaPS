@@ -1,11 +1,8 @@
-# Check if the variable is a cache variable
-get_property(
-  is_cached
-  CACHE ViennaRay_DIR
-  PROPERTY TYPE)
-# If it is not from cache and defined at this point, the variable was passed as a -D command line
-# argument
-if("${is_cached}" STREQUAL "" AND DEFINED ViennaRay_DIR)
+# ##################################################################################################
+# Check ViennaRay Dependency
+# ##################################################################################################
+# If the path to an installation was provided by the user
+if(DEFINED ViennaRay_DIR AND NOT DEFINED CACHE{ViennaRay_DIR})
   # Required for windows to convert backslashes to forward slashes
   file(TO_CMAKE_PATH "${ViennaRay_DIR}" ViennaRay_DIR)
   set(ViennaRay_DIR
