@@ -51,9 +51,9 @@ option(VIENNAPS_BUILD_PYTHON "Build for python3.x." OFF)
 # AUTOMATIC DEPENDENCY PREPARATION
 # ##################################################################################################
 
-# With the stampfile mechanism, cmake automatically retriggers the configure step after
-# the buildDependencies targed has been executed. Thus all dependencies that were built
-# with buildDependencies should then be made available by the find_package calls.
+# With the stampfile mechanism, cmake automatically retriggers the configure step after the
+# buildDependencies targed has been executed. Thus all dependencies that were built with
+# buildDependencies should then be made available by the find_package calls.
 set(STAMPFILE ${CMAKE_BINARY_DIR}/target.stamp)
 # When the buildDependencies target is executed, the stamp file is touched
 add_custom_target(buildDependencies COMMAND ${CMAKE_COMMAND} -E touch ${STAMPFILE})
