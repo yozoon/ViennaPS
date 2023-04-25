@@ -47,6 +47,9 @@ option(VIENNAPS_VERBOSE "Get verbose output and intermediate results." ON)
 # Build Python bindings
 option(VIENNAPS_BUILD_PYTHON "Build for python3.x." OFF)
 
+# Statically link dependencies
+option(VIENNAPS_STATIC_BUILD "Build dependencies as static libraries." OFF)
+
 # ##################################################################################################
 # AUTOMATIC DEPENDENCY PREPARATION
 # ##################################################################################################

@@ -29,6 +29,13 @@ else()
     message(
       STATUS "An installation of ViennaLS was found, but it was built without support for VTK.")
   endif()
+  if(ViennaLS_FOUND
+     AND VIENNAPS_STATIC_BUILD
+     AND NOT ${VIENNALS_STATIC_BUILD})
+    set(ViennaLS_FOUND FALSE)
+    message(
+      STATUS "An installation of ViennaLS was found, but it was built without static dependencies.")
+  endif()
   if(ViennaLS_FOUND)
     message(STATUS "Found ViennaLS at ${ViennaLS_DIR}.")
     add_library(viennals_external INTERFACE) # dummy target
@@ -51,6 +58,7 @@ else()
                  -DVIENNALS_BUILD_EXAMPLES=OFF
                  -DVIENNALS_BUILD_TESTS=OFF
                  -DVIENNALS_USE_VTK=ON
+                 -DVIENNALS_STATIC_BUILD=${VIENNAPS_STATIC_BUILD}
                  -DDEPENDENCIES_DIR=${DEPENDENCIES_DIR}
       # Run build twice, such that the dependencies can be built if necessary
       BUILD_COMMAND ${CMAKE_COMMAND} --build . && ${CMAKE_COMMAND} --build .

@@ -21,6 +21,15 @@ else()
     find_package(ViennaRay QUIET)
   endif()
 
+  if(ViennaRay_FOUND
+     AND VIENNAPS_STATIC_BUILD
+     AND NOT ${VIENNARAY_STATIC_BUILD})
+    set(ViennaRay_FOUND FALSE)
+    message(
+      STATUS "An installation of ViennaRay was found, but it was built without static dependencies."
+    )
+  endif()
+
   if(ViennaRay_FOUND)
     message(STATUS "Found ViennaRay at ${ViennaRay_DIR}.")
     add_library(viennaray_external INTERFACE) # dummy target
@@ -43,6 +52,7 @@ else()
                  -DCMAKE_CXX_STANDARD_REQUIRED=${CMAKE_CXX_STANDARD_REQUIRED}
                  -DVIENNARAY_BUILD_EXAMPLES=OFF
                  -DVIENNARAY_BUILD_TESTS=OFF
+                 -DVIENNARAY_STATIC_BUILD=${VIENNAPS_STATIC_BUILD}
                  -DDEPENDENCIES_DIR=${DEPENDENCIES_DIR}
       # Run build twice, such that the dependencies can be built if necessary
       BUILD_COMMAND ${CMAKE_COMMAND} --build . && ${CMAKE_COMMAND} --build .
