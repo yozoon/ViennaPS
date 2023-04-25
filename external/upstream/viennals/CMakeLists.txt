@@ -51,6 +51,7 @@ else()
                  -DVIENNALS_BUILD_EXAMPLES=OFF
                  -DVIENNALS_BUILD_TESTS=OFF
                  -DVIENNALS_USE_VTK=ON
+                 -DDEPENDENCIES_DIR=${DEPENDENCIES_DIR}
       # Run build twice, such that the dependencies can be built if necessary
       BUILD_COMMAND ${CMAKE_COMMAND} --build . && ${CMAKE_COMMAND} --build .
       USES_TERMINAL_DOWNLOAD 1

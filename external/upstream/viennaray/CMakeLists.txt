@@ -43,6 +43,7 @@ else()
                  -DCMAKE_CXX_STANDARD_REQUIRED=${CMAKE_CXX_STANDARD_REQUIRED}
                  -DVIENNARAY_BUILD_EXAMPLES=OFF
                  -DVIENNARAY_BUILD_TESTS=OFF
+                 -DDEPENDENCIES_DIR=${DEPENDENCIES_DIR}
       # Run build twice, such that the dependencies can be built if necessary
       BUILD_COMMAND ${CMAKE_COMMAND} --build . && ${CMAKE_COMMAND} --build .
       USES_TERMINAL_DOWNLOAD 1
