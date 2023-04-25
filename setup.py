@@ -90,6 +90,7 @@ class CMakeBuild(build_ext):
             f"-DCMAKE_LIBRARY_OUTPUT_DIRECTORY={extdir}{os.sep}",
             f"-DPYTHON_EXECUTABLE={sys.executable}",
             f"-DCMAKE_BUILD_TYPE={cfg}",  # not used on MSVC, but no harm
+            "-DVIENNAPS_BUILD_PYTHON=ON",
         ]
 
         build_args = []
@@ -99,8 +100,6 @@ class CMakeBuild(build_ext):
             cmake_args += [
                 item for item in os.environ["CMAKE_ARGS"].split(" ") if item
             ]
-
-        # cmake_args += ["-DVIENNAPS_VERBOSE=OFF"]
 
         # Install the dependencies alongside the platform libraries
         # dependencies_dir = os.path.join(sysconfig.get_path('platlib'), f"{ext.name}-dependencies")
@@ -164,16 +163,6 @@ class CMakeBuild(build_ext):
         build_temp = Path(self.build_temp) / ext.name
         if not build_temp.exists():
             build_temp.mkdir(parents=True)
-
-        cmake_args += ["-DVIENNAPS_BUILD_PYTHON=ON"]
-
-        # In the future we could check for viennals python module availability and build
-        # it too, if required.
-        # try:
-        #     import viennals2d
-        #     import viennals3d
-        # except ImportError:
-        #     cmake_args += ["-DVIENNAPS_BUILD_VIENNALS_PYTHON=ON"]
 
         # Configure the project
         subprocess.run(["cmake", ext.sourcedir, *cmake_args],
