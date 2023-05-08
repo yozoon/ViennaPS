@@ -19,7 +19,7 @@ int main() {
   profile.emplace_back(std::array{-1., -1.});
   profile.emplace_back(std::array{-1., 1.});
 
-  psExtrudeProfile<NumericType, D>(geometry, gridDelta, profile,
+  psExtrudeProfile<NumericType, D>(geometry, gridDelta, 2.2, 2.2, profile,
                                    extrusionLength, true)
       .apply();
 

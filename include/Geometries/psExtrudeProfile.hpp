@@ -41,20 +41,24 @@ public:
   NumericType extrusionLength;
   bool fullExtent;
   bool periodicBoundary;
+  NumericType xExtent = 20;
+  NumericType yExtent = 14;
 
   static constexpr int horizontalDir = 0;
   static constexpr int extrusionDir = D - 2;
   static constexpr int verticalDir = D - 1;
 
   psExtrudeProfile(PSPtrType passedDomain, const NumericType passedGridDelta,
+                   const NumericType passedXExtent,
+                   const NumericType passedYExtent,
                    const std::vector<std::array<NumericType, 2>> &passedProfile,
                    const NumericType passedExtrusionLength,
                    bool passedFullExtent = false,
                    bool passedPeriodicBoundary = false)
       : domain(passedDomain), gridDelta(passedGridDelta),
-        profile(passedProfile), extrusionLength(passedExtrusionLength),
-        fullExtent(passedFullExtent), periodicBoundary(passedPeriodicBoundary) {
-  }
+        xExtent(passedXExtent), yExtent(passedYExtent), profile(passedProfile),
+        extrusionLength(passedExtrusionLength), fullExtent(passedFullExtent),
+        periodicBoundary(passedPeriodicBoundary) {}
 
   void apply() {
     if (!domain) {
@@ -78,61 +82,42 @@ public:
       return;
     }
 
-    LSPtrType substrate = nullptr;
-    NumericType xExtent, yExtent;
-    if (domain->getLevelSets()->size() == 0) {
-      xExtent = std::max_element(profile.begin(), profile.end(),
-                                 [](auto &a, auto &b) { return a[0] < b[0]; })
-                    ->at(0) +
-                2 * gridDelta;
+    domain->clear();
 
-      yExtent = std::max_element(profile.begin(), profile.end(),
-                                 [](auto &a, auto &b) { return a[1] < b[1]; })
-                    ->at(1) +
-                2 * gridDelta;
+    double bounds[2 * D];
+    bounds[0] = -xExtent / 2;
+    bounds[1] = xExtent / 2;
 
-      double bounds[2 * D];
-      bounds[0] = -xExtent;
-      bounds[1] = xExtent;
-
-      if constexpr (D == 3) {
-        if (fullExtent) {
-          bounds[2] = -yExtent / 2.;
-          bounds[3] = yExtent / 2.;
-        } else {
-          bounds[2] = -extrusionLength / 2 - 2 * gridDelta;
-          bounds[3] = extrusionLength / 2 + 2 * gridDelta;
-        }
-        bounds[4] = -gridDelta;
-        bounds[5] = gridDelta;
+    if constexpr (D == 3) {
+      if (fullExtent) {
+        bounds[2] = -yExtent / 2.;
+        bounds[3] = yExtent / 2.;
       } else {
-        bounds[2] = -gridDelta;
-        bounds[3] = gridDelta;
+        bounds[2] = -extrusionLength / 2 - 2 * gridDelta;
+        bounds[3] = extrusionLength / 2 + 2 * gridDelta;
       }
-
-      typename lsDomain<NumericType, D>::BoundaryType boundaryCons[D];
-
-      for (int i = 0; i < D - 1; i++) {
-        if (periodicBoundary) {
-          boundaryCons[i] =
-              lsDomain<NumericType, D>::BoundaryType::PERIODIC_BOUNDARY;
-        } else {
-          boundaryCons[i] =
-              lsDomain<NumericType, D>::BoundaryType::REFLECTIVE_BOUNDARY;
-        }
-      }
-      boundaryCons[D - 1] =
-          lsDomain<NumericType, D>::BoundaryType::INFINITE_BOUNDARY;
-
-      substrate = LSPtrType::New(bounds, boundaryCons, gridDelta);
+      bounds[4] = -gridDelta;
+      bounds[5] = gridDelta;
     } else {
-      auto &grid = domain->getLevelSets()->front()->getGrid();
-      auto bounds = getBoundsFromGrid<NumericType, D>(grid);
-      substrate = LSPtrType::New(domain->getLevelSets()->front()->getGrid());
-      xExtent = bounds[2 * horizontalDir + 1] - bounds[2 * horizontalDir];
-      if constexpr (D == 3)
-        yExtent = bounds[2 * verticalDir + 1] - bounds[2 * verticalDir];
+      bounds[2] = -gridDelta;
+      bounds[3] = gridDelta;
     }
+
+    typename lsDomain<NumericType, D>::BoundaryType boundaryCons[D];
+
+    for (int i = 0; i < D - 1; i++) {
+      if (periodicBoundary) {
+        boundaryCons[i] =
+            lsDomain<NumericType, D>::BoundaryType::PERIODIC_BOUNDARY;
+      } else {
+        boundaryCons[i] =
+            lsDomain<NumericType, D>::BoundaryType::REFLECTIVE_BOUNDARY;
+      }
+    }
+    boundaryCons[D - 1] =
+        lsDomain<NumericType, D>::BoundaryType::INFINITE_BOUNDARY;
+
+    auto substrate = LSPtrType::New(bounds, boundaryCons, gridDelta);
 
     domain->insertNextLevelSet(substrate);
 

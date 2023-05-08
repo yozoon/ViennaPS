@@ -531,10 +531,12 @@ PYBIND11_MODULE(VIENNAPS_MODULE_NAME, module) {
       .def(pybind11::init(
                &psSmartPointer<psExtrudeProfile<T, D>>::New<
                    psSmartPointer<psDomain<T, D>> &, const T /*GridDelta*/,
+                   const T /*xExtent*/, const T /*yExtent*/,
                    const std::vector<std::array<T, 2>> &,
                    const T /*extrusion length*/, const bool /*full extent*/,
                    const bool /*PeriodicBoundary*/>),
            pybind11::arg("psDomain"), pybind11::arg("gridDelta"),
+           pybind11::arg("xExtent"), pybind11::arg("yExtent"),
            pybind11::arg("profile"), pybind11::arg("extrusionLength"),
            pybind11::arg("fullExtent") = false,
            pybind11::arg("periodicBoundary") = false)
