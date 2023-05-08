@@ -20,12 +20,12 @@ int main() {
       geometry->getLevelSets()->back());
   geometry->insertNextLevelSet(depoLayer);
 
-  SimpleDeposition<NumericType, D> model(0.1 /*particle sticking probability*/,
-                                         1.0 /*particel source power*/);
+  auto model = psSmartPointer<SimpleDeposition<NumericType, D>>::New(
+      0.1 /*particle sticking probability*/, 1.0 /*particel source power*/);
 
   psProcess<NumericType, D> process;
   process.setDomain(geometry);
-  process.setProcessModel(model.getProcessModel());
+  process.setProcessModel(model);
   process.setNumberOfRaysPerPoint(1000);
   process.setProcessDuration(5.0);
 

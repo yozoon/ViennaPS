@@ -118,15 +118,8 @@ endif()
 # ##################################################################################################
 # SETUP MAIN LIBRARY TARGET
 # ##################################################################################################
+# install config files locations are provided by GNUInstallDirs
 add_library(${PROJECT_NAME} INTERFACE)
-
-if(VIENNAPS_VERBOSE)
-  add_compile_definitions(VIENNAPS_VERBOSE)
-endif()
-
-# ##################################################################################################
-# DIRECTORY CONFIGURATIONS
-# ##################################################################################################
 
 # set the correct paths for installation
 set(LOCAL_CONFIG_DIR "lib/cmake/${PROJECT_NAME}")

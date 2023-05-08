@@ -1,6 +1,7 @@
 #include <Geometries/psMakeHole.hpp>
 #include <SF6O2Etching.hpp>
 #include <psProcess.hpp>
+#include <psSmartPointer.hpp>
 #include <psToSurfaceMesh.hpp>
 #include <psUtils.hpp>
 
@@ -38,14 +39,14 @@ int main() {
       0 /* base height */, false /* periodic boundary */, true /*create mask*/)
       .apply();
 
-  SF6O2Etching<NumericType, D> model(
+  auto model = psSmartPointer<SF6O2Etching<NumericType, D>>::New(
       totalIonFlux /*ion flux*/, totalEtchantFlux /*etchant flux*/,
       totalOxygenFlux /*oxygen flux*/, ionEnergy /*min ion energy (eV)*/,
       A_O /*oxy sputter yield*/, 0 /*mask material ID*/);
 
   psProcess<NumericType, D> process;
   process.setDomain(geometry);
-  process.setProcessModel(model.getProcessModel());
+  process.setProcessModel(model);
   process.setMaxCoverageInitIterations(10);
   process.setNumberOfRaysPerPoint(1000);
   process.setProcessDuration(processTime);
