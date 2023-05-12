@@ -17,11 +17,11 @@ def main() -> None:
     depo_layer = vls.lsDomain(geometry.getLevelSets()[-1])
     geometry.insertNextLevelSet(depo_layer, False)
 
-    model = vps.SphereDistribution(radius=radius, gridDelta=gridDelta)
+    model = vps.SphereDistribution(radius, gridDelta)
 
     process = vps.psProcess()
     process.setDomain(geometry)
-    process.setProcessModel(model.getProcessModel())
+    process.setProcessModel(model)
 
     geometry.printSurface("initial.vtp")
 

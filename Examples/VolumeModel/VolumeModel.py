@@ -21,7 +21,7 @@ def main() -> None:
 
     process = vps.psProcess()
     process.setDomain(geometry)
-    process.setProcessModel(model.getProcessModel())
+    process.setProcessModel(model)
     process.setProcessDuration(0.)  # apply volume model only
 
     process.apply()

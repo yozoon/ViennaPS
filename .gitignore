@@ -18,4 +18,5 @@ _generate/
 *.so
 *.py[cod]
 *.egg-info
+*.egg/
 *env*

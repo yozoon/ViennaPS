@@ -47,9 +47,9 @@ def main() -> None:
 
     process = vps.psProcess()
     process.setDomain(geometry)
-    process.setProcessModel(model.getProcessModel())
+    process.setProcessModel(model)
     process.setProcessDuration(timestep * 60)
-    process.setPrintIntermediate(False)
+    process.setPrintTimeInterval(-1)
     process.setIntegrationScheme(
         vls.lsIntegrationSchemeEnum.STENCIL_LOCAL_LAX_FRIEDRICHS_1ST_ORDER)
 

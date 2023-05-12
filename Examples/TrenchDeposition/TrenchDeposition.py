@@ -24,7 +24,7 @@ def main() -> None:
 
     process = vps.psProcess()
     process.setDomain(geometry)
-    process.setProcessModel(model.getProcessModel())
+    process.setProcessModel(model)
     process.setNumberOfRaysPerPoint(1000)
     process.setProcessDuration(processTime)
 
