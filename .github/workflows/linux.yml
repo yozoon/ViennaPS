@@ -165,3 +165,5 @@ jobs:
       - name: Build and install Python module
         shell: bash
         run: pip3 install --user . -v
+        env:
+          CMAKE_ARGS: "-DViennaLS_DIR=${{github.workspace}}/viennals/install/lib/cmake/ViennaLS/ -DViennaRay_DIR=${{github.workspace}}/viennaray/install/lib/cmake/ViennaRay/"
