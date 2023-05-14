@@ -185,9 +185,7 @@ class CMakeBuild(build_ext):
 
             subprocess.run(
                 [
-                    sys.executable,
-                    "-m",
-                    "mypy.stubgen",
+                    "stubgen",
                     "-o",
                     ".",
                     "-p",
@@ -202,9 +200,7 @@ class CMakeBuild(build_ext):
 
             subprocess.run(
                 [
-                    sys.executable,
-                    "-m",
-                    "mypy.stubgen",
+                    "stubgen",
                     "-o",
                     ".",
                     "-p",
