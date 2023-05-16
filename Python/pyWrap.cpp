@@ -123,49 +123,48 @@ public:
   }
 };
 
-// // Particle Class
-// template <int D> class PyParticle : public rayParticle<PyParticle<D>, T> {
-//   using ClassName = rayParticle<PyParticle<D>, T>;
+// Particle Class
+template <int D> class PyParticle : public rayParticle<PyParticle<D>, T> {
+  using ClassName = rayParticle<PyParticle<D>, T>;
 
-// public:
-//   void surfaceCollision(T rayWeight, const rayTriple<T> &rayDir,
-//                         const rayTriple<T> &geomNormal,
-//                         const unsigned int primID, const int materialID,
-//                         rayTracingData<T> &localData,
-//                         const rayTracingData<T> *globalData,
-//                         rayRNG &Rng) override final {
-//     PYBIND11_OVERRIDE(void, ClassName, surfaceCollision, rayWeight, rayDir,
-//                       geomNormal, primID, materialID, localData, globalData,
-//                       Rng);
-//   }
+public:
+  void surfaceCollision(T rayWeight, const rayTriple<T> &rayDir,
+                        const rayTriple<T> &geomNormal,
+                        const unsigned int primID, const int materialID,
+                        rayTracingData<T> &localData,
+                        const rayTracingData<T> *globalData,
+                        rayRNG &Rng) override final {
+    PYBIND11_OVERRIDE(void, ClassName, surfaceCollision, rayWeight, rayDir,
+                      geomNormal, primID, materialID, localData, globalData,
+                      Rng);
+  }
 
-//   std::pair<T, rayTriple<T>>
-//   surfaceReflection(T rayWeight, const rayTriple<T> &rayDir,
-//                     const rayTriple<T> &geomNormal, const unsigned int
-//                     primID, const int materialID, const rayTracingData<T>
-//                     *globalData, rayRNG &Rng) override final {
-//     using Pair = std::pair<T, rayTriple<T>>;
-//     PYBIND11_OVERRIDE(Pair, ClassName, surfaceReflection, rayWeight, rayDir,
-//                       geomNormal, primID, materialID, globalData, Rng);
-//   }
+  std::pair<T, rayTriple<T>>
+  surfaceReflection(T rayWeight, const rayTriple<T> &rayDir,
+                    const rayTriple<T> &geomNormal, const unsigned int primID,
+                    const int materialID, const rayTracingData<T> *globalData,
+                    rayRNG &Rng) override final {
+    using Pair = std::pair<T, rayTriple<T>>;
+    PYBIND11_OVERRIDE(Pair, ClassName, surfaceReflection, rayWeight, rayDir,
+                      geomNormal, primID, materialID, globalData, Rng);
+  }
 
-//   void initNew(rayRNG &RNG) override final {
-//     PYBIND11_OVERRIDE(void, ClassName, initNew, RNG);
-//   }
+  void initNew(rayRNG &RNG) override final {
+    PYBIND11_OVERRIDE(void, ClassName, initNew, RNG);
+  }
 
-//   int getRequiredLocalDataSize() const override final {
-//     PYBIND11_OVERRIDE(int, ClassName, getRequiredLocalDataSize);
-//   }
+  int getRequiredLocalDataSize() const override final {
+    PYBIND11_OVERRIDE(int, ClassName, getRequiredLocalDataSize);
+  }
 
-//   T getSourceDistributionPower() const override final {
-//     PYBIND11_OVERRIDE(T, ClassName, getSourceDistributionPower);
-//   }
+  T getSourceDistributionPower() const override final {
+    PYBIND11_OVERRIDE(T, ClassName, getSourceDistributionPower);
+  }
 
-//   std::vector<std::string> getLocalDataLabels() const override final {
-//     PYBIND11_OVERRIDE(std::vector<std::string>, ClassName,
-//     getLocalDataLabels);
-//   }
-// };
+  std::vector<std::string> getLocalDataLabels() const override final {
+    PYBIND11_OVERRIDE(std::vector<std::string>, ClassName, getLocalDataLabels);
+  }
+};
 
 // psProcessModel
 // could implement only the functions that were not of type smartPointer
@@ -333,24 +332,24 @@ PYBIND11_MODULE(VIENNAPS_MODULE_NAME, module) {
            pybind11::arg("filename"), pybind11::arg("addMaterialIds") = false,
            "Print the surface of the domain.");
 
-  //   // Shim to instantiate the particle class
-  //   pybind11::class_<PyParticle<D>, psSmartPointer<PyParticle<D>>>(module,
-  //                                                                  "PyParticle")
-  //       .def(pybind11::init<>())
-  //       .def("surfaceCollision",
-  //            [](PyParticle<D> &p, T rayWeight) {
-  //              rayTracingData<T> rtData;
-  //              rayTriple<T> triple;
-  //              rayRNG rng;
-  //              p.surfaceCollision(rayWeight, triple, triple, 0, 0, rtData,
-  //                                 nullptr, rng);
-  //            })
-  //       .def("surfaceReflection", [](PyParticle<D> &p, T rayWeight) {
-  //         rayTracingData<T> rtData;
-  //         rayRNG rng;
-  //         rayTriple<T> triple;
-  //         p.surfaceReflection(rayWeight, triple, triple, 0, 0, nullptr, rng);
-  //       });
+  // Shim to instantiate the particle class
+  pybind11::class_<PyParticle<D>, psSmartPointer<PyParticle<D>>>(module,
+                                                                 "PyParticle")
+      .def(pybind11::init<>())
+      .def("surfaceCollision",
+           [](PyParticle<D> &p, T rayWeight) {
+             rayTracingData<T> rtData;
+             rayTriple<T> triple;
+             rayRNG rng;
+             p.surfaceCollision(rayWeight, triple, triple, 0, 0, rtData,
+                                nullptr, rng);
+           })
+      .def("surfaceReflection", [](PyParticle<D> &p, T rayWeight) {
+        rayTracingData<T> rtData;
+        rayRNG rng;
+        rayTriple<T> triple;
+        p.surfaceReflection(rayWeight, triple, triple, 0, 0, nullptr, rng);
+      });
 
   // psProcessModel
   // modified here as it seemes the functions were not defined, and the virtual
@@ -379,6 +378,15 @@ PYBIND11_MODULE(VIENNAPS_MODULE_NAME, module) {
            [](psProcessModel<T, D> &pm,
               psSmartPointer<psAdvectionCallback<T, D>> &ac) {
              pm.setAdvectionCallback(ac);
+           })
+      .def("insertNextParticleType",
+           [](psProcessModel<T, D> &pm,
+              psSmartPointer<PyParticle<D>> &passedParticle) {
+             if (passedParticle) {
+               auto particle =
+                   std::make_unique<PyParticle<D>>(*passedParticle.get());
+               pm.insertNextParticleType(particle);
+             }
            })
       .def("setGeometricModel",
            [](psProcessModel<T, D> &pm,
