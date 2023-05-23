@@ -1,5 +1,5 @@
-#include <Geometries/psMakeHole.hpp>
 #include <SF6O2Etching.hpp>
+#include <psMakeHole.hpp>
 #include <psProcess.hpp>
 #include <psSmartPointer.hpp>
 #include <psToSurfaceMesh.hpp>
@@ -39,11 +39,13 @@ int main() {
       0 /* base height */, false /* periodic boundary */, true /*create mask*/)
       .apply();
 
+  // use pre-defined model SF6O2 etching model
   auto model = psSmartPointer<SF6O2Etching<NumericType, D>>::New(
       totalIonFlux /*ion flux*/, totalEtchantFlux /*etchant flux*/,
       totalOxygenFlux /*oxygen flux*/, ionEnergy /*min ion energy (eV)*/,
       A_O /*oxy sputter yield*/, 0 /*mask material ID*/);
 
+  // process setup
   psProcess<NumericType, D> process;
   process.setDomain(geometry);
   process.setProcessModel(model);
@@ -51,11 +53,15 @@ int main() {
   process.setNumberOfRaysPerPoint(1000);
   process.setProcessDuration(processTime);
 
+  // print initial surface
   geometry->printSurface("initial.vtp");
 
+  // run the process
   process.apply();
 
-  geometry->printSurface("final.vtp");
+  // write collected particle meta data (ion energy distribution) to a file
+  process.writeParticleDataLogs("ionEnergyDistribution.txt");
 
-  return EXIT_SUCCESS;
+  // print final surface
+  geometry->printSurface("final.vtp");
 }

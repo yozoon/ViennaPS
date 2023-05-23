@@ -16,9 +16,7 @@ int main() {
       .apply();
 
   // copy top layer to capture deposition
-  auto depoLayer = psSmartPointer<lsDomain<NumericType, D>>::New(
-      geometry->getLevelSets()->back());
-  geometry->insertNextLevelSet(depoLayer);
+  geometry->duplicateTopLevelSet();
 
   auto model = psSmartPointer<SimpleDeposition<NumericType, D>>::New(
       0.1 /*particle sticking probability*/, 1.0 /*particel source power*/);
@@ -37,6 +35,4 @@ int main() {
 
   if constexpr (D == 2)
     psWriteVisualizationMesh<NumericType, D>(geometry, "final").apply();
-
-  return EXIT_SUCCESS;
 }
