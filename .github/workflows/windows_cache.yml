@@ -67,10 +67,7 @@ jobs:
         id: viennals-dependency-cache
         with:
           key: ${{env.VIENNALS_CACHE_KEY}}
-          path: |
-            ${{github.workspace}}/viennals/dependencies/Source
-            ${{github.workspace}}/viennals/dependencies/Build
-            ${{github.workspace}}/viennals/dependencies/Install
+          path: ${{github.workspace}}/viennals/dependencies/Install
 
       - name: Configure ViennaLS
         if: ${{ env.VIENNALS_CACHE_REFRESH == 'true' }}
@@ -92,7 +89,7 @@ jobs:
       - name: Checkout ViennaRay
         uses: actions/checkout@v3
         with:
-          repository: ViennaTools/ViennaRay
+          repository: ${{github.repository_owner}}/ViennaRay
           path: ./viennaray
 
       - name: Store cache key in ENV

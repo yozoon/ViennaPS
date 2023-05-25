@@ -33,10 +33,7 @@ jobs:
         id: viennals-dependency-cache
         with:
           key: viennals-dependency-cache-${{ runner.os }}-${{env.BUILD_TYPE}}-${{ hashFiles( './viennals/external/upstream/**CMakeLists.txt' ) }}
-          path: |
-            ${{github.workspace}}/viennals/dependencies/Source
-            ${{github.workspace}}/viennals/dependencies/Build
-            ${{github.workspace}}/viennals/dependencies/Install
+          path: ${{github.workspace}}/viennals/dependencies/Install
 
       - name: Configure ViennaLS
         working-directory: ${{github.workspace}}/viennals
@@ -69,8 +66,7 @@ jobs:
         id: viennaray-dependency-cache
         with:
           key: viennaray-dependency-cache-${{ runner.os }}-${{env.BUILD_TYPE}}-${{ hashFiles( './viennaray/external/upstream/**CMakeLists.txt' ) }}
-          path: |
-            ${{github.workspace}}/viennaray/dependencies/Install
+          path: ${{github.workspace}}/viennaray/dependencies/Install
 
       - name: Configure ViennaRay
         working-directory: ${{github.workspace}}/viennaray
