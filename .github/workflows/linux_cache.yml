@@ -89,7 +89,7 @@ jobs:
       - name: Checkout ViennaRay
         uses: actions/checkout@v3
         with:
-          repository: ViennaTools/ViennaRay
+          repository: ${{github.repository_owner}}/ViennaRay
           path: ./viennaray
 
       - name: Store cache key in ENV
